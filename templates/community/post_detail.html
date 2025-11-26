@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}{{ post.title }} · Comunidad{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="flex items-start justify-between gap-3">
+    <div>
+      <p class="kicker">Comunidad</p>
+      <h1 class="h1-glow text-2xl md:text-3xl">{{ post.title }}</h1>
+      <p class="text-white/60 text-sm">
+        por <strong>{{ post.author.username }}</strong> · {{ post.created|naturaltime }}
+        {% if post.type == 'review' %}<span class="tag ml-2">Reseña</span>{% endif %}
+      </p>
+    </div>
+
+    {# === SIN PARÉNTESIS: anidamos condiciones === #}
+    {% if not post.is_removed and user.is_authenticated %}
+      {% if user.is_superuser or user == post.author %}
+        <div class="flex items-center gap-2">
+          <a href="{% url 'community:post_edit' post.slug %}" class="btn-ghost"><i class="fa-solid fa-pen mr-2"></i>Editar</a>
+          <a href="{% url 'community:post_delete' post.slug %}" class="btn-ghost" data-modal>
+            <i class="fa-solid fa-trash mr-2"></i>Eliminar
+          </a>
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
+
+<section class="grid lg:grid-cols-3 gap-5">
+  <article class="card lg:col-span-2">
+    <p class="text-white/80 whitespace-pre-line">{{ post.body }}</p>
+    {% if post.image %}
+    <div class="mt-4" style="aspect-ratio:16/9;overflow:hidden;border:1px solid var(--line);border-radius:.5rem">
+      <img src="{{ post.image.url }}" style="width:100%;height:100%;object-fit:cover" alt="">
+    </div>
+    {% endif %}
+  </article>
+
+  <aside class="card">
+    <h3 class="card-title"><i class="fa-regular fa-circle-user mr-2"></i>Autor</h3>
+    <p class="text-white/80"><strong>{{ post.author.username }}</strong></p>
+    <p class="text-white/60 text-sm">Publicado {{ post.created|naturaltime }}</p>
+  </aside>
+</section>
+
+<section class="section">
+  <h3 class="card-title"><i class="fa-solid fa-comments"></i> Comentarios</h3>
+
+  {% for c in comments %}
+    <div class="card mb-3">
+      <div class="flex items-center justify-between">
+        <strong>{{ c.author.username }}</strong>
+        <span class="text-white/60 text-sm">{{ c.created|naturaltime }}</span>
+      </div>
+      <p class="text-white/80 mt-2 whitespace-pre-line">{{ c.body }}</p>
+
+      {# === SIN PARÉNTESIS: anidamos condiciones === #}
+      {% if user.is_authenticated %}
+        {% if user.is_superuser or user == c.author %}
+          <div class="mt-2">
+            <a href="{% url 'community:comment_delete' c.id %}" class="btn-ghost" data-modal>
+              <i class="fa-solid fa-trash mr-2"></i>Eliminar
+            </a>
+          </div>
+        {% endif %}
+      {% endif %}
+    </div>
+  {% empty %}
+    <p class="text-white/60">Sé el primero en comentar.</p>
+  {% endfor %}
+
+  {% if user.is_authenticated %}
+  <form method="post" action="{% url 'community:comment_create' post.slug %}" class="card mt-4">
+    {% csrf_token %}
+    <label class="block mb-2">Nuevo comentario</label>
+    {{ form.body }}
+    <button class="lol-button mt-3">
+      <span class="lol-button-text"><i class="fa-solid fa-paper-plane mr-2"></i>Publicar</span>
+      <span class="lol-button-shine"></span>
+    </button>
+  </form>
+  {% else %}
+    <p class="text-white/60 mt-3">Para comentar, <a class="link-soft" href="{% url 'accounts:login' %}">inicia sesión</a>.</p>
+  {% endif %}
+</section>
+{% endblock %}

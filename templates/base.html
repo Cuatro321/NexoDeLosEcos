@@ -1,0 +1,187 @@
+{% load static %}
+<!doctype html>
+<html lang="es" class="h-full bg-[#0b0f14] text-zinc-200" data-domain="tiempo">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{% block title %}El Nexo de los Ecos{% endblock %}</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="{% url 'pwa-manifest' %}">
+    <meta name="theme-color" content="#0b0f14" />
+    <meta name="description" content="El Nexo de los Ecos - Un portador sin gloria. Cinco dominios imposibles. Artefactos olvidados que vuelven a hablar.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Nexo Ecos">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'icons/apple-touch-icon.png' %}">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'core/icons/nexo-mark.svg' %}">
+    <link rel="alternate icon" href="{% static 'core/icons/nexo-mark.svg' %}">
+    <link rel="mask-icon" href="{% static 'core/icons/nexo-mark.svg' %}" color="#0b0f14">
+
+    <!-- Tema dinámico por ruta -->
+    <script>
+      (function(){
+        var rules = [
+          { re: /^\/$/, theme: 'tiempo' },
+          { re: /^\/codex\/?$/, theme: 'niebla' },
+          { re: /^\/codex\//, theme: 'niebla' },
+          { re: /^\/accounts\/login/, theme: 'piedra' },
+          { re: /^\/accounts\/register/, theme: 'cenizas' },
+          { re: /^\/accounts\/profile/, theme: 'vientos' },
+          { re: /^\/admin\//, theme: 'piedra' },
+          { re: /^\/comunidad\/?/, theme: 'vientos' }
+        ];
+        var p = location.pathname, theme = 'tiempo';
+        for (var i=0;i<rules.length;i++){ if (rules[i].re.test(p)){ theme = rules[i].theme; break; } }
+        document.documentElement.setAttribute('data-domain', theme);
+        document.documentElement.classList.add('theme-loaded');
+      })();
+    </script>
+
+    <!-- Estilos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <link rel="preload" href="{% static 'css/theme.css' %}" as="style">
+
+    <!-- Ajustes puntuales -->
+    <style>
+      .logo-mark{height:64px;width:auto;display:block;background:transparent!important;filter:none!important;mix-blend-mode:normal!important}
+      @media (max-width:860px){ .logo-mark{height:48px} }
+      .nav-link.is-active{
+        background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.08));
+        border-color: color-mix(in oklab, var(--accent) 65%, transparent);
+        box-shadow:
+          inset 0 0 0 2px color-mix(in oklab, var(--accent) 40%, transparent),
+          0 10px 26px color-mix(in oklab, var(--brand) 20%, transparent);
+        transform: translateY(-1px);
+        color:#fff;
+      }
+      .nav-link .nav-pill::before,
+      .nav-link .nav-pill::after{ content:none!important; }
+    </style>
+
+    {% block head %}{% endblock %}
+  </head>
+
+  <body class="min-h-full antialiased font-sans">
+    <!-- Barra de progreso -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Fondo animado -->
+    <div class="nx-bg" aria-hidden="true">
+      <div class="nx-grad"></div>
+      <div class="nx-fog"></div>
+      <div class="nx-grid"></div>
+      <div class="nx-orbs"></div>
+      <div class="nx-particles" id="particles"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="nexo-header" id="siteHeader">
+      <div class="nexo-header-inner">
+        <a href="/" class="logo-link group" aria-label="Ir a inicio">
+          <img src="{% static 'core/icons/Neo1.png' %}" alt="NeoForge Games" class="logo-mark transition-transform group-hover:scale-110">
+          <span class="logo-text">El Nexo de los Ecos</span>
+        </a>
+
+        <nav class="nav">
+          <button class="nav-toggle" id="navToggle" aria-label="Menú">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <ul class="nav-list" id="navList">
+            <li><a href="/" class="nav-link"><span class="nav-pill">Inicio</span></a></li>
+            <li><a href="/codex/" class="nav-link"><span class="nav-pill">Códex</span></a></li>
+            <li><a href="/comunidad/" class="nav-link"><span class="nav-pill">Comunidad</span></a></li>
+            <li><a href="/noticias/" class="nav-link"><span class="nav-pill">Noticias</span></a></li>
+            {% if user.is_authenticated %}
+              <li><a href="/accounts/profile/" class="nav-link"><span class="nav-pill">Mi Perfil</span></a></li>
+
+              {% if user.is_staff %}
+                <li>
+                  <a href="{% url 'admin:index' %}" class="nav-link" rel="nofollow noopener">
+                    <span class="nav-pill">
+                      <i class="fa-solid fa-shield-halved mr-2"></i>
+                      {% if user.is_superuser %}Admin{% else %}Staff{% endif %}
+                    </span>
+                  </a>
+                </li>
+              {% endif %}
+                
+              <li><a href="/accounts/logout/" class="cta"><i class="fa-solid fa-right-from-bracket mr-2"></i>Salir</a></li>
+            {% else %}
+              <li><a href="/accounts/login/" class="nav-link"><span class="nav-pill">Entrar</span></a></li>
+            {% endif %}
+
+            <!-- Botón de instalar PWA en el menú (se muestra solo cuando el navegador permite instalar) -->
+            <li>
+              <button id="btn-install" class="nav-link install-btn hidden" type="button" aria-label="Instalar app">
+                <i class="fa-solid fa-download mr-2"></i><span class="nav-pill">Instalar</span>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Contenido -->
+    <main class="nexo-container">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="nexo-footer">
+      <div class="footer-content">
+        <p class="footer-text">
+          Hecho con <i class="fa-solid fa-heart text-red-400 mx-1"></i> usando Django · PWA · HTMX
+        </p>
+        <p class="footer-text" style="gap:.6rem">
+          <img src="{% static 'core/icons/NeoForceGames.png' %}" alt="NeoForge Games" style="height:22px;width:auto;vertical-align:middle">
+          <span>NeoForge Games</span>
+        </p>
+        <small class="footer-copyright">© {% now "Y" %} El Nexo de los Ecos</small>
+      </div>
+
+      {% comment %} <!-- Botón de instalación siempre visible en el footer -->
+      <div class="footer-install">
+        <button id="btn-install-footer" class="footer-install-btn" type="button">
+          <i class="fa-solid fa-download mr-2"></i>
+          <span>Instalar El Nexo de los Ecos</span>
+        </button>
+        <p class="footer-install-hint">
+          Instala la versión app 0del Nexo para entrar directo al portal desde tu dispositivo.
+        </p>
+      </div> {% endcomment %}
+    </footer>
+
+    <!-- Scroll Top -->
+    <button class="scroll-top" id="scrollTop" aria-label="Volver arriba">
+      <i class="fa-solid fa-chevron-up"></i>
+    </button>
+
+    <!-- ===== Modal global (para confirmaciones con motivo) ===== -->
+    <div id="nx-modal" class="nx-modal hidden" aria-hidden="true">
+      <div class="nx-modal__backdrop" data-modal-close></div>
+      <div class="nx-modal__panel" role="dialog" aria-modal="true" aria-labelledby="nx-modal-title">
+        <button class="nx-modal__close" type="button" data-modal-close><i class="fa-solid fa-xmark"></i></button>
+        <div id="nx-modal-body"></div>
+      </div>
+    </div>
+    <style>
+      .nx-modal.hidden{display:none}
+      .nx-modal{position:fixed;inset:0;z-index:60}
+      .nx-modal__backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(2px)}
+      .nx-modal__panel{position:relative;max-width:640px;margin:6vh auto;padding:0;border-radius:16px;overflow:hidden;
+        background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1)}
+      .nx-modal__close{position:absolute;top:.6rem;right:.6rem;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.4);
+        color:#fff;border-radius:10px;padding:.4rem .55rem}
+    </style>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="{% static 'js/app.js' %}" defer></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

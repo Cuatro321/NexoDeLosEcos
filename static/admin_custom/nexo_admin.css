@@ -1,0 +1,42 @@
+:root{
+  --bg:#0b0f14; --panel:#0f141b; --line:rgba(255,255,255,.08);
+  --muted:#a8b0bb; --brand:#60a5fa; --chip:#1a2430;
+}
+html,body{background:var(--bg);}
+body, input, select, textarea { font-family: Inter, system-ui, Segoe UI, Roboto, sans-serif; }
+
+/* Barra superior */
+#header{ background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+  border-bottom:1px solid var(--line); }
+.nx-brand{display:flex;align-items:center;gap:.8rem;text-decoration:none}
+.nx-logo{height:34px;width:auto;filter:drop-shadow(0 6px 14px rgba(96,165,250,.25))}
+.nx-title{font-weight:700;color:#fff}
+
+/* Contenido */
+#content{padding:24px 28px 40px;}
+.nx-wrap{max-width:1200px;margin:0 auto}
+
+/* Hero */
+.nx-hero{
+  display:grid;grid-template-columns:1.2fr .8fr;gap:24px;
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.02));
+  border:1px solid var(--line);border-radius:16px;padding:24px 22px;margin-bottom:22px;
+  box-shadow:0 18px 40px rgba(0,0,0,.25);
+}
+.nx-hero__title{font-size:28px;font-weight:800;margin:0 0 8px;color:#fff}
+.nx-hero__lead{color:var(--muted);margin:0 0 14px}
+.nx-btn{background:linear-gradient(180deg,#3080ff,#2b6edb);color:#fff;border:1px solid #3b82f6;
+  border-radius:10px;padding:.6rem .9rem;font-weight:700;text-decoration:none}
+
+/* Tarjetas de apps */
+.nx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.nx-card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.02));
+  border:1px solid var(--line);border-radius:14px;padding:16px}
+.nx-card__head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.nx-card__title{margin:0;color:#fff;font-weight:700}
+.nx-link{color:#9ec2ff;text-decoration:none}
+.nx-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.nx-list__item{background:rgba(0,0,0,.25);border:1px dashed var(--line);border-radius:10px;padding:10px 12px}
+.nx-list__main{display:flex;justify-content:space-between;gap:10px;align-items:center;color:#e9eef8}
+.nx-chip{display:inline-block;background:var(--chip);border:1px solid var(--line);color:#dfe8f6;
+  padding:.25rem .6rem;border-radius:999px;text-decoration:none;margin-left:6px;font-size:.9em}

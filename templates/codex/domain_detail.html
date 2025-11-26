@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load static %}
+{% load news_extras %}
+
+{% block title %}{{ item.name }} · Dominio{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="card">
+    <h1 class="h1-glow text-3xl">
+      {% if item.icon %}<i class="{{ item.icon }} mr-2"></i>{% endif %}{{ item.name }}
+    </h1>
+    <p class="text-white/70 mt-1">{{ item.short_description }}</p>
+
+    {% if item.banner_image %}
+      <div class="mt-3" style="aspect-ratio:21/9;overflow:hidden;border:1px solid var(--line);border-radius:.5rem">
+        <img src="{{ item.banner_image.url }}" alt="" style="width:100%;height:100%;object-fit:cover">
+      </div>
+    {% endif %}
+
+    {% if item.video_url %}
+      {% with embed=item.video_url|youtube_embed %}
+        {% if embed %}
+          <div class="mt-4 flex justify-center">
+            <div style="width:100%;max-width:960px;aspect-ratio:16/9;border:1px solid var(--line);border-radius:.6rem;overflow:hidden;">
+              <iframe
+                src="{{ embed }}"
+                style="width:100%;height:100%;display:block"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="origin-when-cross-origin"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+        {% elif item.video_url|is_http_video %}
+          <div class="mt-4 flex justify-center">
+            <video controls style="width:100%;max-width:960px;border:1px solid var(--line);border-radius:.6rem;display:block">
+              <source src="{{ item.video_url }}">
+              Tu navegador no soporta el tag video.
+            </video>
+          </div>
+        {% else %}
+          <p class="mt-4 text-white/70">
+            Este video tiene la incrustación deshabilitada por su autor (Error 153).
+            <a class="link-soft" href="{{ item.video_url }}" target="_blank" rel="noopener">Abrir en YouTube</a>.
+          </p>
+        {% endif %}
+      {% endwith %}
+    {% endif %}
+  </div>
+
+  <div class="mt-6 grid md:grid-cols-2 gap-5">
+    <div class="card">
+      <h3 class="card-title"><i class="fa-solid fa-book-open"></i> Historias</h3>
+      <ul class="list-disc ml-5">
+        {% for x in lore %}
+          <li><a class="link-soft" href="{{ x.get_absolute_url }}">{{ x.title }}</a></li>
+        {% empty %}
+          <li class="text-white/60">—</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title"><i class="fa-solid fa-gem"></i> Consumibles</h3>
+      <ul class="list-disc ml-5">
+        {% for a in artifacts %}
+          <li><a class="link-soft" href="{{ a.get_absolute_url }}">{{ a.name }}</a></li>
+        {% empty %}
+          <li class="text-white/60">—</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="mt-6 grid md:grid-cols-2 gap-5">
+    <div class="card">
+      <h3 class="card-title"><i class="fa-solid fa-user-ninja"></i> Personajes</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {% for c in characters %}
+          <a class="card text-center" href="{{ c.get_absolute_url }}">
+            {% if c.sprite_gif %}<img src="{{ c.sprite_gif.url }}" alt="">
+            {% elif c.sprite_still %}<img src="{{ c.sprite_still.url }}" alt="">
+            {% endif %}
+            <div class="mt-1">{{ c.name }}</div>
+          </a>
+        {% empty %}
+          <p class="text-white/60">—</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title"><i class="fa-solid fa-skull"></i> Enemigos</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {% for e in enemies %}
+          <a class="card text-center" href="{{ e.get_absolute_url }}">
+            {% if e.sprite_gif %}<img src="{{ e.sprite_gif.url }}" alt="">
+            {% elif e.sprite_still %}<img src="{{ e.sprite_still.url }}" alt="">
+            {% endif %}
+            <div class="mt-1">{{ e.name }}</div>
+          </a>
+        {% empty %}
+          <p class="text-white/60">—</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 grid md:grid-cols-2 gap-5">
+    <div class="card">
+      <h3 class="card-title"><i class="fa-solid fa-bomb"></i> Trampas</h3>
+      <div class="grid md:grid-cols-2 gap-3">
+        {% for t in traps %}
+          <div class="card">
+            <strong>{{ t.title }}</strong>
+            <p class="text-white/70 mt-1">{{ t.description }}</p>
+            {% if t.gif %}
+              <img class="mt-2" src="{{ t.gif.url }}" alt="">
+            {% elif t.image %}
+              <img class="mt-2" src="{{ t.image.url }}" alt="">
+            {% endif %}
+          </div>
+        {% empty %}
+          <p class="text-white/60">—</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title"><i class="fa-solid fa-lightbulb"></i> Guías</h3>
+      <ul class="list-disc ml-5">
+        {% for g in guides %}
+          <li><a class="link-soft" href="{{ g.get_absolute_url }}">{{ g.title }}</a></li>
+        {% empty %}
+          <li class="text-white/60">—</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}

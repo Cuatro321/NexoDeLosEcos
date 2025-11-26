@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Editar perfil{% endblock %}
+
+{% block head %}
+<style>
+  /* ===== Modo claro para el formulario ===== */
+  .form-light .card{background:#fafafa;color:#0b0f14}
+  /* Importante: NO tocamos el h1 global para que quede blanco */
+  .form-light .card-title,
+  .form-light .kicker,
+  .form-light h2,
+  .form-light h3{color:#0b0f14}
+
+  .form-light label{color:#0b0f14;font-weight:700;margin-bottom:.4rem;display:block}
+  .form-light .text-muted{color:#334155} /* gris oscuro legible */
+
+  .input-light{
+    background:#fff;color:#0b0f14;width:100%;
+    border:1px solid #d4d4d8;border-radius:12px;
+    padding:.75rem .9rem;line-height:1.25;
+    transition:border-color .2s, box-shadow .2s;
+  }
+  .input-light:focus{
+    outline:0;border-color:#7aa7ff;
+    box-shadow:0 0 0 3px rgba(122,167,255,.35);
+  }
+  .field-error{color:#b91c1c;font-size:.85rem;margin-top:.25rem}
+
+  /* ===== Uploader avatar ===== */
+  .avatar-grid{display:grid;grid-template-columns:112px 1fr;gap:1rem;align-items:center}
+  .avatar-frame{
+    width:112px;height:112px;border-radius:16px;overflow:hidden;
+    border:1px dashed #cbd5e1;background:#fff;display:grid;place-items:center;
+  }
+  .avatar-frame img{width:100%;height:100%;object-fit:cover}
+  .uploader-actions{display:flex;gap:.5rem;flex-wrap:wrap}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+  /* Botonera */
+  .form-actions{display:flex;gap:.6rem;flex-wrap:wrap}
+
+  /* Botón fantasma en modo claro (texto negro) */
+  .btn-ghost--light{
+    border:1px solid #cbd5e1;background:transparent;color:#0b0f14 !important;
+    padding:.7rem 1rem;border-radius:.6rem;display:inline-flex;align-items:center;gap:.45rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section form-light">
+  <!-- h1 sin override para que permanezca BLANCO -->
+  <h1 class="h1-glow text-2xl md:text-3xl">Editar perfil</h1>
+
+  <form method="post" enctype="multipart/form-data" class="grid md:grid-cols-2 gap-5 mt-4">
+    {% csrf_token %}
+
+    <!-- Columna izquierda -->
+    <div class="card">
+      <h2 class="card-title"><i class="fa-solid fa-user mr-2"></i> Perfil público</h2>
+
+      <!-- Avatar (control propio, sin textos del widget) -->
+      <div class="avatar-grid mt-2">
+        <div class="avatar-frame">
+          <img id="avatarPreview"
+               src="{% if form.instance.avatar %}{{ form.instance.avatar.url }}{% else %}{% static 'img/avatars/default.png' %}{% endif %}"
+               alt="Avatar">
+        </div>
+
+        <div>
+          <label>Avatar</label>
+          <p class="text-muted text-sm mb-2">JPG/PNG, recomendado 512×512px.</p>
+
+          <div class="uploader-actions">
+            <label for="id_avatar" class="lol-button" role="button">
+              <span class="lol-button-text"><i class="fa-solid fa-image mr-2"></i>Cambiar imagen</span>
+              <span class="lol-button-shine"></span>
+            </label>
+
+            {% if form.instance.avatar %}
+              <label class="btn-ghost--light" style="cursor:pointer">
+                <input type="checkbox" name="avatar-clear" id="id_avatar_clear" style="margin-right:.4rem">
+                Quitar avatar
+              </label>
+            {% endif %}
+          </div>
+
+          <!-- Input real -->
+          <input type="file" name="avatar" id="id_avatar" class="sr-only" accept="image/*" onchange="NX.previewAvatar(this)">
+          {% if form.errors.avatar %}<div class="field-error">{{ form.errors.avatar.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div class="hr-soft"></div>
+
+      <label for="id_display_name">Nombre para mostrar</label>
+      <input type="text" name="{{ form.display_name.name }}" id="id_display_name"
+             value="{{ form.display_name.value|default_if_none:'' }}" class="input-light" placeholder="Tu nombre público">
+      {% if form.errors.display_name %}<div class="field-error">{{ form.errors.display_name.0 }}</div>{% endif %}
+
+      <div class="hr-soft"></div>
+
+      <label for="id_bio">Bio</label>
+      <textarea name="{{ form.bio.name }}" id="id_bio" rows="5" class="input-light"
+                placeholder="Cuéntanos algo sobre ti…" data-max="500" oninput="NX.countBio(this)">{{ form.bio.value|default_if_none:'' }}</textarea>
+      <div class="text-right text-muted text-xs" id="bioCounter" aria-live="polite"></div>
+      {% if form.errors.bio %}<div class="field-error">{{ form.errors.bio.0 }}</div>{% endif %}
+    </div>
+
+    <!-- Columna derecha -->
+    <div class="card">
+      <h2 class="card-title"><i class="fa-solid fa-id-card mr-2"></i> Información básica</h2>
+
+      <label for="id_city">Ciudad</label>
+      <input type="text" name="{{ form.city.name }}" id="id_city"
+             value="{{ form.city.value|default_if_none:'' }}" class="input-light" placeholder="Tu ciudad">
+      {% if form.errors.city %}<div class="field-error">{{ form.errors.city.0 }}</div>{% endif %}
+
+      <div class="hr-soft"></div>
+
+      <label for="id_country">País</label>
+      <input type="text" name="{{ form.country.name }}" id="id_country"
+             value="{{ form.country.value|default_if_none:'' }}" class="input-light" placeholder="Tu país">
+      {% if form.errors.country %}<div class="field-error">{{ form.errors.country.0 }}</div>{% endif %}
+
+      <div class="hr-soft"></div>
+
+      <div class="form-actions">
+        <button class="lol-button" type="submit">
+          <span class="lol-button-text"><i class="fa-solid fa-check mr-2"></i>Guardar cambios</span>
+          <span class="lol-button-shine"></span>
+        </button>
+
+        <a href="/accounts/profile/" class="btn-ghost--light">
+          <i class="fa-solid fa-arrow-left"></i> Cancelar
+        </a>
+
+        <a href="/accounts/password_change/" class="btn-ghost--light" style="margin-left:auto">
+          <i class="fa-solid fa-key"></i> Cambiar contraseña
+        </a>
+      </div>
+    </div>
+  </form>
+
+  {% if form.non_field_errors %}
+    <div class="card mt-4" style="border-color:#b91c1c">
+      <p class="field-error">{{ form.non_field_errors.0 }}</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.NX = window.NX || {};
+
+  NX.previewAvatar = function(input){
+    if (!input.files || !input.files[0]) return;
+    const img = document.getElementById('avatarPreview');
+    img.src = URL.createObjectURL(input.files[0]);
+    img.onload = () => URL.revokeObjectURL(img.src);
+  };
+
+  NX.countBio = function(el){
+    const max = parseInt(el.dataset.max || '500', 10);
+    const counter = document.getElementById('bioCounter');
+    const len = (el.value || '').length;
+    counter.textContent = `${len}/${max} caracteres`;
+    counter.style.color = len > max ? '#b91c1c' : '#334155';
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const bio = document.getElementById('id_bio');
+    if (bio) NX.countBio(bio);
+  });
+</script>
+{% endblock %}

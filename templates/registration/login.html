@@ -1,0 +1,740 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Entrar · El Nexo de los Ecos{% endblock %}
+
+{% block head %}
+<style>
+  /* Estructura base con video de fondo */
+  .login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login-video-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -2;
+  }
+
+  .login-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.6) 50%,
+      rgba(0, 0, 0, 0.8) 100%
+    );
+    z-index: -1;
+  }
+
+  /* Partículas decorativas */
+  .login-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .login-particle {
+    position: absolute;
+    background: rgba(var(--accent-rgb), 0.3);
+    border-radius: 50%;
+    animation: floatLogin 8s infinite ease-in-out;
+  }
+
+  @keyframes floatLogin {
+    0%, 100% { 
+      transform: translateY(0px) rotate(0deg) scale(1);
+      opacity: 0.3;
+    }
+    50% { 
+      transform: translateY(-30px) rotate(180deg) scale(1.2);
+      opacity: 0.6;
+    }
+  }
+
+  /* Tarjeta principal con imagen de fondo DENTRO del formulario */
+  .login-card {
+    background: 
+      /* Capa de color semitransparente */
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.05) 100%
+      ),
+      /* Imagen de fondo DENTRO de la card */
+      url('{% static "img/fotologin.png" %}') center/cover;
+    
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
+    padding: 3rem;
+    box-shadow: 
+      0 25px 50px rgba(0, 0, 0, 0.5),
+      0 0 100px rgba(var(--accent-rgb), 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    animation: cardEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+    max-width: 420px;
+    width: 100%;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* Efecto de animación sutil en el fondo de la card */
+  .login-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      45deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.03) 50%,
+      transparent 100%
+    );
+    animation: bgShine 6s ease-in-out infinite;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  @keyframes bgShine {
+    0%, 100% {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+    50% {
+      opacity: 1;
+      transform: translateX(100%);
+    }
+  }
+
+  .login-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    transition: left 0.8s ease;
+    z-index: 1;
+  }
+
+  .login-card:hover::before {
+    left: 100%;
+  }
+
+  @keyframes cardEntrance {
+    0% {
+      opacity: 0;
+      transform: translateY(50px) scale(0.9);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Contenido de la card (sobre el fondo de imagen) */
+  .login-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Header mejorado */
+  .login-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    position: relative;
+  }
+
+  .login-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, var(--accent), var(--brand));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    animation: iconGlow 3s ease-in-out infinite alternate;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+  }
+
+  .login-icon::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    background: linear-gradient(135deg, var(--accent), var(--brand));
+    border-radius: 50%;
+    z-index: -1;
+    filter: blur(15px);
+    opacity: 0.5;
+  }
+
+  @keyframes iconGlow {
+    0% {
+      box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.4);
+    }
+    100% {
+      box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.8);
+    }
+  }
+
+  /* Formulario mejorado */
+  .form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+  }
+
+  .input-wrapper {
+    position: relative;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+  }
+
+  .input-wrapper:focus-within {
+    border-color: var(--accent);
+    box-shadow: 
+      0 0 0 3px rgba(var(--accent-rgb), 0.2),
+      0 8px 25px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .input-wrapper input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .input-wrapper input:focus {
+    outline: none;
+  }
+
+  .input-wrapper input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+    text-shadow: none;
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .input-wrapper:focus-within .input-icon {
+    color: var(--accent);
+    transform: translateY(-50%) scale(1.1);
+    text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .password-toggle:hover {
+    color: var(--accent);
+    transform: translateY(-50%) scale(1.1);
+    text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
+  }
+
+  /* Botón de submit mejorado */
+  .login-submit {
+    width: 100%;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, var(--accent), var(--brand));
+    border: none;
+    border-radius: 12px;
+    color: var(--coal);
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+  }
+
+  .login-submit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+    transition: left 0.6s ease;
+  }
+
+  .login-submit:hover::before {
+    left: 100%;
+  }
+
+  .login-submit:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+      0 15px 30px rgba(var(--accent-rgb), 0.4),
+      0 0 30px rgba(var(--accent-rgb), 0.2);
+  }
+
+  .login-submit:active {
+    transform: translateY(-1px);
+  }
+
+  /* Estados de error mejorados */
+  .form-error {
+    color: #ff6b6b;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: shake 0.5s ease-in-out;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .alert-error {
+    background: rgba(255, 107, 107, 0.2);
+    border: 1px solid rgba(255, 107, 107, 0.4);
+    color: #ff6b6b;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: slideDown 0.5s ease-out;
+    backdrop-filter: blur(15px);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+
+  @keyframes slideDown {
+    0% {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Checkbox mejorado */
+  .checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+  }
+
+  .custom-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+    position: relative;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+  }
+
+  .checkbox-input:checked + .custom-checkbox {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
+  }
+
+  .checkbox-input:checked + .custom-checkbox::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--coal);
+    font-weight: bold;
+    font-size: 0.875rem;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Enlaces sociales mejorados */
+  .social-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .social-btn {
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.95);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    font-weight: 500;
+    backdrop-filter: blur(15px);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .social-btn:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .social-btn.google:hover {
+    border-color: #DB4437;
+    color: #DB4437;
+    text-shadow: 0 0 10px rgba(219, 68, 55, 0.5);
+  }
+
+  .social-btn.discord:hover {
+    border-color: #5865F2;
+    color: #5865F2;
+    text-shadow: 0 0 10px rgba(88, 101, 242, 0.5);
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .login-card {
+      margin: 1rem;
+      padding: 2rem;
+      min-height: 450px;
+    }
+    
+    .social-buttons {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Efectos de texto */
+  .text-glow {
+    text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.5);
+  }
+
+  .fade-in-up {
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+  <!-- Video de fondo general -->
+  <video class="login-video-bg" muted loop playsinline
+         preload="none"
+         poster="{% static 'img/hero-poster.jpg' %}"
+         data-src-mp4="{% static 'videos/login.mp4' %}"
+         data-src-webm="{% static 'videos/login.webm' %}"
+         aria-label="Video de fondo del Nexo de los Ecos">
+    <img src="{% static 'img/hero-poster.jpg' %}" alt="Fondo del Nexo de los Ecos">
+  </video>
+
+  <div class="login-overlay"></div>
+  <div class="login-particles" id="loginParticles"></div>
+
+  <div class="max-w-md w-full mx-4">
+    <!-- Tarjeta principal con imagen de fondo DENTRO -->
+    <div class="login-card">
+      <div class="login-content">
+        <!-- Header -->
+        <div class="login-header fade-in-up" style="animation-delay: 0.1s">
+  <div class="login-icon">
+    <img src="{% static 'core/icons/NeoForceGames.png' %}" alt="NeoForce Games" class="login-custom-icon">
+  </div>
+          <h1 class="h1-glow text-3xl font-bold mb-2 text-glow">Entrar al Nexo</h1>
+          <p class="text-white/80 text-lg">
+            Accede a tu cuenta para continuar tu viaje
+          </p>
+        </div>
+
+        <!-- Formulario -->
+        <form method="post" class="space-y-6" novalidate>
+          {% csrf_token %}
+          
+          <!-- Errores generales -->
+          {% if form.non_field_errors %}
+          <div class="alert-error" role="alert">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            {{ form.non_field_errors.0 }}
+          </div>
+          {% endif %}
+
+          <!-- Campo Usuario/Email -->
+          <div class="form-group fade-in-up" style="animation-delay: 0.2s">
+            <label for="id_username" class="form-label">
+              Usuario o Email
+            </label>
+            <div class="input-wrapper">
+              {{ form.username }}
+              <i class="fa-solid fa-user input-icon"></i>
+            </div>
+            {% if form.username.errors %}
+            <div class="form-error">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              {{ form.username.errors.0 }}
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Campo Contraseña -->
+          <div class="form-group fade-in-up" style="animation-delay: 0.3s">
+            <label for="id_password" class="form-label">
+              Contraseña
+            </label>
+            <div class="input-wrapper">
+              {{ form.password }}
+              <i class="fa-solid fa-lock input-icon"></i>
+              <button type="button" class="password-toggle" id="passwordToggle" aria-label="Mostrar contraseña">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+            {% if form.password.errors %}
+            <div class="form-error">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              {{ form.password.errors.0 }}
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Recordarme y Olvidé contraseña -->
+          <div class="flex items-center justify-between fade-in-up" style="animation-delay: 0.4s">
+            <label class="checkbox-container">
+              <input type="checkbox" name="remember" class="checkbox-input sr-only">
+              <span class="custom-checkbox"></span>
+              <span class="text-white/80 text-sm">Recordar sesión</span>
+            </label>
+            <a href="/accounts/password/reset/" class="text-sm text-accent hover:text-brand transition-colors font-semibold">
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="login-submit fade-in-up" style="animation-delay: 0.5s">
+            <span>Continuar al Nexo</span>
+            <i class="fa-solid fa-arrow-right ml-2"></i>
+          </button>
+        </form>
+
+        <!-- Separador -->
+        <div class="mt-8 pt-6 border-t border-white/20 fade-in-up" style="animation-delay: 0.6s">
+          <p class="text-center text-white/70">
+            ¿Primera vez en el Nexo?
+            <a href="/accounts/register/" class="text-accent hover:text-brand font-semibold ml-1 transition-colors">
+              Crear cuenta
+            </a>
+          </p>
+        </div>
+
+        <!-- Login rápido -->
+        <div class="mt-6 fade-in-up" style="animation-delay: 0.7s">
+          <div class="relative">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-white/20"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+              <span class="px-3 bg-transparent text-white/50 font-medium">O continuar con</span>
+            </div>
+          </div>
+
+          <div class="social-buttons">
+            <button type="button" class="social-btn google">
+              <i class="fa-brands fa-google"></i>
+              Google
+            </button>
+            <button type="button" class="social-btn discord">
+              <i class="fa-brands fa-discord"></i>
+              Discord
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Cargar video de fondo (login.mp4)
+  const video = document.querySelector('.login-video-bg');
+  if (video) {
+    const src = video.dataset.srcMp4;
+    if (src && !video.src) {
+      video.src = src;
+      video.load();
+      video.play().catch(e => {
+        console.log('Autoplay prevented:', e);
+        document.addEventListener('click', function playVideo() {
+          video.play();
+          document.removeEventListener('click', playVideo);
+        });
+      });
+    }
+  }
+
+  // Crear partículas decorativas
+  const particlesContainer = document.getElementById('loginParticles');
+  if (particlesContainer) {
+    const particleCount = 12;
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'login-particle';
+      
+      const size = Math.random() * 6 + 2;
+      const posX = Math.random() * 100;
+      const posY = Math.random() * 100;
+      const delay = Math.random() * 5;
+      const duration = Math.random() * 4 + 6;
+      
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      particle.style.left = `${posX}vw`;
+      particle.style.top = `${posY}vh`;
+      particle.style.animationDelay = `${delay}s`;
+      particle.style.animationDuration = `${duration}s`;
+      
+      particlesContainer.appendChild(particle);
+    }
+  }
+
+  // Toggle de visibilidad de contraseña
+  const passwordToggle = document.getElementById('passwordToggle');
+  const passwordField = document.getElementById('id_password');
+  
+  if (passwordToggle && passwordField) {
+    passwordToggle.addEventListener('click', function() {
+      const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordField.setAttribute('type', type);
+      
+      const icon = this.querySelector('i');
+      icon.className = type === 'password' ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
+    });
+  }
+
+  // Efectos de focus mejorados
+  const inputs = document.querySelectorAll('input');
+  inputs.forEach(input => {
+    if (input.type !== 'checkbox') {
+      input.style.paddingLeft = '3rem';
+    }
+
+    input.addEventListener('focus', function() {
+      this.parentElement.style.transform = 'translateY(-2px)';
+      this.parentElement.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.2)';
+    });
+    
+    input.addEventListener('blur', function() {
+      this.parentElement.style.transform = 'translateY(0)';
+      this.parentElement.style.boxShadow = 'none';
+    });
+
+    if (input.value) {
+      input.parentElement.classList.add('focused');
+    }
+  });
+
+  // Efecto de carga del formulario
+  const form = document.querySelector('form');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      const submitBtn = this.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Accediendo...';
+        submitBtn.disabled = true;
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}{{ thread.title }} · Foros{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="flex items-center justify-between">
+    <h1 class="h1-glow text-2xl md:text-3xl">{{ thread.title }}</h1>
+    <div class="flex gap-2">
+      {% if user.is_authenticated and (user.is_superuser or user == thread.author) %}
+        <a href="{% url 'community:thread_delete' thread.slug %}" class="btn-ghost" data-modal><i class="fa-solid fa-trash mr-2"></i>Eliminar</a>
+      {% endif %}
+    </div>
+  </div>
+  <p class="text-white/60 text-sm mb-3">En {{ thread.forum.title }} · por {{ thread.author.username }} · {{ thread.created|naturaltime }}</p>
+
+  {% if thread.image %}
+  <div style="aspect-ratio:16/9;overflow:hidden;border:1px solid var(--line);border-radius:.75rem;margin-bottom:1rem">
+    <img src="{{ thread.image.url }}" style="width:100%;height:100%;object-fit:cover">
+  </div>
+  {% endif %}
+
+  <div class="text-white/80 whitespace-pre-line">{{ thread.body }}</div>
+</section>
+
+<section class="section">
+  <h3 class="card-title"><i class="fa-solid fa-reply"></i> Respuestas</h3>
+  {% for r in replies %}
+  <div class="card mb-3">
+    <div class="flex items-center justify-between">
+      <strong>{{ r.author.username }}</strong>
+      <span class="text-white/60 text-sm">{{ r.created|naturaltime }}</span>
+    </div>
+    <p class="text-white/80 mt-2 whitespace-pre-line">{{ r.body }}</p>
+    {% if user.is_authenticated and (user.is_superuser or user == r.author) %}
+      <div class="mt-2">
+        <a href="{% url 'community:reply_delete' r.id %}" class="btn-ghost" data-modal><i class="fa-solid fa-trash mr-2"></i>Eliminar</a>
+      </div>
+    {% endif %}
+  </div>
+  {% empty %}
+    <p class="text-white/60">Aún no hay respuestas.</p>
+  {% endfor %}
+
+  {% if user.is_authenticated %}
+  <form action="{% url 'community:thread_reply' thread.slug %}" method="post" class="mt-4">
+    {% csrf_token %}
+    {{ form.body }}
+    <button class="lol-button mt-2"><span class="lol-button-text"><i class="fa-solid fa-paper-plane mr-2"></i>Responder</span><span class="lol-button-shine"></span></button>
+  </form>
+  {% else %}
+  <p class="mt-4 text-white/60"><a href="/accounts/login/" class="text-accent">Inicia sesión</a> para responder.</p>
+  {% endif %}
+</section>
+
+{% include "community/_modal_delete.html" %}
+{% endblock %}

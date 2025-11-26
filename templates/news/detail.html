@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static news_extras %}
+{% block title %}{{ item.title }} · Noticias{% endblock %}
+
+{% block content %}
+<section class="section">
+  <article class="card">
+    <p class="kicker">
+      {% if item.category %}
+        {% if item.category.icon %}<i class="{{ item.category.icon }} mr-2"></i>{% endif %}
+        {{ item.category.name }}
+      {% else %}Noticias{% endif %}
+      {% if item.version %}<span class="tag ml-2">v{{ item.version }}</span>{% endif %}
+      {% if item.is_patch_notes %}<span class="tag ml-2">Notas del parche</span>{% endif %}
+    </p>
+
+    <h1 class="h1-glow text-3xl md:text-4xl">{{ item.title }}</h1>
+    {% if item.summary %}<p class="text-white/70 mt-2">{{ item.summary }}</p>{% endif %}
+
+    {% if item.banner_image %}
+      <div class="mt-4" style="aspect-ratio:21/9;overflow:hidden;border-radius:.6rem;border:1px solid var(--line)">
+        <img src="{{ item.banner_image.url }}" alt="" style="width:100%;height:100%;object-fit:cover">
+      </div>
+    {% elif item.hero_image %}
+      <div class="mt-4" style="aspect-ratio:16/9;overflow:hidden;border-radius:.6rem;border:1px solid var(--line)">
+        <img src="{{ item.hero_image.url }}" alt="" style="width:100%;height:100%;object-fit:cover">
+      </div>
+    {% endif %}
+
+    {# --------- VIDEO (YouTube / MP4 / fallback enlace) --------- #}
+    {% if item.video_url %}
+      {% with embed=item.video_url|youtube_embed %}
+        {% if embed %}
+          <div class="mt-4 aspect-video rounded-md overflow-hidden border border-white/10">
+            <iframe
+              src="{{ embed }}"
+              style="width:100%;height:100%"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen>
+            </iframe>
+          </div>
+        {% elif item.video_url|is_http_video %}
+          <video class="mt-4 w-full rounded-md border border-white/10" controls>
+            <source src="{{ item.video_url }}">
+            Tu navegador no soporta el tag <code>video</code>.
+          </video>
+        {% else %}
+          <p class="text-white/60 mt-3">
+            Este video no permite incrustación aquí.
+            <a class="link-soft" href="{{ item.video_url }}" target="_blank" rel="noopener">Ver en YouTube</a>.
+          </p>
+        {% endif %}
+      {% endwith %}
+    {% endif %}
+
+    <div class="prose prose-invert mt-6 max-w-none">
+      {{ item.body|safe }}
+    </div>
+
+    {% if item.gallery.all %}
+      <div class="mt-6 grid md:grid-cols-3 gap-4">
+        {% for asset in item.gallery.all %}
+          <figure class="card overflow-hidden">
+            {% if asset.kind == 'video' %}
+              <video controls class="w-full">
+                <source src="{{ asset.file.url }}">
+              </video>
+            {% else %}
+              <img src="{{ asset.file.url }}" alt="{{ asset.caption }}" class="w-full h-auto">
+            {% endif %}
+            {% if asset.caption %}<figcaption class="text-white/60 text-sm p-3">{{ asset.caption }}</figcaption>{% endif %}
+          </figure>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </article>
+
+  {% if related %}
+    <div class="mt-6">
+      <h3 class="card-title"><i class="fa-solid fa-newspaper mr-2"></i> Más novedades</h3>
+      <div class="grid md:grid-cols-3 gap-4">
+        {% for n in related %}
+          <a href="{{ n.get_absolute_url }}" class="card hover:-translate-y-0.5 transition">
+            {% if n.hero_image %}
+              <div style="aspect-ratio:16/9;overflow:hidden;border-radius:.5rem;border:1px solid var(--line)">
+                <img src="{{ n.hero_image.url }}" alt="" style="width:100%;height:100%;object-fit:cover">
+              </div>
+            {% endif %}
+            <h4 class="mt-2">{{ n.title }}</h4>
+            {% if n.summary %}<p class="text-white/60 text-sm">{{ n.summary|truncatechars:120 }}</p>{% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

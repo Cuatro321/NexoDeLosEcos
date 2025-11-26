@@ -1,0 +1,31 @@
+<!-- static/core/icons/nexo-mark.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Nexo de los Ecos">
+  <defs>
+    <radialGradient id="gCore" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#fff7da" stop-opacity="1"></stop>
+      <stop offset="60%" stop-color="#ffeaa6" stop-opacity=".95"></stop>
+      <stop offset="100%" stop-color="#e2c46f" stop-opacity=".9"></stop>
+    </radialGradient>
+    <linearGradient id="gRing" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#b792ff"></stop>
+      <stop offset="100%" stop-color="#e2c46f"></stop>
+    </linearGradient>
+    <linearGradient id="gHex" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#b792ff" stop-opacity=".95"></stop>
+      <stop offset="100%" stop-color="#e2c46f" stop-opacity=".95"></stop>
+    </linearGradient>
+  </defs>
+
+  <!-- eco externo -->
+  <circle cx="128" cy="128" r="110" fill="none" stroke="url(#gRing)" stroke-width="10" stroke-opacity=".35"></circle>
+  <circle cx="128" cy="128" r="92" fill="none" stroke="url(#gRing)" stroke-width="6" stroke-opacity=".45"></circle>
+
+  <!-- hexágono del nexo -->
+  <path d="M128,40 203,84 203,172 128,216 53,172 53,84 Z" fill="url(#gHex)" stroke="rgba(0,0,0,.25)" stroke-width="2" opacity=".95"></path>
+
+  <!-- núcleo -->
+  <circle cx="128" cy="128" r="36" fill="url(#gCore)" stroke="rgba(255,255,255,.35)" stroke-width="2"></circle>
+
+  <!-- brillo suave -->
+  <ellipse cx="128" cy="114" rx="60" ry="22" fill="white" opacity=".07"></ellipse>
+</svg>

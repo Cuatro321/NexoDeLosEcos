@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ title }} · Códex{% endblock %}
+
+{% block content %}
+
+<!-- ===== BREADCRUMB / ENCABEZADO ===== -->
+<section class="section">
+  <nav class="text-white/70 text-sm mb-3" aria-label="breadcrumb">
+    <a href="/" class="nav-link" style="padding:.2rem .6rem">Inicio</a>
+    <span class="mx-2">›</span>
+    <a href="/codex/" class="nav-link" style="padding:.2rem .6rem">Códex</a>
+    <span class="mx-2">›</span>
+    <span class="text-white">{{ title }}</span>
+  </nav>
+
+  <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+    <div>
+      <p class="kicker"><i class="fa-solid fa-book"></i> Códex</p>
+      <h1 class="h1-glow text-3xl md:text-4xl mt-1">{{ title }}</h1>
+      <p class="text-white/80 max-w-2xl mt-2">{{ summary }}</p>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="tag">{{ domain }}</span>
+      <span class="tag">Rareza: Épico</span>
+      <span class="tag">Tipo: Artefacto</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HERO VISUAL: ARTEFACTO Y DOMINIO GRANDES ===== -->
+<section class="grid md:grid-cols-2 gap-5">
+  <!-- Artefacto -->
+  <article class="card">
+    <h3 class="card-title"><i class="fa-solid fa-gem"></i> Artefacto</h3>
+    <div style="border:1px solid var(--line);border-radius:.75rem;overflow:hidden;background:rgba(255,255,255,.02);">
+      <div style="position:relative;width:100%;aspect-ratio:16/10;overflow:hidden;">
+        <img
+          loading="lazy"
+          alt="Artefacto de {{ domain }}"
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:rgba(255,255,255,.02);"
+          src="{% static 'img/domains/' %}{% if domain|lower == 'cenizas' %}arfuego{% elif domain|lower == 'niebla' %}arniebla{% elif domain|lower == 'piedra' %}arpiedra{% elif domain|lower == 'tiempo' %}artiempo{% elif domain|lower == 'vientos' %}arviento{% else %}artiempo{% endif %}.png"
+        >
+      </div>
+    </div>
+    <p class="text-white/70 text-sm mt-3">
+      Dominio asociado: <strong>{{ domain }}</strong>
+    </p>
+    <p class="italic mt-2">“{{ echo }}”</p>
+  </article>
+
+  <!-- Dominio -->
+  <aside class="card">
+    <h3 class="card-title"><i class="fa-solid fa-shield-halved"></i> Dominio</h3>
+    <div style="border:1px solid var(--line);border-radius:.75rem;overflow:hidden;background:rgba(255,255,255,.02);">
+      <div style="position:relative;width:100%;aspect-ratio:16/10;overflow:hidden;">
+        <img
+          loading="lazy"
+          alt="Dominio {{ domain }}"
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.9;filter:saturate(1.05) contrast(1.05)"
+          src="{% static 'img/domains/' %}{% if domain|lower == 'cenizas' %}cenizas{% elif domain|lower == 'niebla' %}niebla{% elif domain|lower == 'piedra' %}piedra{% elif domain|lower == 'tiempo' %}tiempo{% elif domain|lower == 'vientos' %}vientos{% else %}tiempo{% endif %}.png"
+        >
+      </div>
+    </div>
+    <p class="text-white/75 mt-3">
+      Los secretos de <strong>{{ domain }}</strong> moldean rutas, acertijos y combates. Entender su
+      filosofía amplifica el potencial del artefacto.
+    </p>
+  </aside>
+</section>
+
+<!-- ===== GUÍA RÁPIDA / STATS ===== -->
+<section class="grid md:grid-cols-3 gap-5 mt-5">
+  <div class="card">
+    <h4 class="card-title"><i class="fa-solid fa-bolt"></i> Guía rápida</h4>
+    <ul class="text-white/80 space-y-2">
+      <li>Rol sugerido: <strong>Explorador</strong></li>
+      <li>Dificultad: <strong>Media</strong></li>
+      <li>Controles clave: <code>Q/E</code> habilidad · <code>Espacio</code> acción</li>
+    </ul>
+    <div class="hr-soft"></div>
+    <p class="text-white/70 mt-2">{{ usage }}</p>
+  </div>
+
+  <div class="card">
+    <h4 class="card-title"><i class="fa-solid fa-chart-simple"></i> Atributos</h4>
+    <ul class="text-white/80 space-y-2">
+      <li>Poder base: <strong>▲▲▲▲☆</strong></li>
+      <li>Recarga: <strong>8s</strong></li>
+      <li>Alcance: <strong>medio</strong></li>
+      <li>Durabilidad: <strong>alta</strong></li>
+    </ul>
+    <div class="hr-soft"></div>
+    <small class="text-white/60">Los valores pueden variar con mejoras.</small>
+  </div>
+
+  <div class="card">
+    <h4 class="card-title"><i class="fa-solid fa-person-running"></i> Habilidades</h4>
+    <ul class="text-white/80 space-y-2">
+      <li><strong>Activo:</strong> efecto principal del artefacto en su dominio.</li>
+      <li><strong>Pasivo:</strong> ventaja situacional persistente.</li>
+      <li><strong>Especial:</strong> combo con objetos o señales de entorno.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== GALERÍA MULTIMEDIA (GIFs / Video loop) ===== -->
+<section class="section">
+  <h3 class="card-title"><i class="fa-solid fa-images"></i> Galería</h3>
+
+  <!-- GIFs del artefacto (si no existen, se ocultan de forma segura) -->
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-3">
+    <div style="border:1px solid var(--line);border-radius:.75rem;overflow:hidden;">
+      <img loading="lazy" alt="Demo 1 {{ title }}"
+           src="{% static 'img/domains/gifs/' %}{{ title|slugify }}-1.gif"
+           style="width:100%;height:auto;display:block"
+           onerror="this.parentElement.style.display='none'">
+    </div>
+    <div style="border:1px solid var(--line);border-radius:.75rem;overflow:hidden;">
+      <img loading="lazy" alt="Demo 2 {{ title }}"
+           src="{% static 'img/domains/gifs/' %}{{ title|slugify }}-2.gif"
+           style="width:100%;height:auto;display:block"
+           onerror="this.parentElement.style.display='none'">
+    </div>
+    <div style="border:1px solid var(--line);border-radius:.75rem;overflow:hidden;">
+      <img loading="lazy" alt="Demo 3 {{ title }}"
+           src="{% static 'img/domains/gifs/' %}{{ title|slugify }}-3.gif"
+           style="width:100%;height:auto;display:block"
+           onerror="this.parentElement.style.display='none'">
+    </div>
+  </div>
+
+  <!-- Loop del dominio (GIF o MP4) -->
+  <div class="grid md:grid-cols-2 gap-4 mt-4">
+    <div style="border:1px solid var(--line);border-radius:.75rem;overflow:hidden;">
+      <img loading="lazy" alt="Loop {{ domain }}"
+           src="{% static 'img/domains/gifs/' %}{{ domain|lower }}-loop.gif"
+           style="width:100%;height:auto;display:block"
+           onerror="this.parentElement.style.display='none'">
+    </div>
+    <div style="border:1px solid var(--line);border-radius:.75rem;overflow:hidden;">
+      <video autoplay muted loop playsinline
+             style="width:100%;height:auto;display:block"
+             onerror="this.parentElement.style.display='none'">
+        <source src="{% static 'videos/artifacts/' %}{{ title|slugify }}-loop.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <!-- Audio opcional -->
+  <div class="card mt-4">
+    <h4 class="card-title"><i class="fa-solid fa-wave-square"></i> Eco sonoro</h4>
+    <audio controls preload="none"
+           onerror="this.parentElement.style.display='none'"
+           style="width:100%">
+      <source src="{% static 'audio/artifacts/' %}{{ title|slugify }}.mp3" type="audio/mpeg">
+    </audio>
+    <small class="text-white/60">Si no ves el reproductor, aún no hay audio para este artefacto.</small>
+  </div>
+</section>
+
+<!-- ===== SINERGIAS / COUNTERS / MEJORAS ===== -->
+<section class="grid lg:grid-cols-3 gap-5">
+  <div class="card">
+    <h4 class="card-title"><i class="fa-solid fa-sparkles"></i> Sinergias</h4>
+    <p class="text-white/75 mb-2">Combinaciones que potencian el artefacto:</p>
+    <div class="flex flex-wrap gap-2">
+      <a href="/codex/reloj-fractal/" class="tag">Reloj Fractal</a>
+      <a href="/codex/cristal-de-niebla/" class="tag">Cristal de Niebla</a>
+      <a href="/codex/pluma-eterea/" class="tag">Pluma Etérea</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4 class="card-title"><i class="fa-solid fa-skull-crossbones"></i> Debilidades</h4>
+    <ul class="text-white/80 list-disc ml-5 space-y-2">
+      <li>Áreas anti-eco reducen su alcance.</li>
+      <li>Trampas con temporizador corto anulan combos largos.</li>
+      <li>Enemigos con resistencia al dominio <strong>{{ domain }}</strong>.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h4 class="card-title"><i class="fa-solid fa-hammer"></i> Mejora</h4>
+    <ul class="text-white/80 space-y-2">
+      <li><strong>Eco II:</strong> +10% potencia, -1s recarga.</li>
+      <li><strong>Eco III:</strong> +20% potencia, +efecto secundario.</li>
+      <li><strong>Eco IV:</strong> pasiva mejorada y efecto visual único.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== RECETA / LORE / TIPS ===== -->
+<section class="grid lg:grid-cols-3 gap-5 mt-5">
+  <div class="card">
+    <h4 class="card-title"><i class="fa-solid fa-flask"></i> Receta (forja)</h4>
+    <ul class="text-white/80 list-disc ml-5 space-y-2">
+      <li>Fragmento de {{ domain }} ×2</li>
+      <li>Núcleo resonante ×1</li>
+      <li>Vínculo arcano ×3</li>
+    </ul>
+    <div class="hr-soft"></div>
+    <small class="text-white/60">Entrega en el Altar del Eco para completar la forja.</small>
+  </div>
+
+  <div class="card">
+    <h4 class="card-title"><i class="fa-solid fa-feather-pointed"></i> Lore breve</h4>
+    <p class="text-white/80">
+      Forjado por los portadores de antaño, su voz resuena con memorias olvidadas. Cada eco
+      revela un fragmento del ciclo que se niega a romperse.
+    </p>
+  </div>
+
+  <div class="card">
+    <h4 class="card-title"><i class="fa-solid fa-lightbulb"></i> Tips de uso</h4>
+    <ul class="text-white/80 list-disc ml-5 space-y-2">
+      <li>Combina activo + entorno para rutas alternativas.</li>
+      <li>Aprovecha el “cooldown” para esprintar entre salas.</li>
+      <li>Sincroniza con compañeros que lleven <em>sinergias</em>.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== NOTAS DE DISEÑO (Unity 2D) ===== -->
+<section class="section">
+  <h3 class="card-title"><i class="fa-solid fa-cubes"></i> Notas técnicas (Unity 2D)</h3>
+  <ul class="text-white/80 list-disc ml-5 space-y-2">
+    <li>Usar <code>ScriptableObject</code> para definir datos del artefacto (stats, efectos, VFX).</li>
+    <li>Gestionar recarga con <code>Coroutine</code> y UI de indicador radial.</li>
+    <li>Separar VFX por dominio con paletas temáticas (tiempo/niebla/cenizas/vientos/piedra).</li>
+    <li>Optimizar GIFs o convertir a <code>MP4</code> cortos para menor peso en PWA.</li>
+  </ul>
+</section>
+
+<!-- ===== RELACIONADOS ===== -->
+<section class="section">
+  <h3 class="card-title"><i class="fa-solid fa-link"></i> Relacionados</h3>
+  <div class="concept-grid">
+    <a class="concept-card" href="/codex/reloj-fractal/">
+      <h4 class="text-xl font-bold mb-2"><i class="fa-regular fa-clock mr-2"></i>Reloj Fractal</h4>
+      <p>Manipula el flujo temporal para crear ventanas seguras.</p>
+      <span class="tag">Tiempo</span>
+    </a>
+    <a class="concept-card" href="/codex/cristal-de-niebla/">
+      <h4 class="text-xl font-bold mb-2"><i class="fa-regular fa-gem mr-2"></i>Cristal de Niebla</h4>
+      <p>Atraviesa superficies delgadas y descubre rutas ocultas.</p>
+      <span class="tag">Niebla</span>
+    </a>
+    <a class="concept-card" href="/codex/pluma-eterea/">
+      <h4 class="text-xl font-bold mb-2"><i class="fa-solid fa-feather mr-2"></i>Pluma Etérea</h4>
+      <p>Controla ráfagas de viento para planear y esquivar.</p>
+      <span class="tag">Vientos</span>
+    </a>
+  </div>
+</section>
+
+{% endblock %}

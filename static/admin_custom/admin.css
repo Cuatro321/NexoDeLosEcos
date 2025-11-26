@@ -1,0 +1,76 @@
+:root{
+  --bg:#0b0f14;
+  --panel:#10161d;
+  --surface:#121a22;
+  --line:rgba(255,255,255,.08);
+  --text:#d4d8dd;
+  --muted:#9aa3ad;
+  --accent:#d9b66f;         /* dorado */
+  --brand:#6fb7ff;          /* cian sutil */
+  --ok:#3ec275;
+  --err:#ef5b5b;
+}
+
+html, body { background: var(--bg) !important; color:var(--text) !important; }
+a { color: var(--brand); }
+a:hover { color:#a9d6ff; }
+
+#header { background: linear-gradient(180deg,#0f141a,#0b1118); border-bottom:1px solid var(--line); }
+#header a:link, #header a:visited { color: #e7ecf2; }
+#content { padding: 24px; }
+
+.nx-brand{display:flex;align-items:center;gap:.6rem;font-weight:700;font-size:15px;color:#fff}
+.nx-brand img{height:28px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.45))}
+.nx-user-tools{display:flex;gap:.6rem;align-items:center}
+.nx-chip{display:inline-flex;align-items:center;border:1px solid var(--line);
+  padding:.25rem .55rem;border-radius:999px;background:rgba(255,255,255,.04);color:#dfe6ee}
+.nx-chip:hover{background:rgba(255,255,255,.07)}
+
+.nx-dashboard{display:grid;gap:18px}
+.nx-hero{display:flex;justify-content:space-between;align-items:end;padding:18px 20px;
+  border:1px solid var(--line);border-radius:14px;background:
+  linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.nx-hero__title{font-size:28px;margin:0 0 6px; text-shadow:0 6px 30px rgba(0,0,0,.4)}
+.nx-hero__sub{margin:0;color:var(--muted)}
+
+.nx-panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media (max-width:1200px){ .nx-panels{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:800px){ .nx-panels{grid-template-columns:1fr} }
+
+.nx-card{border:1px solid var(--line);border-radius:14px;background:
+  linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));overflow:hidden}
+.nx-card__head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+.nx-card__head h2{margin:0;font-size:16px;letter-spacing:.2px}
+
+.nx-resources{list-style:none;margin:0;padding:6px}
+.nx-resource{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 10px;border-radius:10px;transition:background .25s,border-color .25s}
+.nx-resource:hover{background:rgba(255,255,255,.04)}
+.nx-resource__name{display:flex;align-items:center;gap:.6rem}
+.nx-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent)}
+.nx-actions{display:flex;gap:.35rem}
+
+.nx-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.42rem .7rem;border-radius:10px;
+  border:1px solid var(--line);background:rgba(255,255,255,.03);color:#e9eef5;text-decoration:none}
+.nx-btn:hover{background:rgba(255,255,255,.06)}
+.nx-btn--primary{border-color:color-mix(in oklab,var(--brand) 40%,transparent);
+  background:linear-gradient(180deg,color-mix(in oklab,var(--brand) 16%,transparent),rgba(255,255,255,.02))}
+.nx-btn--ghost{background:transparent}
+
+.nx-fade{opacity:0;transform:translateY(6px);animation:nxFade .55s ease both}
+@keyframes nxFade{to{opacity:1;transform:none}}
+
+.change-list .actions select, .selector, .related-widget-wrapper { filter:none }
+.breadcrumbs { background: transparent; border:0; color:var(--muted); }
+.module caption, .module h2 { background: transparent; color: #e7ecf2; }
+
+/* LOGIN */
+.nx-login{min-height:calc(100dvh - 72px);display:grid;place-items:center}
+.nx-login__panel{width:min(420px,92vw);padding:24px;border:1px solid var(--line);border-radius:16px;background:
+  radial-gradient(800px 400px at 50% 0, rgba(217,182,111,.07), rgba(17,22,28,.5));box-shadow:0 24px 80px rgba(0,0,0,.35)}
+.nx-login__panel h1{margin:.4rem 0 1rem}
+.nx-login__logo{height:46px;display:block;margin:0 auto .6rem}
+.nx-field{display:grid;gap:.35rem;margin:.6rem 0}
+.nx-field input{background:#0f151c;border:1px solid var(--line);border-radius:10px;color:#e9eef5;padding:.55rem .7rem}
+.nx-login__cta{width:100%;margin-top:.4rem}
+.nx-alert{background:rgba(239,91,91,.14);border:1px solid rgba(239,91,91,.4);color:#ffb3b3;padding:.5rem .7rem;border-radius:10px}

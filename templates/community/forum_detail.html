@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}{{ forum.title }} · Foros{% endblock %}
+{% block content %}
+<section class="section">
+  <h1 class="h1-glow text-2xl md:text-3xl">{{ forum.title }}</h1>
+  <p class="text-white/70">{{ forum.description }}</p>
+</section>
+
+<div class="concept-grid">
+  {% for t in threads %}
+    <a href="{{ t.get_absolute_url }}" class="concept-card">
+      <h3 class="text-xl font-bold mb-1">{{ t.title }}</h3>
+      <p class="text-white/75">{{ t.body|truncatechars:160 }}</p>
+      <div class="hr-soft"></div>
+      <div class="text-white/60 text-sm">Por {{ t.author.username }} · {{ t.replies.count }} respuestas</div>
+    </a>
+  {% empty %}
+    <p class="text-white/60">Aún no hay hilos aquí.</p>
+  {% endfor %}
+</div>
+{% endblock %}

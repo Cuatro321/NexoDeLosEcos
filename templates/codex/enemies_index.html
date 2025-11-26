@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Enemigos · Códex{% endblock %}
+{% block content %}
+<section class="section">
+  <h1 class="h1-glow text-3xl">Enemigos</h1>
+  <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-4">
+    {% for e in page_obj %}
+    <a class="card text-center" href="{{ e.get_absolute_url }}">
+      {% if e.sprite_gif %}
+        <img src="{{ e.sprite_gif.url }}" alt="" style="width:100%;object-fit:contain">
+      {% elif e.sprite_still %}
+        <img src="{{ e.sprite_still.url }}" alt="" style="width:100%;object-fit:contain">
+      {% endif %}
+      <div class="mt-1 font-semibold">{{ e.name }}</div>
+      {% if e.domain %}<div class="text-white/60 text-sm">{{ e.domain.name }}</div>{% endif %}
+    </a>
+    {% empty %}
+    <p class="text-white/60">No hay enemigos.</p>
+    {% endfor %}
+  </div>
+  {% if page_obj.has_other_pages %}
+  <nav class="mt-6 flex items-center gap-2">
+    {% if page_obj.has_previous %}<a class="btn-ghost" href="?page={{ page_obj.previous_page_number }}">‹ Anterior</a>{% endif %}
+    <span class="text-white/60">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a class="btn-ghost" href="?page={{ page_obj.next_page_number }}">Siguiente ›</a>{% endif %}
+  </nav>
+  {% endif %}
+</section>
+{% endblock %}

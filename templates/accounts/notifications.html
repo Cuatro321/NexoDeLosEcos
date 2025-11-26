@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Notificaciones{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="flex items-center justify-between">
+    <h1 class="h1-glow text-2xl md:text-3xl">Notificaciones</h1>
+    <span class="text-white/60">Se marcan como leídas al abrir esta página.</span>
+  </div>
+</section>
+
+<section class="grid md:grid-cols-2 gap-5">
+  {% for n in items %}
+    <div class="card">
+      <p class="text-white/80">{{ n.message }}</p>
+      <small class="text-white/50">{{ n.created|naturaltime }}</small>
+    </div>
+  {% empty %}
+    <p class="text-white/60">No tienes notificaciones.</p>
+  {% endfor %}
+</section>
+{% endblock %}

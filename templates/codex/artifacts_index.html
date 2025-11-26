@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Artefactos · Códex{% endblock %}
+{% block content %}
+<section class="section">
+  <h1 class="h1-glow text-3xl">Artefactos</h1>
+  <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+    {% for a in page_obj %}
+    <a class="card" href="{{ a.get_absolute_url }}">
+      {% if a.gif %}
+        <img src="{{ a.gif.url }}" alt="" style="width:100%;object-fit:contain">
+      {% elif a.image %}
+        <img src="{{ a.image.url }}" alt="" style="width:100%;object-fit:contain">
+      {% endif %}
+      <h3 class="mt-2">{{ a.name }}</h3>
+      <p class="text-white/60 text-sm">{{ a.quote }}</p>
+      {% if a.domain %}<span class="tag mt-2">{{ a.domain.name }}</span>{% endif %}
+    </a>
+    {% empty %}
+    <p class="text-white/60">Aún no hay artefactos.</p>
+    {% endfor %}
+  </div>
+
+  {% if page_obj.has_other_pages %}
+  <nav class="mt-6 flex items-center gap-2">
+    {% if page_obj.has_previous %}<a class="btn-ghost" href="?page={{ page_obj.previous_page_number }}">‹ Anterior</a>{% endif %}
+    <span class="text-white/60">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a class="btn-ghost" href="?page={{ page_obj.next_page_number }}">Siguiente ›</a>{% endif %}
+  </nav>
+  {% endif %}
+</section>
+{% endblock %}

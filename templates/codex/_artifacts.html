@@ -1,0 +1,60 @@
+{% load static %}
+<div class="artifact-grid">
+{% for a in artifacts %}
+  {% with dominio=a.dominio|lower %}
+  {% with
+      webp_path='img/domains/'|add:dominio|add:'.webp' 
+      jpg_path='img/domains/'|add:dominio|add:'.jpg'
+      png_path='img/domains/'|add:dominio|add:'.png'
+      url=a.get_absolute_url|default:'#'
+  %}
+  <article class="artifact-card fade-in is-loading" data-dominio="{{ dominio }}">
+    <a href="{{ url }}" class="artifact-inner" aria-label="{{ a.nombre }}">
+      <!-- Media izquierda -->
+      <figure class="artifact-media">
+        <div class="artifact-skeleton" aria-hidden="true"></div>
+
+        {# Lazy + blur-up. Usamos webp con fallback a jpg/png #}
+        <img
+          class="artifact-img lazy-blur"
+          src="{% static 'img/placeholders/1x1-black.png' %}"
+          data-still-webp="{% static webp_path %}"
+          data-still-fallback="{% static jpg_path %}"
+          data-still-fallback2="{% static png_path %}"
+          {% if a.gif %}data-gif="{{ a.gif }}"{% endif %}
+          alt="{{ a.nombre }}">
+
+        {% if a.gif %}
+        <button class="gif-toggle" type="button" title="Reproducir/Pausar animación" aria-label="Reproducir o pausar animación">GIF</button>
+        {% endif %}
+      </figure>
+
+      <!-- Info derecha -->
+      <div class="artifact-info">
+        <header class="artifact-head">
+          <span class="artifact-domain">
+            <i class="fa-solid fa-scroll"></i> {{ dominio|title }}
+          </span>
+          <h3 class="artifact-title">{{ a.nombre }}</h3>
+        </header>
+
+        <p class="artifact-quote">“{{ a.eco }}”</p>
+
+        <div class="artifact-meta">
+          {% if a.portador %}<span class="chip"><i class="fa-solid fa-user"></i> {{ a.portador }}</span>{% endif %}
+          {% if a.epoca %}<span class="chip"><i class="fa-regular fa-clock"></i> {{ a.epoca }}</span>{% endif %}
+          {% if a.rarity %}<span class="chip"><i class="fa-solid fa-gem"></i> {{ a.rarity }}</span>{% endif %}
+        </div>
+
+        <div class="artifact-actions">
+          <span class="link-soft">Ver detalle <i class="fa-solid fa-arrow-right"></i></span>
+        </div>
+      </div>
+    </a>
+  </article>
+  {% endwith %}
+  {% endwith %}
+{% empty %}
+  <p class="text-white/70">No hay resultados.</p>
+{% endfor %}
+</div>

@@ -1,0 +1,35 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | Panel · Nexo{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin_custom/admin.css' %}">
+  <link rel="preload" href="{% static 'core/icons/Neo1.png' %}" as="image">
+{% endblock %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <script defer src="{% static 'admin_custom/admin.js' %}"></script>
+{% endblock %}
+
+{# Branding superior con logo y enlace al home del sitio #}
+{% block branding %}
+  <a class="nx-brand" href="/" title="Ver sitio">
+    <img src="{% static 'core/icons/Neo1.png' %}" alt="NeoForge Games">
+    <span>El Nexo de los Ecos</span>
+  </a>
+{% endblock %}
+
+{# Barra superior de usuario en español y con acentos #}
+{% block usertools %}
+  {% if has_permission %}
+  <div id="user-tools" class="nx-user-tools">
+    <span>Bienvenido, <strong>{{ user.get_short_name|default:user.get_username }}</strong></span>
+    {% if site_url %}<a href="{{ site_url }}" class="nx-chip">Ver el sitio</a>{% endif %}
+    <a href="{% url 'admin:password_change' %}" class="nx-chip">Cambiar contraseña</a>
+    <a href="{% url 'admin:logout' %}" class="nx-chip">Cerrar sesión</a>
+  </div>
+  {% endif %}
+{% endblock %}

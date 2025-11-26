@@ -1,0 +1,25 @@
+{% load static %}
+<form method="post" class="card" style="background:#fafafa;color:#000">
+  {% csrf_token %}
+  <h3 class="card-title" id="nx-modal-title" style="color:#000">
+    <i class="fa-solid fa-triangle-exclamation mr-2"></i> Confirmar eliminación
+  </h3>
+  <p style="color:#111">
+    Vas a eliminar: <strong>{{ type|title }}</strong>.
+  </p>
+
+  {% if user.is_superuser %}
+    <label class="block mt-3 mb-2" style="color:#000">Motivo (obligatorio para administradores)</label>
+    <textarea name="reason" class="input" rows="3"
+              style="background:#fff;color:#000;border:1px solid #d4d4d8;border-radius:10px;padding:.7rem .9rem"
+              required placeholder="Describe la razón de moderación…"></textarea>
+  {% endif %}
+
+  <div class="mt-4 flex items-center gap-2">
+    <button class="lol-button">
+      <span class="lol-button-text"><i class="fa-solid fa-trash mr-2"></i>Eliminar</span>
+      <span class="lol-button-shine"></span>
+    </button>
+    <button type="button" class="btn-ghost" data-modal-close>Cancelar</button>
+  </div>
+</form>

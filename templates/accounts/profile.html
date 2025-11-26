@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static humanize %}
+{% block title %}Perfil · {{ u.username }}{% endblock %}
+
+{% block head %}
+<style>
+  .hero-prof{
+    position:relative;padding:1.25rem;border-radius:16px;
+    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.08);
+    overflow:hidden;
+  }
+  .hero-prof::after{
+    content:"";position:absolute;inset:-40%;background:
+      radial-gradient(600px 300px at 15% 0%, rgba(123,97,255,.18), transparent 60%),
+      radial-gradient(400px 200px at 85% 0%, rgba(255,180,50,.12), transparent 60%);
+    pointer-events:none;filter:blur(20px);
+  }
+  .avatar-xl{
+    width:112px;height:112px;border-radius:18px;overflow:hidden;
+    border:1px solid rgba(255,255,255,.12);background:#0b0f14;
+  }
+  .chip{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .6rem;border:1px solid rgba(255,255,255,.12);border-radius:.6rem}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="hero-prof">
+    <div class="flex items-center justify-between gap-6 relative z-10">
+      <div class="flex items-center gap-4">
+        <div class="avatar-xl">
+          {% if profile.avatar %}
+            <img src="{{ profile.avatar.url }}" alt="Avatar" style="width:100%;height:100%;object-fit:cover">
+          {% else %}
+            <img src="{% static 'img/avatars/default.png' %}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;opacity:.75">
+          {% endif %}
+        </div>
+        <div>
+          <p class="kicker"><i class="fa-regular fa-circle-user"></i> Perfil</p>
+          <h1 class="h1-glow text-2xl md:text-3xl">{{ profile.display_name|default:u.username }}</h1>
+          <div class="flex items-center gap-2 text-white/80">
+            <span class="chip"><i class="fa-regular fa-calendar"></i> Desde {{ u.date_joined|date:"M Y" }}</span>
+            {% if profile.city or profile.country %}
+              <span class="chip"><i class="fa-solid fa-location-dot"></i> {{ profile.city|default:"" }}{% if profile.city and profile.country %}, {% endif %}{{ profile.country|default:"" }}</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      {% if request.user == u %}
+      <div class="flex items-center gap-2">
+        <a class="lol-button" href="{% url 'accounts:profile_edit' %}">
+          <span class="lol-button-text"><i class="fa-solid fa-pen mr-2"></i>Editar perfil</span>
+          <span class="lol-button-shine"></span>
+        </a>
+        <a class="btn-ghost" href="/accounts/password_change/" style="padding:.7rem 1rem;border-radius:.6rem">
+          <i class="fa-solid fa-key mr-1"></i> Cambiar contraseña
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="grid lg:grid-cols-3 gap-5">
+  <!-- Datos rápidos -->
+  <aside class="card">
+    <h3 class="card-title"><i class="fa-solid fa-id-card-clip mr-2"></i> Datos</h3>
+    <ul class="text-white/80 mt-2 space-y-2">
+      <li><strong>Ciudad:</strong> {{ profile.city|default:"—" }}</li>
+      <li><strong>País:</strong> {{ profile.country|default:"—" }}</li>
+    </ul>
+  </aside>
+
+  <!-- Bio -->
+  <article class="card lg:col-span-2">
+    <h3 class="card-title"><i class="fa-solid fa-feather-pointed mr-2"></i> Bio</h3>
+    <p class="text-white/80 whitespace-pre-line mt-1">{{ profile.bio|default:"Sin descripción." }}</p>
+  </article>
+</section>
+
+{% if request.user == u %}
+<section class="mt-5">
+  <div class="card">
+    <h3 class="card-title"><i class="fa-regular fa-bell mr-2"></i> Notificaciones</h3>
+    <p class="text-white/70 mt-1">
+      Tienes <strong>{{ unread_count }}</strong> notificaciones sin leer.
+      <a class="link-soft ml-2" href="{% url 'accounts:notifications' %}">Ver todas</a>
+    </p>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

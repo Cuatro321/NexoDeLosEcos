@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Códex · Personajes{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="flex items-center justify-between">
+    <h1 class="h1-glow text-2xl md:text-3xl"><i class="fa-regular fa-user mr-2"></i>Personajes</h1>
+    <a href="{% url 'codex:index' %}" class="link-soft"><i class="fa-solid fa-arrow-left mr-2"></i>Volver al Códex</a>
+  </div>
+  <p class="text-white/70 mt-2">Lista de personajes jugables y NPCs con su dominio y ficha rápida.</p>
+</section>
+
+<section class="grid md:grid-cols-3 lg:grid-cols-4 gap-5">
+  {% for c in page_obj %}
+    <article class="card hover:translate-y-[-2px] transition">
+      {% if c.portrait %}
+        <div style="aspect-ratio:1/1;overflow:hidden;border-radius:.5rem;border:1px solid var(--line)">
+          <img src="{{ c.portrait.url }}" alt="{{ c.name }}" style="width:100%;height:100%;object-fit:cover">
+        </div>
+      {% else %}
+        <div style="aspect-ratio:1/1;display:grid;place-items:center;border-radius:.5rem;border:1px solid var(--line);background:rgba(255,255,255,.05)">
+          <img src="{% static 'img/placeholders/portrait.png' %}" alt="" style="height:56px;opacity:.7">
+        </div>
+      {% endif %}
+
+      <header class="mt-3">
+        <div class="flex items-center justify-between gap-2">
+          <h3 class="card-title">{{ c.name }}</h3>
+          {% if c.domain %}
+            <span class="chip"><i class="fa-solid fa-scroll mr-1"></i>{{ c.domain.name }}</span>
+          {% endif %}
+        </div>
+        {% if c.summary %}
+          <p class="text-white/60 text-sm mt-1">{{ c.summary|truncatechars:120 }}</p>
+        {% endif %}
+      </header>
+
+      <footer class="mt-3 flex items-center justify-between">
+        <a class="link-soft" href="{% url 'codex:character_detail' c.slug %}">
+          Ver ficha <i class="fa-solid fa-arrow-right ml-1"></i>
+        </a>
+        {% if c.rarity %}
+          <span class="tag">{{ c.get_rarity_display|default:c.rarity }}</span>
+        {% endif %}
+      </footer>
+    </article>
+  {% empty %}
+    <p class="text-white/70">Aún no hay personajes cargados.</p>
+  {% endfor %}
+</section>
+
+{% if page_obj.has_other_pages %}
+<nav class="mt-6 flex items-center gap-2">
+  {% if page_obj.has_previous %}
+    <a class="btn-ghost" href="?page={{ page_obj.previous_page_number }}">‹ Anterior</a>
+  {% endif %}
+  <span class="text-white/60">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+    <a class="btn-ghost" href="?page={{ page_obj.next_page_number }}">Siguiente ›</a>
+  {% endif %}
+</nav>
+{% endif %}
+{% endblock %}

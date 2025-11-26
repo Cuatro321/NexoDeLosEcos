@@ -1,0 +1,40 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="nx-dashboard">
+  <header class="nx-hero">
+    <div>
+      <h1 class="nx-hero__title">Centro de control</h1>
+      <p class="nx-hero__sub">Gestiona contenido del Códex, Comunidad y Noticias con una interfaz rápida y clara.</p>
+    </div>
+    <a href="/" class="nx-btn nx-btn--primary">⤴ Ver sitio</a>
+  </header>
+
+  <div class="nx-panels">
+    {% for app in app_list %}
+      <section class="nx-card nx-fade">
+        <header class="nx-card__head">
+          <h2>{{ app.name }}</h2>
+          <a href="{{ app.app_url }}" class="nx-chip">Ver todos</a>
+        </header>
+
+        <ul class="nx-resources">
+          {% for model in app.models %}
+            <li class="nx-resource">
+              <div class="nx-resource__name">
+                <span class="nx-dot"></span>
+                <a href="{{ model.admin_url }}">{{ model.name }}</a>
+              </div>
+              <div class="nx-actions">
+                {% if model.add_url %}<a class="nx-btn nx-btn--ghost" href="{{ model.add_url }}">+ Añadir</a>{% endif %}
+                {% if model.admin_url %}<a class="nx-btn nx-btn--ghost" href="{{ model.admin_url }}">✎ Cambiar</a>{% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

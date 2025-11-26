@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Historias · Códex{% endblock %}
+{% block content %}
+<section class="section">
+  <h1 class="h1-glow text-3xl">Historias</h1>
+  <div class="grid md:grid-cols-3 gap-4 mt-4">
+    {% for x in page_obj %}
+    <a class="card" href="{{ x.get_absolute_url }}">
+      {% if x.cover_image %}
+      <div style="aspect-ratio:16/9;overflow:hidden;border-radius:.5rem;border:1px solid var(--line)">
+        <img src="{{ x.cover_image.url }}" alt="" style="width:100%;height:100%;object-fit:cover">
+      </div>
+      {% endif %}
+      <h3 class="mt-2">{{ x.title }}</h3>
+      <p class="text-white/60 text-sm">{{ x.summary|truncatechars:160 }}</p>
+    </a>
+    {% empty %}
+    <p class="text-white/60">Nada por aquí.</p>
+    {% endfor %}
+  </div>
+
+  {% if page_obj.has_other_pages %}
+  <nav class="mt-6 flex items-center gap-2">
+    {% if page_obj.has_previous %}<a class="btn-ghost" href="?page={{ page_obj.previous_page_number }}">‹ Anterior</a>{% endif %}
+    <span class="text-white/60">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a class="btn-ghost" href="?page={{ page_obj.next_page_number }}">Siguiente ›</a>{% endif %}
+  </nav>
+  {% endif %}
+</section>
+{% endblock %}

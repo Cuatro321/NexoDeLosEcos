@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Nuevo hilo · Foros{% endblock %}
+{% block content %}
+<section class="section">
+  <h1 class="h1-glow text-2xl md:text-3xl">Crear hilo</h1>
+  <form method="post" enctype="multipart/form-data" class="grid md:grid-cols-2 gap-5 mt-4">
+    {% csrf_token %}
+    <div class="card">
+      <label class="block mb-2">Foro</label>
+      {{ form.forum }}
+      <div class="hr-soft"></div>
+      <label class="block mb-2 mt-3">Asunto</label>
+      {{ form.title }}
+      <div class="hr-soft"></div>
+      <label class="block mb-2 mt-3">Mensaje</label>
+      {{ form.body }}
+    </div>
+    <div class="card">
+      <label class="block mb-2">Imagen (opcional)</label>
+      {{ form.image }}
+      <button class="lol-button mt-4"><span class="lol-button-text"><i class="fa-solid fa-check mr-2"></i>Publicar</span><span class="lol-button-shine"></span></button>
+    </div>
+  </form>
+</section>
+{% endblock %}

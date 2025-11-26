@@ -1,0 +1,472 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Inicio · El Nexo de los Ecos{% endblock %}
+
+{% block head %}
+<link rel="preload" href="{% static 'img/hero-poster.jpg' %}" as="image">
+
+<style>
+  /* ====== HERO ====== */
+  .hero--bleed{
+    position:relative;left:50%;right:50%;width:100vw;margin-left:-50vw;margin-right:-50vw;
+    border-left:none;border-right:none;border-radius:0
+  }
+  .hero--flush{ margin-top:calc(var(--space-lg)*-1) }
+
+  .hero .hero-media{ position:relative; width:100%; height:100%; min-height:clamp(520px, 88vh, 900px); overflow:hidden }
+  .hero .hero-video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover }
+  .hero .hero-overlay{ position:absolute; inset:0;
+    background: radial-gradient(120% 120% at 10% 10%, rgba(0,0,0,.35) 0%, rgba(0,0,0,.65) 70%, rgba(0,0,0,.85) 100%)
+  }
+
+  .hero .hero-content{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    padding:clamp(16px, 4vw, 48px)
+  }
+
+  .hero-panel{
+    display:inline-block;
+    background:linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,.35));
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:0 20px 40px rgba(0,0,0,.35);
+    border-radius:18px;
+    padding:1.25rem 1.5rem;
+    backdrop-filter:blur(6px);
+    width:min(100%, 980px);
+  }
+
+  .hero-title{
+    font-size:clamp(1.6rem, 4.8vw, 3.2rem);
+    line-height:1.08;
+    margin:0 0 .5rem 0;
+  }
+  .hero-sub{
+    font-size:clamp(.95rem, 1.6vw, 1.125rem);
+    line-height:1.5;
+    margin:.5rem 0 1.1rem 0;
+    max-width:75ch;
+  }
+
+  .hero-cta{ display:flex; gap:.75rem; flex-wrap:wrap }
+
+  .typing{
+    border-right:2px solid var(--accent);
+    white-space:nowrap;
+    display:inline-block;
+    vertical-align:baseline;
+  }
+  .typing--fixed-width{}
+
+  @media (prefers-reduced-motion: reduce){
+    .typing{ border-right:0 }
+  }
+
+  @media (max-width:768px){
+    .hero-panel{ padding:1rem 1.1rem; border-radius:14px }
+    .hero .hero-content{ align-items:flex-end }
+  }
+
+  /* ====== SECCIÓN TRÁILER ====== */
+  .section-trailer{
+    position:relative;
+    z-index:1;
+  }
+
+  .trailer-grid{
+    display:grid;
+    gap:1.75rem;
+    grid-template-columns:minmax(0,2.2fr) minmax(0,1.4fr);
+    align-items:stretch;
+  }
+
+  .trailer-card{
+    background:linear-gradient(145deg, rgba(15,23,42,.96), rgba(8,18,36,.98));
+    border-radius:18px;
+    border:1px solid rgba(148,163,184,.5);
+    box-shadow:0 24px 40px rgba(15,23,42,.75);
+    padding:1.25rem;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* --- Card del VIDEO: la caja es solo el frame del video --- */
+  .trailer-card--video{
+    padding:0;
+    background:transparent;
+    border:none;
+    box-shadow:none;
+    height:100%;
+  }
+
+  .trailer-frame{
+    position:relative;
+    width:100%;
+    height:100%;
+    border-radius:22px;
+    overflow:hidden;
+    background:radial-gradient(circle at top, #020617 0%, #020617 40%, #020617 100%);
+    box-shadow:0 28px 80px rgba(15,23,42,.9);
+    transition:transform .25s ease, box-shadow .25s ease, box-shadow .25s ease;
+  }
+
+  .trailer-frame::before{
+    content:'';
+    position:absolute;
+    inset:-1px;
+    border-radius:inherit;
+    background:linear-gradient(135deg,
+      rgba(56,189,248,.8),
+      rgba(59,130,246,.65),
+      rgba(249,115,22,.75),
+      rgba(244,63,94,.75)
+    );
+    opacity:.4;
+    filter:blur(0);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .trailer-frame::after{
+    content:'';
+    position:absolute;
+    inset:2px;
+    border-radius:inherit;
+    background:radial-gradient(circle at top, #020617 0%, #020617 45%, #020617 100%);
+    z-index:0;
+    pointer-events:none;
+  }
+
+  .trailer-card--video:hover .trailer-frame{
+    transform:translateY(-4px);
+    box-shadow:0 40px 110px rgba(15,23,42,1);
+  }
+
+  .trailer-video{
+    position:relative;
+    z-index:1;
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:inherit;
+    background:black;
+  }
+
+  /* --- Lado info del tráiler --- */
+  .trailer-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:.5rem;
+    padding:.25rem .7rem;
+    border-radius:999px;
+    font-size:.75rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    background:rgba(248,250,252,.06);
+    border:1px solid rgba(148,163,184,.6);
+  }
+
+  .trailer-badge-dot{
+    width:8px;
+    height:8px;
+    border-radius:999px;
+    background:radial-gradient(circle, #22c55e 0%, #166534 65%, transparent 100%);
+    box-shadow:0 0 10px rgba(34,197,94,.9);
+  }
+
+  .trailer-title{
+    font-size:clamp(1.35rem, 2.4vw, 1.9rem);
+    line-height:1.2;
+    margin:.75rem 0 .4rem 0;
+  }
+
+  .trailer-sub{
+    font-size:.95rem;
+    line-height:1.6;
+    color:rgba(226,232,240,.8);
+    margin-bottom:1rem;
+  }
+
+  .trailer-meta-list{
+    display:grid;
+    gap:.4rem;
+    margin-bottom:1rem;
+    font-size:.85rem;
+    color:rgba(148,163,184,1);
+  }
+
+  .trailer-meta-label{
+    font-weight:600;
+    color:rgba(248,250,252,.9);
+  }
+
+  .trailer-pills{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.45rem;
+  }
+
+  .trailer-pill{
+    padding:.25rem .6rem;
+    border-radius:999px;
+    font-size:.8rem;
+    border:1px solid rgba(148,163,184,.5);
+    background:rgba(15,23,42,.9);
+    text-transform:uppercase;
+    letter-spacing:.06em;
+  }
+
+  .trailer-cta-wrap{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.65rem;
+    margin-top:1rem;
+  }
+
+  .trailer-cta-secondary{
+    display:inline-flex;
+    align-items:center;
+    gap:.45rem;
+    padding:.5rem .9rem;
+    border-radius:999px;
+    border:1px dashed rgba(148,163,184,.6);
+    font-size:.8rem;
+    color:rgba(209,213,219,1);
+    background:rgba(15,23,42,.85);
+  }
+
+  .trailer-cta-secondary i{
+    font-size:.9rem;
+  }
+
+  @media (max-width:960px){
+    .trailer-grid{
+      grid-template-columns:minmax(0,1fr);
+    }
+    .trailer-card--video{
+      max-height:520px;
+    }
+  }
+
+  @media (max-width:640px){
+    .trailer-card{ padding:1rem; border-radius:14px }
+    .trailer-frame{ border-radius:16px }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="hero hero--bleed hero--flush">
+  <div class="hero-media">
+    <video class="hero-video" muted loop playsinline
+           preload="none"
+           poster="{% static 'img/hero-poster.jpg' %}"
+           data-src-mp4="{% static 'videos/hero.mp4' %}"
+           data-src-webm="{% static 'videos/hero.webm' %}"
+           aria-label="Video de fondo del Nexo de los Ecos">
+      <img src="{% static 'img/hero-poster.jpg' %}" alt="Fondo del Nexo de los Ecos">
+    </video>
+    <div class="hero-overlay"></div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-panel">
+      <p class="kicker"><i class="fa-solid fa-burst"></i> El Nexo de los Ecos</p>
+      <h1 class="hero-title">
+        El Nexo despierta.
+        <span class="nowrap text-accent-grad typing" data-text="¿Responderás al eco?"></span>
+      </h1>
+      <p class="hero-sub">
+        Un portador sin gloria. Cinco dominios imposibles. Artefactos olvidados que vuelven a hablar.
+        Reúne su voluntad y quiebra el ciclo.
+      </p>
+
+      <div class="hero-cta">
+        {% if user.is_authenticated %}
+          <a href="/codex/" class="lol-button" aria-label="Descubre el Nexo">
+            <span class="lol-button-text"><i class="fa-solid fa-compass mr-2"></i>Descubre el Nexo</span>
+            <span class="lol-button-shine"></span>
+          </a>
+        {% else %}
+          <a href="/accounts/register/" class="lol-button" aria-label="Regístrate">
+            <span class="lol-button-text"><i class="fa-solid fa-user-plus mr-2"></i>Regístrate</span>
+            <span class="lol-button-shine"></span>
+          </a>
+        {% endif %}
+
+        <button id="btn-install-hero" class="lol-button hidden" type="button" aria-label="Instalar app">
+          <span class="lol-button-text"><i class="fa-solid fa-download mr-2"></i>Instalar app</span>
+          <span class="lol-button-shine"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRÁILER -->
+<section class="section section-trailer fade-in" style="animation-delay:.15s">
+  <div class="trailer-grid">
+    <!-- VIDEO: ocupa toda la caja -->
+    <div class="trailer-card trailer-card--video">
+      <div class="trailer-frame">
+        <video
+          class="trailer-video"
+          controls
+          preload="metadata"
+          playsinline
+          poster="{% static 'img/trailer-poster.jpg' %}">
+          <source src="{% static 'videos/trailer.mp4' %}" type="video/mp4">
+          Tu navegador no soporta la etiqueta de video HTML5.
+        </video>
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="trailer-card">
+      <div class="trailer-badge">
+        <span class="trailer-badge-dot"></span>
+        Tráiler oficial
+      </div>
+      <h2 class="trailer-title">
+        Tráiler oficial · El Nexo de los Ecos
+      </h2>
+      <p class="trailer-sub">
+        Mira el primer vistazo al viaje del Portador, a los cinco dominios que lo devorarán
+        y a las fuerzas que intentan romper el ciclo. Cada eco que escuches aquí se manifestará
+        dentro del juego.
+      </p>
+
+      <div class="trailer-meta-list">
+        <div><span class="trailer-meta-label">Duración:</span> ~2:30 min</div>
+        <div><span class="trailer-meta-label">Formato:</span> 1080p · 60 FPS</div>
+        <div><span class="trailer-meta-label">Contenido:</span> Gameplay + cinemáticas in–engine</div>
+      </div>
+
+      <div class="trailer-pills">
+        <span class="trailer-pill"><i class="fa-solid fa-bolt mr-1"></i>Metroidvania</span>
+        <span class="trailer-pill"><i class="fa-solid fa-skull-crossbones mr-1"></i>Retos</span>
+        <span class="trailer-pill"><i class="fa-solid fa-landmark mr-1"></i>Dominios</span>
+        <span class="trailer-pill"><i class="fa-solid fa-wave-square mr-1"></i>OST original</span>
+      </div>
+
+      <div class="trailer-cta-wrap">
+        {% if user.is_authenticated %}
+          <a href="/codex/" class="lol-button" aria-label="Explora el Códex tras ver el tráiler">
+            <span class="lol-button-text"><i class="fa-solid fa-book-open mr-2"></i>Explorar el Códex</span>
+            <span class="lol-button-shine"></span>
+          </a>
+        {% else %}
+          <a href="/accounts/register/" class="lol-button" aria-label="Crea tu cuenta tras ver el tráiler">
+            <span class="lol-button-text"><i class="fa-solid fa-user-astronaut mr-2"></i>Reserva tu eco</span>
+            <span class="lol-button-shine"></span>
+          </a>
+        {% endif %}
+
+        <div class="trailer-cta-secondary">
+          <i class="fa-regular fa-circle-play"></i>
+          Consejo: súbele el volumen, el Nexo <strong>responde</strong>.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function reserveTypingSpace(el) {
+  if (!el) return;
+  var text = el.dataset.text || el.textContent || '';
+  if (!text) return;
+
+  var cs = window.getComputedStyle(el);
+  var probe = document.createElement('span');
+  probe.textContent = text;
+  probe.style.position = 'absolute';
+  probe.style.visibility = 'hidden';
+  probe.style.whiteSpace = 'nowrap';
+  probe.style.font = cs.font;
+  probe.style.letterSpacing = cs.letterSpacing;
+  probe.style.fontKerning = cs.fontKerning || 'auto';
+  probe.style.fontFeatureSettings = cs.fontFeatureSettings || 'normal';
+  document.body.appendChild(probe);
+
+  var w = Math.ceil(probe.getBoundingClientRect().width);
+  document.body.removeChild(probe);
+
+  el.classList.add('typing--fixed-width');
+  el.style.minWidth = w + 'px';
+}
+
+function runTyping(el, speed) {
+  if (!el) return;
+  var text = el.dataset.text || el.textContent || '';
+  el.textContent = '';
+  var i = 0;
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) {
+    el.textContent = text;
+    el.style.borderRight = 'none';
+    return;
+  }
+
+  (function type() {
+    if (i < text.length) {
+      el.textContent += text.charAt(i++);
+      setTimeout(type, speed);
+    } else {
+      el.style.borderRight = 'none';
+    }
+  })();
+}
+
+function lazyLoadHeroVideo() {
+  var video = document.querySelector('.hero-video');
+  if (!video || video.dataset.loaded) return;
+
+  var loadSources = function() {
+    if (video.dataset.loaded) return;
+    var mp4 = video.getAttribute('data-src-mp4');
+    var webm = video.getAttribute('data-src-webm');
+
+    if (webm) {
+      var sWebm = document.createElement('source');
+      sWebm.src = webm; sWebm.type = 'video/webm';
+      video.appendChild(sWebm);
+    }
+    if (mp4) {
+      var sMp4 = document.createElement('source');
+      sMp4.src = mp4; sMp4.type = 'video/mp4';
+      video.appendChild(sMp4);
+    }
+    video.load();
+    video.dataset.loaded = '1';
+    var play = function(){ video.play().catch(function(){}); };
+    if ('readyState' in video && video.readyState >= 2) play();
+    else video.addEventListener('loadeddata', play, { once:true });
+  };
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) { loadSources(); io.disconnect(); }
+      });
+    }, { rootMargin:'200px' });
+    io.observe(video);
+  } else {
+    loadSources();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  var el = document.querySelector('.typing');
+  if (el) {
+    reserveTypingSpace(el);
+    runTyping(el, 85);
+  }
+  lazyLoadHeroVideo();
+});
+</script>
+{% endblock %}
