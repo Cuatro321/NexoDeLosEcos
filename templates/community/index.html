@@ -2,69 +2,430 @@
 {% load humanize %}
 {% block title %}Comunidad · Feed{% endblock %}
 
+{% block head %}
+<style>
+  /* --- LAYOUT GENERAL DEL FEED --- */
+  .feed-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:1rem;
+    flex-wrap:wrap;
+  }
+
+  .feed-header-main p.kicker{
+    margin-bottom:.25rem;
+  }
+
+  /* Filtros (Todo / Publicación / Reseña) */
+  .feed-filters{
+    margin-top:1.5rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:.75rem;
+    flex-wrap:wrap;
+  }
+  .feed-filters-label{
+    font-size:.8rem;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    color:rgba(148,163,184,.9);
+  }
+  .feed-filter-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.5rem;
+  }
+  .feed-filter-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:.4rem;
+    padding:.45rem .9rem;
+    border-radius:999px;
+    border:1px solid rgba(148,163,184,.4);
+    background:radial-gradient(circle at top,
+                rgba(15,23,42,.9),
+                rgba(15,23,42,.98));
+    color:rgba(226,232,240,.9);
+    font-size:.8rem;
+    text-decoration:none;
+    transition:all .18s ease-out;
+  }
+  .feed-filter-chip i{
+    font-size:.85rem;
+  }
+  .feed-filter-chip:hover{
+    border-color:rgba(59,130,246,.8);
+    color:#e5e7eb;
+    box-shadow:0 0 18px rgba(37,99,235,.45);
+  }
+  .feed-filter-chip.is-active{
+    border-color:rgba(251,191,36,.9);
+    background:radial-gradient(circle at top,
+                rgba(251,191,36,.25),
+                rgba(15,23,42,.97));
+    color:#fefce8;
+    box-shadow:0 0 22px rgba(250,204,21,.55);
+  }
+
+  /* --- TARJETA DE PUBLICACIÓN --- */
+  .post-list{
+    margin-top:1.5rem;
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+  }
+
+  .post-card {
+    position: relative;
+    border-radius: 20px;
+    padding: 1.4rem 1.6rem 1.1rem;
+    background:
+      radial-gradient(circle at top, rgba(37,99,235,.13), transparent 55%),
+      radial-gradient(circle at bottom, rgba(147,51,234,.18), transparent 60%),
+      rgba(15,23,42,.96);
+    box-shadow:
+      0 22px 45px rgba(0,0,0,.65),
+      0 0 0 1px rgba(15,23,42,1),
+      0 0 0 1px rgba(148,163,184,.18);
+    overflow:hidden;
+  }
+  .post-card::before{
+    content:"";
+    position:absolute;
+    inset:-1px;
+    border-radius:inherit;
+    background:conic-gradient(from 130deg,
+      rgba(56,189,248,.35),
+      rgba(129,140,248,.4),
+      rgba(192,132,252,.3),
+      rgba(56,189,248,.35));
+    opacity:.10;
+    pointer-events:none;
+  }
+  .post-card-inner{
+    position:relative;
+    z-index:1;
+  }
+
+  .post-header{
+    display:flex;
+    justify-content:space-between;
+    gap:1rem;
+  }
+  .post-meta{
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    color:rgba(96,165,250,.9);
+  }
+  .post-title{
+    font-size:1.1rem;
+    font-weight:600;
+    color:#e5e7eb;
+  }
+  .post-submeta{
+    font-size:.8rem;
+    color:rgba(148,163,184,.95);
+    margin-top:.2rem;
+  }
+
+  .post-tag-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:.35rem;
+    padding:.15rem .7rem;
+    border-radius:999px;
+    background:rgba(15,23,42,.9);
+    border:1px solid rgba(148,163,184,.55);
+    font-size:.7rem;
+    color:rgba(226,232,240,.9);
+  }
+
+  .post-actions-admin{
+    margin-top:.5rem;
+    display:flex;
+    justify-content:flex-end;
+    gap:.35rem;
+  }
+
+  .post-body{
+    margin-top:.9rem;
+    color:rgba(248,250,252,.88);
+  }
+  .post-body-preview{
+    max-height:6.5rem;
+    overflow:hidden;
+    mask-image:linear-gradient(to bottom,#000 68%,transparent 100%);
+    font-size:.92rem;
+  }
+
+  .post-image-wrapper{
+    position:relative;
+    margin-top:.9rem;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid rgba(148,163,184,.35);
+  }
+
+  .post-footer{
+    margin-top:.9rem;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem;
+    font-size:.82rem;
+  }
+  .post-stats{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.75rem;
+    color:rgba(148,163,184,.9);
+  }
+  .stat-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:.35rem;
+  }
+  .stat-pill i{font-size:.9rem;}
+
+  .post-cta{
+    display:inline-flex;
+    align-items:center;
+    gap:.5rem;
+    padding:.5rem 1.1rem;
+    border-radius:999px;
+    border:1px solid rgba(251,191,36,.7);
+    background:radial-gradient(circle at top, rgba(251,191,36,.25), rgba(15,23,42,.98));
+    color:#fefce8;
+    font-weight:600;
+    font-size:.9rem;
+    text-decoration:none;
+    white-space:nowrap;
+    transition:all .18s ease-out;
+  }
+  .post-cta i{font-size:.9rem;}
+  .post-cta:hover{
+    box-shadow:0 0 25px rgba(250,204,21,.5);
+  }
+
+  /* Mini-preview de comentarios */
+  .mini-comment-list{
+    margin-top:.7rem;
+    padding-top:.7rem;
+    border-top:1px solid rgba(148,163,184,.28);
+  }
+  .mini-comment{
+    display:flex;
+    flex-direction:column;
+    gap:.12rem;
+    font-size:.78rem;
+    margin-bottom:.55rem;
+  }
+  .mini-comment strong{
+    color:#e5e7eb;
+    font-weight:600;
+  }
+  .mini-comment small{
+    color:rgba(148,163,184,.95);
+  }
+  .mini-comment p{
+    color:rgba(203,213,225,.96);
+  }
+  .mini-comment-more{
+    font-size:.78rem;
+    color:rgba(248,250,252,.85);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px){
+    .post-card{
+      padding:1.1rem 1.15rem .9rem;
+      border-radius:16px;
+    }
+    .post-footer{
+      flex-direction:column;
+      align-items:flex-start;
+    }
+    .post-cta{
+      width:100%;
+      justify-content:center;
+    }
+  }
+</style>
+{% endblock %}
+
+
 {% block content %}
+
 <section class="section">
-  <div class="flex items-center justify-between">
-    <h1 class="h1-glow text-2xl md:text-3xl">Comunidad</h1>
+  <div class="feed-header">
+    <div class="feed-header-main">
+      <p class="kicker">Comunidad</p>
+      <h1 class="h1-glow text-2xl md:text-3xl">Feed del Nexo</h1>
+      <p class="text-white/60 text-sm mt-1">
+        Comparte avances, teorías, clips y reseñas de tu viaje interdimensional.
+      </p>
+    </div>
+
     {% if user.is_authenticated %}
       <a href="{% url 'community:post_create' %}" class="lol-button">
-        <span class="lol-button-text"><i class="fa-solid fa-plus mr-2"></i>Nueva publicación</span>
+        <span class="lol-button-text">
+          <i class="fa-solid fa-plus mr-2"></i>Nueva publicación
+        </span>
         <span class="lol-button-shine"></span>
+      </a>
+    {% else %}
+      <a href="/accounts/login/?next={{ request.path|urlencode }}" class="btn-ghost">
+        <i class="fa-solid fa-right-to-bracket mr-2"></i>
+        Inicia sesión para publicar
       </a>
     {% endif %}
   </div>
+
+  {# Filtros tipo de post #}
+  {% with current_type=current_type|default:"all" %}
+  <div class="feed-filters">
+    <span class="feed-filters-label">
+      Filtrar por tipo
+    </span>
+
+    <div class="feed-filter-chips">
+      <a href="{% url 'community:feed' %}"
+         class="feed-filter-chip {% if current_type == 'all' %}is-active{% endif %}">
+        <i class="fa-solid fa-stream"></i>
+        Todo
+      </a>
+
+      <a href="?tipo=post"
+         class="feed-filter-chip {% if current_type == 'post' %}is-active{% endif %}">
+        <i class="fa-solid fa-bolt"></i>
+        Publicaciones
+      </a>
+
+      <a href="?tipo=review"
+         class="feed-filter-chip {% if current_type == 'review' %}is-active{% endif %}">
+        <i class="fa-solid fa-star-half-stroke"></i>
+        Reseñas
+      </a>
+    </div>
+  </div>
+  {% endwith %}
 </section>
 
-<section class="grid lg:grid-cols-2 gap-5">
+<section class="post-list">
   {% for p in posts %}
-    <article class="card">
-      <header class="flex items-start justify-between gap-3">
-        <div>
-          <h3 class="card-title">{{ p.title }}</h3>
-          <p class="text-white/60 text-sm">
-            por <strong>{{ p.author.username }}</strong> · {{ p.created|naturaltime }}
-            {% if p.type == 'review' %}<span class="tag ml-2">Reseña</span>{% endif %}
-          </p>
-        </div>
+    <article class="post-card">
+      <div class="post-card-inner">
+        <header class="post-header">
+          <div>
+            <div class="post-meta">
+              COMUNIDAD
+            </div>
+            <h3 class="post-title">{{ p.title }}</h3>
+            <p class="post-submeta">
+              por <strong>{{ p.author.username }}</strong> · {{ p.created|naturaltime }}
+            </p>
+          </div>
 
-        {# === SIN PARÉNTESIS: anidamos condiciones === #}
-        {% if not p.is_removed and user.is_authenticated %}
-          {% if user.is_superuser or user == p.author %}
-            <div class="flex items-center gap-2">
-              <a href="{% url 'community:post_edit' p.slug %}" class="btn-ghost">
-                <i class="fa-solid fa-pen mr-2"></i>Editar
-              </a>
-              <!-- Abrir modal de confirmación -->
-              <a href="{% url 'community:post_delete' p.slug %}" class="btn-ghost" data-modal>
-                <i class="fa-solid fa-trash mr-2"></i>Eliminar
-              </a>
+          <div class="text-right">
+            {% if p.type == 'review' %}
+              <span class="post-tag-pill">
+                <i class="fa-solid fa-star-half-stroke"></i> Reseña
+              </span>
+            {% else %}
+              <span class="post-tag-pill">
+                <i class="fa-solid fa-bolt"></i> Publicación
+              </span>
+            {% endif %}
+
+            {% if user.is_authenticated and not p.is_removed %}
+              {% if user.is_superuser or user == p.author %}
+                <div class="post-actions-admin">
+                  <a href="{% url 'community:post_edit' p.slug %}"
+                     class="btn-ghost text-xs px-2 py-1">
+                    <i class="fa-solid fa-pen mr-1"></i>Editar
+                  </a>
+                  <a href="{% url 'community:post_delete' p.slug %}"
+                     class="btn-ghost text-xs px-2 py-1" data-modal>
+                    <i class="fa-solid fa-trash mr-1"></i>Eliminar
+                  </a>
+                </div>
+              {% endif %}
+            {% endif %}
+          </div>
+        </header>
+
+        <div class="post-body">
+          <div class="post-body-preview">
+            <p class="whitespace-pre-line">{{ p.body }}</p>
+          </div>
+
+          {% if p.image %}
+            <div class="post-image-wrapper">
+              <img src="{{ p.image.url }}" alt=""
+                   style="width:100%;height:100%;object-fit:cover;">
             </div>
           {% endif %}
-        {% endif %}
-      </header>
+        </div>
 
-      <p class="text-white/80 mt-3 whitespace-pre-line">{{ p.body|truncatechars:300 }}</p>
+        {# Vista previa de los últimos 2 comentarios #}
+        {% with preview=p.latest_comments %}
+          {% if preview %}
+            <div class="mini-comment-list">
+              {% for c in preview %}
+                <div class="mini-comment">
+                  <div>
+                    <strong>{{ c.author.username }}</strong>
+                    <small> · {{ c.created|naturaltime }}</small>
+                  </div>
+                  <p>{{ c.body }}</p>
+                </div>
+              {% endfor %}
+              {% if p.comments_count > preview|length %}
+                <a href="{{ p.get_absolute_url }}"
+                   class="mini-comment-more link-soft">
+                  Ver los {{ p.comments_count }} comentarios →
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endwith %}
 
-      {% if p.image %}
-      <div class="mt-3" style="aspect-ratio:16/9;overflow:hidden;border:1px solid var(--line);border-radius:.5rem">
-        <img src="{{ p.image.url }}" style="width:100%;height:100%;object-fit:cover" alt="">
+        <footer class="post-footer">
+          <div class="post-stats">
+            <span class="stat-pill">
+              <i class="fa-solid fa-message"></i>
+              {{ p.comments_count }} comentario{{ p.comments_count|pluralize:"s" }}
+            </span>
+            <span class="stat-pill">
+              <i class="fa-solid fa-fire-flame-curved"></i>
+              {{ p.reactions_count }} reacción{{ p.reactions_count|pluralize:"es" }}
+            </span>
+          </div>
+
+          <a class="post-cta" href="{{ p.get_absolute_url }}">
+            <i class="fa-solid fa-arrow-right"></i>
+            Ver detalles
+          </a>
+        </footer>
       </div>
-      {% endif %}
-
-      <footer class="mt-4 flex items-center justify-between">
-        <a class="link-soft" href="{{ p.get_absolute_url }}"><i class="fa-solid fa-arrow-right mr-2"></i>Ver detalles</a>
-      </footer>
     </article>
   {% empty %}
-    <p class="text-white/60">Sin publicaciones aún.</p>
+    <p class="text-white/60 px-1">Sin publicaciones aún.</p>
   {% endfor %}
 </section>
 
 {% if posts.has_other_pages %}
 <nav class="mt-6 flex items-center gap-2">
-  {% if posts.has_previous %}<a class="btn-ghost" href="?page={{ posts.previous_page_number }}">‹ Anterior</a>{% endif %}
+  {% if posts.has_previous %}
+    <a class="btn-ghost" href="?page={{ posts.previous_page_number }}{% if current_type and current_type != 'all' %}&tipo={{ current_type }}{% endif %}">‹ Anterior</a>
+  {% endif %}
   <span class="text-white/60">Página {{ posts.number }} de {{ posts.paginator.num_pages }}</span>
-  {% if posts.has_next %}<a class="btn-ghost" href="?page={{ posts.next_page_number }}">Siguiente ›</a>{% endif %}
+  {% if posts.has_next %}
+    <a class="btn-ghost" href="?page={{ posts.next_page_number }}{% if current_type and current_type != 'all' %}&tipo={{ current_type }}{% endif %}">Siguiente ›</a>
+  {% endif %}
 </nav>
 {% endif %}
 {% endblock %}

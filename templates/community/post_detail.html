@@ -2,87 +2,431 @@
 {% load humanize %}
 {% block title %}{{ post.title }} · Comunidad{% endblock %}
 
+{% block head %}
+<style>
+  .post-hero{
+    border-radius:22px;
+    padding:1.6rem 1.9rem;
+    margin-bottom:1.5rem;
+    background:radial-gradient(circle at top, rgba(56,189,248,.25), transparent 55%),
+               radial-gradient(circle at bottom, rgba(129,140,248,.35), transparent 60%),
+               rgba(15,23,42,.98);
+    box-shadow:
+      0 26px 55px rgba(0,0,0,.72),
+      0 0 0 1px rgba(165,180,252,.45);
+    display:flex;
+    justify-content:space-between;
+    gap:1.25rem;
+    align-items:flex-start;
+  }
+  .post-hero-main h1{
+    font-size:1.7rem;
+  }
+  .post-hero-meta{
+    font-size:.8rem;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    color:rgba(148,163,184,.95);
+  }
+  .post-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:.4rem;
+    padding:.2rem .75rem;
+    border-radius:999px;
+    font-size:.75rem;
+    border:1px solid rgba(251,191,36,.7);
+    background:radial-gradient(circle at top, rgba(251,191,36,.3), rgba(15,23,42,.95));
+    color:#fefce8;
+  }
+  .post-hero-actions{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:.45rem;
+  }
+  .post-main-card{
+    border-radius:18px;
+    padding:1.5rem 1.6rem;
+    background:rgba(15,23,42,.96);
+    box-shadow:
+      0 22px 45px rgba(0,0,0,.7),
+      0 0 0 1px rgba(30,64,175,.4);
+  }
+  .post-main-image{
+    margin-top:1rem;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid rgba(148,163,184,.35);
+  }
+
+  .reaction-bar{
+    margin-top:1rem;
+    padding-top:.75rem;
+    border-top:1px solid rgba(148,163,184,.3);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:.75rem;
+    align-items:center;
+    font-size:.85rem;
+  }
+  .reaction-count{
+    color:rgba(148,163,184,.95);
+    display:flex;
+    align-items:center;
+    gap:.4rem;
+  }
+  .reaction-buttons{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.5rem;
+  }
+  .reaction-btn{
+    border-radius:999px;
+    padding:.35rem .8rem;
+    border:1px solid rgba(148,163,184,.4);
+    background:rgba(15,23,42,.9);
+    font-size:.8rem;
+    display:inline-flex;
+    align-items:center;
+    gap:.35rem;
+  }
+  .reaction-btn span{
+    font-size:.85rem;
+  }
+  .reaction-btn.active{
+    border-color:rgba(251,191,36,.9);
+    background:radial-gradient(circle at top, rgba(251,191,36,.3), rgba(15,23,42,.98));
+    color:#fefce8;
+    box-shadow:0 0 18px rgba(251,191,36,.45);
+  }
+
+  .author-card{
+    border-radius:18px;
+    padding:1.25rem 1.5rem;
+    background:radial-gradient(circle at top, rgba(56,189,248,.16), transparent 60%),
+               rgba(15,23,42,.98);
+    box-shadow:
+      0 22px 45px rgba(0,0,0,.7),
+      0 0 0 1px rgba(56,189,248,.35);
+  }
+
+  .comment-shell{
+    border-radius:20px;
+    padding:1.25rem 1.5rem;
+    background:rgba(15,23,42,.96);
+    box-shadow:
+      0 22px 45px rgba(0,0,0,.75),
+      0 0 0 1px rgba(30,64,175,.4);
+  }
+  .comment-item{
+    border-radius:14px;
+    padding:1rem 1.1rem;
+    background:rgba(15,23,42,.95);
+    border:1px solid rgba(51,65,85,.9);
+    margin-bottom:.85rem;
+  }
+  .comment-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:.5rem;
+    font-size:.8rem;
+  }
+  .comment-body{
+    margin-top:.35rem;
+    font-size:.9rem;
+    color:rgba(226,232,240,.96);
+  }
+  .comment-actions{
+    margin-top:.45rem;
+    display:flex;
+    flex-wrap:wrap;
+    gap:.4rem;
+    justify-content:flex-end;
+    font-size:.8rem;
+  }
+  .comment-chip{
+    border-radius:999px;
+    padding:.25rem .7rem;
+    border:1px solid rgba(148,163,184,.5);
+    background:rgba(15,23,42,.9);
+    display:inline-flex;
+    align-items:center;
+    gap:.3rem;
+  }
+  .comment-chip.danger{
+    border-color:rgba(248,113,113,.9);
+    color:rgba(254,202,202,.95);
+  }
+  .comment-replies{
+    margin-top:.65rem;
+    padding-left:1.25rem;
+    border-left:1px dashed rgba(71,85,105,.8);
+  }
+  .comment-reply-item{
+    border-radius:12px;
+    padding:.6rem .75rem;
+    background:rgba(15,23,42,.95);
+    border:1px solid rgba(51,65,85,.8);
+    margin-bottom:.5rem;
+    font-size:.85rem;
+  }
+  .comment-new textarea{
+    width:100%;
+    border-radius:12px;
+    border:1px solid rgba(51,65,85,.9);
+    background:rgba(15,23,42,.96);
+    color:#e5e7eb;
+    padding:.75rem .8rem;
+    resize:vertical;
+  }
+</style>
+{% endblock %}
+
+
 {% block content %}
+
+{# HERO DEL POST #}
 <section class="section">
-  <div class="flex items-start justify-between gap-3">
-    <div>
-      <p class="kicker">Comunidad</p>
+  <div class="post-hero">
+    <div class="post-hero-main">
+      <div class="post-hero-meta mb-1">COMUNIDAD</div>
       <h1 class="h1-glow text-2xl md:text-3xl">{{ post.title }}</h1>
-      <p class="text-white/60 text-sm">
+      <p class="text-white/60 text-xs mt-1">
         por <strong>{{ post.author.username }}</strong> · {{ post.created|naturaltime }}
-        {% if post.type == 'review' %}<span class="tag ml-2">Reseña</span>{% endif %}
       </p>
-    </div>
-
-    {# === SIN PARÉNTESIS: anidamos condiciones === #}
-    {% if not post.is_removed and user.is_authenticated %}
-      {% if user.is_superuser or user == post.author %}
-        <div class="flex items-center gap-2">
-          <a href="{% url 'community:post_edit' post.slug %}" class="btn-ghost"><i class="fa-solid fa-pen mr-2"></i>Editar</a>
-          <a href="{% url 'community:post_delete' post.slug %}" class="btn-ghost" data-modal>
-            <i class="fa-solid fa-trash mr-2"></i>Eliminar
-          </a>
-        </div>
-      {% endif %}
-    {% endif %}
-  </div>
-</section>
-
-<section class="grid lg:grid-cols-3 gap-5">
-  <article class="card lg:col-span-2">
-    <p class="text-white/80 whitespace-pre-line">{{ post.body }}</p>
-    {% if post.image %}
-    <div class="mt-4" style="aspect-ratio:16/9;overflow:hidden;border:1px solid var(--line);border-radius:.5rem">
-      <img src="{{ post.image.url }}" style="width:100%;height:100%;object-fit:cover" alt="">
-    </div>
-    {% endif %}
-  </article>
-
-  <aside class="card">
-    <h3 class="card-title"><i class="fa-regular fa-circle-user mr-2"></i>Autor</h3>
-    <p class="text-white/80"><strong>{{ post.author.username }}</strong></p>
-    <p class="text-white/60 text-sm">Publicado {{ post.created|naturaltime }}</p>
-  </aside>
-</section>
-
-<section class="section">
-  <h3 class="card-title"><i class="fa-solid fa-comments"></i> Comentarios</h3>
-
-  {% for c in comments %}
-    <div class="card mb-3">
-      <div class="flex items-center justify-between">
-        <strong>{{ c.author.username }}</strong>
-        <span class="text-white/60 text-sm">{{ c.created|naturaltime }}</span>
+      <div class="mt-2">
+        {% if post.type == 'review' %}
+          <span class="post-badge">
+            <i class="fa-solid fa-star"></i> Reseña del juego
+          </span>
+        {% else %}
+          <span class="post-badge">
+            <i class="fa-solid fa-bolt-lightning"></i> Publicación de la comunidad
+          </span>
+        {% endif %}
       </div>
-      <p class="text-white/80 mt-2 whitespace-pre-line">{{ c.body }}</p>
+    </div>
 
-      {# === SIN PARÉNTESIS: anidamos condiciones === #}
-      {% if user.is_authenticated %}
-        {% if user.is_superuser or user == c.author %}
-          <div class="mt-2">
-            <a href="{% url 'community:comment_delete' c.id %}" class="btn-ghost" data-modal>
+    <div class="post-hero-actions">
+      {% if user.is_authenticated and not post.is_removed %}
+        {% if user.is_superuser or user == post.author %}
+          <div class="flex gap-2">
+            <a href="{% url 'community:post_edit' post.slug %}" class="btn-ghost">
+              <i class="fa-solid fa-pen mr-2"></i>Editar
+            </a>
+            <a href="{% url 'community:post_delete' post.slug %}" class="btn-ghost" data-modal>
               <i class="fa-solid fa-trash mr-2"></i>Eliminar
             </a>
           </div>
         {% endif %}
       {% endif %}
     </div>
-  {% empty %}
-    <p class="text-white/60">Sé el primero en comentar.</p>
-  {% endfor %}
-
-  {% if user.is_authenticated %}
-  <form method="post" action="{% url 'community:comment_create' post.slug %}" class="card mt-4">
-    {% csrf_token %}
-    <label class="block mb-2">Nuevo comentario</label>
-    {{ form.body }}
-    <button class="lol-button mt-3">
-      <span class="lol-button-text"><i class="fa-solid fa-paper-plane mr-2"></i>Publicar</span>
-      <span class="lol-button-shine"></span>
-    </button>
-  </form>
-  {% else %}
-    <p class="text-white/60 mt-3">Para comentar, <a class="link-soft" href="{% url 'accounts:login' %}">inicia sesión</a>.</p>
-  {% endif %}
+  </div>
 </section>
+
+<section class="grid lg:grid-cols-3 gap-5">
+  <article class="post-main-card lg:col-span-2">
+    <p class="text-white/80 whitespace-pre-line text-sm md:text-base">
+      {{ post.body }}
+    </p>
+
+    {% if post.image %}
+      <div class="post-main-image">
+        <img src="{{ post.image.url }}" alt="" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+    {% endif %}
+
+    <div class="reaction-bar">
+      <div class="reaction-count">
+        <i class="fa-solid fa-fire-flame-curved"></i>
+        {{ post.reactions_count }} reacción{{ post.reactions_count|pluralize:"es" }}
+        · {{ post.comments_count }} comentario{{ post.comments_count|pluralize:"s" }}
+      </div>
+
+      <div class="reaction-buttons">
+        {% if user.is_authenticated %}
+          <form method="post" action="{% url 'community:post_react' post.slug 'like' %}">
+            {% csrf_token %}
+            <button type="submit"
+                    class="reaction-btn {% if user_post_reaction and user_post_reaction.reaction == 'like' %}active{% endif %}">
+              <i class="fa-solid fa-heart"></i><span>Me gusta</span>
+            </button>
+          </form>
+          <form method="post" action="{% url 'community:post_react' post.slug 'gg' %}">
+            {% csrf_token %}
+            <button type="submit"
+                    class="reaction-btn {% if user_post_reaction and user_post_reaction.reaction == 'gg' %}active{% endif %}">
+              <i class="fa-solid fa-thumbs-up"></i><span>GG</span>
+            </button>
+          </form>
+          <form method="post" action="{% url 'community:post_react' post.slug 'wow' %}">
+            {% csrf_token %}
+            <button type="submit"
+                    class="reaction-btn {% if user_post_reaction and user_post_reaction.reaction == 'wow' %}active{% endif %}">
+              <i class="fa-solid fa-bolt"></i><span>Wow</span>
+            </button>
+          </form>
+          <form method="post" action="{% url 'community:post_react' post.slug 'salt' %}">
+            {% csrf_token %}
+            <button type="submit"
+                    class="reaction-btn {% if user_post_reaction and user_post_reaction.reaction == 'salt' %}active{% endif %}">
+              <i class="fa-solid fa-skull-crossbones"></i><span>Salado</span>
+            </button>
+          </form>
+        {% else %}
+          <span class="text-white/60 text-xs">
+            Para reaccionar, <a href="/accounts/login/?next={{ request.path|urlencode }}" class="link-soft">inicia sesión</a>.
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  </article>
+
+  <aside class="author-card">
+    <h3 class="card-title flex items-center gap-2 mb-2">
+      <i class="fa-regular fa-circle-user"></i> Autor
+    </h3>
+    <p class="text-white/90 font-semibold">{{ post.author.username }}</p>
+    <p class="text-white/60 text-sm mt-1">
+      Publicado {{ post.created|naturaltime }}<br>
+      <i class="fa-solid fa-message mr-1 mt-1"></i>{{ post.comments_count }} comentarios
+    </p>
+  </aside>
+</section>
+
+{# ================== COMENTARIOS ================== #}
+<section class="section">
+  <div class="comment-shell">
+    <h3 class="card-title flex items-center gap-2 mb-3">
+      <i class="fa-solid fa-comments"></i> Comentarios
+    </h3>
+
+    {% for c in comments %}
+      <div class="comment-item">
+        <div class="comment-header">
+          <div>
+            <strong>{{ c.author.username }}</strong>
+            <span class="text-white/50 text-xs"> · {{ c.created|naturaltime }}</span>
+          </div>
+        </div>
+
+        <div class="comment-body whitespace-pre-line">
+          {{ c.body }}
+        </div>
+
+        {# Reacciones y acciones del comentario raíz #}
+        <div class="comment-actions">
+          {% if user.is_authenticated %}
+            <form method="post" action="{% url 'community:comment_react' c.id 'like' %}">
+              {% csrf_token %}
+              <button type="submit" class="comment-chip">
+                <i class="fa-solid fa-fire"></i> Reaccionar
+              </button>
+            </form>
+
+            <details class="comment-chip" style="cursor:pointer;">
+              <summary class="flex items-center gap-1">
+                <i class="fa-solid fa-reply"></i> Responder
+              </summary>
+              <form method="post" action="{% url 'community:comment_reply' c.id %}" class="mt-2 w-full">
+                {% csrf_token %}
+                <textarea name="body" rows="2" required
+                          class="w-full rounded-md border border-slate-600 bg-slate-900/80 text-sm text-white px-2 py-1"></textarea>
+                <button type="submit" class="lol-button mt-2">
+                  <span class="lol-button-text text-xs">
+                    <i class="fa-solid fa-paper-plane mr-2"></i>Enviar respuesta
+                  </span>
+                  <span class="lol-button-shine"></span>
+                </button>
+              </form>
+            </details>
+
+            {% if user.is_superuser or user == c.author %}
+              <form method="post"
+                    action="{% url 'community:comment_delete' c.id %}"
+                    onsubmit="return confirm('¿Eliminar este comentario?');">
+                {% csrf_token %}
+                <button type="submit" class="comment-chip danger">
+                  <i class="fa-solid fa-trash"></i> Eliminar
+                </button>
+              </form>
+            {% endif %}
+          {% else %}
+            <span class="text-white/50 text-xs">
+              Para reaccionar o responder,
+              <a href="/accounts/login/?next={{ request.path|urlencode }}" class="link-soft">inicia sesión</a>.
+            </span>
+          {% endif %}
+        </div>
+
+        {# Respuestas anidadas #}
+        {% if c.replies.all %}
+          <div class="comment-replies">
+            {% for r in c.replies.all %}
+              {% if not r.is_removed %}
+                <div class="comment-reply-item">
+                  <div class="flex justify-between text-xs text-white/60 mb-1">
+                    <span><strong>{{ r.author.username }}</strong></span>
+                    <span>{{ r.created|naturaltime }}</span>
+                  </div>
+                  <div class="text-white/90 whitespace-pre-line">
+                    {{ r.body }}
+                  </div>
+                  <div class="flex justify-end gap-2 mt-1 text-xs">
+                    {% if user.is_authenticated %}
+                      <form method="post" action="{% url 'community:comment_react' r.id 'like' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="comment-chip">
+                          <i class="fa-solid fa-fire"></i> Reaccionar
+                        </button>
+                      </form>
+                      {% if user.is_superuser or user == r.author %}
+                        <form method="post"
+                              action="{% url 'community:comment_delete' r.id %}"
+                              onsubmit="return confirm('¿Eliminar esta respuesta?');">
+                          {% csrf_token %}
+                          <button type="submit" class="comment-chip danger">
+                            <i class="fa-solid fa-trash"></i> Eliminar
+                          </button>
+                        </form>
+                      {% endif %}
+                    {% endif %}
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% empty %}
+      <p class="text-white/60 mb-3">Sé el primero en comentar.</p>
+    {% endfor %}
+
+    {# Nuevo comentario raíz #}
+    {% if user.is_authenticated %}
+      <div class="comment-new mt-4">
+        <h4 class="text-white/80 text-sm mb-2">Nuevo comentario</h4>
+        <form method="post" action="{% url 'community:comment_create' post.slug %}">
+          {% csrf_token %}
+          {{ form.body }}
+          <button class="lol-button mt-3">
+            <span class="lol-button-text">
+              <i class="fa-solid fa-paper-plane mr-2"></i>Publicar
+            </span>
+            <span class="lol-button-shine"></span>
+          </button>
+        </form>
+      </div>
+    {% else %}
+      <p class="text-white/60 mt-4 text-sm">
+        Para comentar, responder o reaccionar,
+        <a class="link-soft" href="/accounts/login/?next={{ request.path|urlencode }}">inicia sesión</a>.
+      </p>
+    {% endif %}
+  </div>
+</section>
+
 {% endblock %}

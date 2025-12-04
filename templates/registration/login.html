@@ -30,12 +30,13 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(
-      135deg,
-      rgba(0, 0, 0, 0.8) 0%,
-      rgba(0, 0, 0, 0.6) 50%,
-      rgba(0, 0, 0, 0.8) 100%
-    );
+    background: radial-gradient(circle at top, rgba(15,23,42,0.4), transparent 45%),
+                linear-gradient(
+                  135deg,
+                  rgba(0, 0, 0, 0.9) 0%,
+                  rgba(0, 0, 0, 0.7) 50%,
+                  rgba(0, 0, 0, 0.9) 100%
+                );
     z-index: -1;
   }
 
@@ -58,9 +59,9 @@
   }
 
   @keyframes floatLogin {
-    0%, 100% { 
+    0%, 100% {
       transform: translateY(0px) rotate(0deg) scale(1);
-      opacity: 0.3;
+      opacity: 0.25;
     }
     50% { 
       transform: translateY(-30px) rotate(180deg) scale(1.2);
@@ -70,24 +71,24 @@
 
   /* Tarjeta principal con imagen de fondo DENTRO del formulario */
   .login-card {
-    background: 
-      /* Capa de color semitransparente */
+    background:
       linear-gradient(
         135deg,
-        rgba(255, 255, 255, 0.1) 0%,
-        rgba(255, 255, 255, 0.05) 100%
+        rgba(15, 23, 42, 0.96) 0%,
+        rgba(15, 23, 42, 0.85) 40%,
+        rgba(15, 23, 42, 0.9) 100%
       ),
-      /* Imagen de fondo DENTRO de la card */
       url('{% static "img/fotologin.png" %}') center/cover;
+    background-blend-mode: overlay;
     
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 24px;
+    backdrop-filter: blur(22px);
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    border-radius: 26px;
     padding: 3rem;
     box-shadow: 
-      0 25px 50px rgba(0, 0, 0, 0.5),
-      0 0 100px rgba(var(--accent-rgb), 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      0 26px 60px rgba(0, 0, 0, 0.7),
+      0 0 120px rgba(var(--accent-rgb), 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
     animation: cardEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
     overflow: hidden;
@@ -99,23 +100,37 @@
     justify-content: center;
   }
 
-  /* Efecto de animación sutil en el fondo de la card */
+  /* Borde glow sutil */
+  .login-card::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    border-radius: 25px;
+    background: linear-gradient(
+      135deg,
+      rgba(56, 189, 248, 0.12),
+      rgba(249, 115, 22, 0.12),
+      rgba(129, 140, 248, 0.12)
+    );
+    opacity: 0.6;
+    z-index: -1;
+  }
+
+  /* Brillo en movimiento sobre la card */
   .login-card::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background: linear-gradient(
       45deg,
       transparent 0%,
-      rgba(255, 255, 255, 0.03) 50%,
+      rgba(255, 255, 255, 0.06) 50%,
       transparent 100%
     );
     animation: bgShine 6s ease-in-out infinite;
     z-index: 1;
     pointer-events: none;
+    opacity: 0.0;
   }
 
   @keyframes bgShine {
@@ -129,27 +144,6 @@
     }
   }
 
-  .login-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.1),
-      transparent
-    );
-    transition: left 0.8s ease;
-    z-index: 1;
-  }
-
-  .login-card:hover::before {
-    left: 100%;
-  }
-
   @keyframes cardEntrance {
     0% {
       opacity: 0;
@@ -161,7 +155,6 @@
     }
   }
 
-  /* Contenido de la card (sobre el fondo de imagen) */
   .login-content {
     position: relative;
     z-index: 2;
@@ -175,41 +168,45 @@
   }
 
   .login-icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 1.5rem;
-    background: linear-gradient(135deg, var(--accent), var(--brand));
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 1.75rem;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    animation: iconGlow 3s ease-in-out infinite alternate;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
+    border: 1px solid rgba(248, 250, 252, 0.4);
+    backdrop-filter: blur(14px);
+    background: radial-gradient(circle at 30% 20%, rgba(248, 250, 252, 0.25), rgba(15, 23, 42, 0.95));
+    box-shadow:
+      0 0 40px rgba(249, 115, 22, 0.35),
+      inset 0 0 12px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
   }
 
-  .login-icon::after {
+  .login-icon::before {
     content: '';
     position: absolute;
-    inset: -3px;
-    background: linear-gradient(135deg, var(--accent), var(--brand));
-    border-radius: 50%;
+    inset: -14px;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.5), transparent 60%);
+    opacity: 0.6;
+    filter: blur(20px);
     z-index: -1;
-    filter: blur(15px);
-    opacity: 0.5;
   }
 
-  @keyframes iconGlow {
-    0% {
-      box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.4);
-    }
-    100% {
-      box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.8);
-    }
+  .login-custom-icon {
+    width: 68px;
+    height: 68px;
+    object-fit: contain;
+    filter: none; /* colores reales del logo */
   }
 
-  /* Formulario mejorado */
+  .login-header h1 {
+    letter-spacing: -0.03em;
+  }
+
+  /* Formulario */
   .form-group {
     margin-bottom: 1.5rem;
     position: relative;
@@ -219,27 +216,27 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.95);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    transition: all 0.3s ease;
+    color: rgba(248, 250, 252, 0.95);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+    font-size: 0.9rem;
   }
 
   .input-wrapper {
     position: relative;
     border-radius: 12px;
     transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(148, 163, 184, 0.55);
     backdrop-filter: blur(15px);
   }
 
   .input-wrapper:focus-within {
-    border-color: var(--accent);
+    border-color: rgba(249, 115, 22, 0.85);
     box-shadow: 
-      0 0 0 3px rgba(var(--accent-rgb), 0.2),
-      0 8px 25px rgba(0, 0, 0, 0.4);
-    transform: translateY(-2px);
-    background: rgba(255, 255, 255, 0.15);
+      0 0 0 1px rgba(249, 115, 22, 0.8),
+      0 12px 30px rgba(15, 23, 42, 0.9);
+    transform: translateY(-1px);
+    background: rgba(15, 23, 42, 0.9);
   }
 
   .input-wrapper input {
@@ -247,8 +244,8 @@
     padding: 1rem 1rem 1rem 3rem;
     background: transparent;
     border: none;
-    color: white;
-    font-size: 1rem;
+    color: #f9fafb;
+    font-size: 0.98rem;
     transition: all 0.3s ease;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
@@ -258,7 +255,7 @@
   }
 
   .input-wrapper input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(148, 163, 184, 0.85);
     text-shadow: none;
   }
 
@@ -267,15 +264,14 @@
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(148, 163, 184, 0.9);
     transition: all 0.3s ease;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
   .input-wrapper:focus-within .input-icon {
-    color: var(--accent);
-    transform: translateY(-50%) scale(1.1);
-    text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
+    color: #fed7aa;
+    transform: translateY(-50%) scale(1.08);
+    text-shadow: 0 0 10px rgba(249, 115, 22, 0.75);
   }
 
   .password-toggle {
@@ -285,35 +281,32 @@
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(148, 163, 184, 0.9);
     cursor: pointer;
     transition: all 0.3s ease;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
   .password-toggle:hover {
-    color: var(--accent);
+    color: #fed7aa;
     transform: translateY(-50%) scale(1.1);
-    text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
   }
 
-  /* Botón de submit mejorado */
+  /* Botón de submit */
   .login-submit {
     width: 100%;
     padding: 1rem 2rem;
-    background: linear-gradient(135deg, var(--accent), var(--brand));
+    background: linear-gradient(135deg, #f97316, #ea580c);
     border: none;
     border-radius: 12px;
-    color: var(--coal);
+    color: #020617;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
     position: relative;
     overflow: hidden;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(10px);
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(248, 250, 252, 0.75);
   }
 
   .login-submit::before {
@@ -326,10 +319,10 @@
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 255, 255, 0.4),
+      rgba(255, 255, 255, 0.35),
       transparent
     );
-    transition: left 0.6s ease;
+    transition: left 0.55s ease;
   }
 
   .login-submit:hover::before {
@@ -337,33 +330,33 @@
   }
 
   .login-submit:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     box-shadow: 
-      0 15px 30px rgba(var(--accent-rgb), 0.4),
-      0 0 30px rgba(var(--accent-rgb), 0.2);
+      0 16px 35px rgba(249, 115, 22, 0.55),
+      0 0 40px rgba(249, 115, 22, 0.4);
   }
 
   .login-submit:active {
-    transform: translateY(-1px);
+    transform: translateY(0);
   }
 
-  /* Estados de error mejorados */
+  /* Errores */
   .form-error {
-    color: #ff6b6b;
-    font-size: 0.875rem;
+    color: #fecaca;
+    font-size: 0.85rem;
     margin-top: 0.5rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
     animation: shake 0.5s ease-in-out;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
   }
 
   .alert-error {
-    background: rgba(255, 107, 107, 0.2);
-    border: 1px solid rgba(255, 107, 107, 0.4);
-    color: #ff6b6b;
-    padding: 1rem;
+    background: rgba(248, 113, 113, 0.15);
+    border: 1px solid rgba(248, 113, 113, 0.6);
+    color: #fee2e2;
+    padding: 0.9rem 1.1rem;
     border-radius: 12px;
     margin-bottom: 1.5rem;
     display: flex;
@@ -371,27 +364,20 @@
     gap: 0.75rem;
     animation: slideDown 0.5s ease-out;
     backdrop-filter: blur(15px);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
   @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
   }
 
   @keyframes slideDown {
-    0% {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    0% { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
   }
 
-  /* Checkbox mejorado */
+  /* Checkbox Recordar sesión */
   .checkbox-container {
     display: flex;
     align-items: center;
@@ -402,18 +388,18 @@
   .custom-checkbox {
     width: 20px;
     height: 20px;
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    border-radius: 4px;
+    border: 2px solid rgba(148, 163, 184, 0.8);
+    border-radius: 6px;
     position: relative;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.15);
+    transition: all 0.25s ease;
+    background: rgba(15, 23, 42, 0.9);
     backdrop-filter: blur(10px);
   }
 
   .checkbox-input:checked + .custom-checkbox {
-    background: var(--accent);
-    border-color: var(--accent);
-    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
+    background: linear-gradient(135deg, #f97316, #fb923c);
+    border-color: transparent;
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.8);
   }
 
   .checkbox-input:checked + .custom-checkbox::after {
@@ -421,55 +407,55 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    color: var(--coal);
-    font-weight: bold;
-    font-size: 0.875rem;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    transform: translate(-50%, -55%);
+    color: #020617;
+    font-weight: 800;
+    font-size: 0.8rem;
   }
 
-  /* Enlaces sociales mejorados */
-  .social-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-top: 1.5rem;
+  /* CTA Crear cuenta (más destacado) */
+  .create-account-wrapper {
+    text-align: center;
   }
 
-  .social-btn {
-    padding: 0.75rem 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.12);
-    color: rgba(255, 255, 255, 0.95);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
+  .create-account-text {
+    color: rgba(226, 232, 240, 0.8);
+    font-size: 0.9rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .create-account-btn {
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    font-weight: 500;
-    backdrop-filter: blur(15px);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    gap: 0.55rem;
+    padding: 0.8rem 1.8rem;
+    border-radius: 999px;
+    border: 1px solid rgba(251, 191, 36, 0.85);
+    background: radial-gradient(circle at top,
+              rgba(249, 115, 22, 0.25),
+              rgba(15, 23, 42, 0.95));
+    color: #fef9c3;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.25);
   }
 
-  .social-btn:hover {
-    border-color: rgba(255, 255, 255, 0.4);
-    background: rgba(255, 255, 255, 0.2);
+  .create-account-btn i {
+    font-size: 0.9rem;
+  }
+
+  .create-account-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    box-shadow:
+      0 14px 30px rgba(251, 191, 36, 0.45),
+      0 0 40px rgba(251, 191, 36, 0.5);
+    border-color: rgba(253, 224, 71, 0.95);
   }
 
-  .social-btn.google:hover {
-    border-color: #DB4437;
-    color: #DB4437;
-    text-shadow: 0 0 10px rgba(219, 68, 55, 0.5);
-  }
-
-  .social-btn.discord:hover {
-    border-color: #5865F2;
-    color: #5865F2;
-    text-shadow: 0 0 10px rgba(88, 101, 242, 0.5);
+  .create-account-btn:active {
+    transform: translateY(0);
   }
 
   /* Responsive */
@@ -479,15 +465,6 @@
       padding: 2rem;
       min-height: 450px;
     }
-    
-    .social-buttons {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  /* Efectos de texto */
-  .text-glow {
-    text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.5);
   }
 
   .fade-in-up {
@@ -523,16 +500,15 @@
   <div class="login-particles" id="loginParticles"></div>
 
   <div class="max-w-md w-full mx-4">
-    <!-- Tarjeta principal con imagen de fondo DENTRO -->
     <div class="login-card">
       <div class="login-content">
         <!-- Header -->
         <div class="login-header fade-in-up" style="animation-delay: 0.1s">
-  <div class="login-icon">
-    <img src="{% static 'core/icons/NeoForceGames.png' %}" alt="NeoForce Games" class="login-custom-icon">
-  </div>
-          <h1 class="h1-glow text-3xl font-bold mb-2 text-glow">Entrar al Nexo</h1>
-          <p class="text-white/80 text-lg">
+          <div class="login-icon">
+            <img src="{% static 'core/icons/NeoForceGames.png' %}" alt="NeoForce Games" class="login-custom-icon">
+          </div>
+          <h1 class="h1-glow text-3xl font-bold mb-2 text-center">Entrar al Nexo</h1>
+          <p class="text-white/80 text-base text-center">
             Accede a tu cuenta para continuar tu viaje
           </p>
         </div>
@@ -541,7 +517,6 @@
         <form method="post" class="space-y-6" novalidate>
           {% csrf_token %}
           
-          <!-- Errores generales -->
           {% if form.non_field_errors %}
           <div class="alert-error" role="alert">
             <i class="fa-solid fa-circle-exclamation"></i>
@@ -549,7 +524,7 @@
           </div>
           {% endif %}
 
-          <!-- Campo Usuario/Email -->
+          <!-- Usuario / Email -->
           <div class="form-group fade-in-up" style="animation-delay: 0.2s">
             <label for="id_username" class="form-label">
               Usuario o Email
@@ -566,7 +541,7 @@
             {% endif %}
           </div>
 
-          <!-- Campo Contraseña -->
+          <!-- Contraseña -->
           <div class="form-group fade-in-up" style="animation-delay: 0.3s">
             <label for="id_password" class="form-label">
               Contraseña
@@ -586,16 +561,13 @@
             {% endif %}
           </div>
 
-          <!-- Recordarme y Olvidé contraseña -->
+          <!-- Recordar sesión (sin "olvidaste tu contraseña") -->
           <div class="flex items-center justify-between fade-in-up" style="animation-delay: 0.4s">
             <label class="checkbox-container">
               <input type="checkbox" name="remember" class="checkbox-input sr-only">
               <span class="custom-checkbox"></span>
               <span class="text-white/80 text-sm">Recordar sesión</span>
             </label>
-            <a href="/accounts/password/reset/" class="text-sm text-accent hover:text-brand transition-colors font-semibold">
-              ¿Olvidaste tu contraseña?
-            </a>
           </div>
 
           <!-- Submit -->
@@ -605,36 +577,16 @@
           </button>
         </form>
 
-        <!-- Separador -->
-        <div class="mt-8 pt-6 border-t border-white/20 fade-in-up" style="animation-delay: 0.6s">
-          <p class="text-center text-white/70">
-            ¿Primera vez en el Nexo?
-            <a href="/accounts/register/" class="text-accent hover:text-brand font-semibold ml-1 transition-colors">
-              Crear cuenta
+        <!-- CTA Crear cuenta destacado -->
+        <div class="mt-8 pt-6 border-t border-white/15 fade-in-up" style="animation-delay: 0.6s">
+          <div class="create-account-wrapper">
+            <p class="create-account-text">
+              ¿Primera vez en el Nexo?
+            </p>
+            <a href="/accounts/register/" class="create-account-btn">
+              <i class="fa-solid fa-user-plus"></i>
+              <span>Crear cuenta nueva</span>
             </a>
-          </p>
-        </div>
-
-        <!-- Login rápido -->
-        <div class="mt-6 fade-in-up" style="animation-delay: 0.7s">
-          <div class="relative">
-            <div class="absolute inset-0 flex items-center">
-              <div class="w-full border-t border-white/20"></div>
-            </div>
-            <div class="relative flex justify-center text-sm">
-              <span class="px-3 bg-transparent text-white/50 font-medium">O continuar con</span>
-            </div>
-          </div>
-
-          <div class="social-buttons">
-            <button type="button" class="social-btn google">
-              <i class="fa-brands fa-google"></i>
-              Google
-            </button>
-            <button type="button" class="social-btn discord">
-              <i class="fa-brands fa-discord"></i>
-              Discord
-            </button>
           </div>
         </div>
       </div>
@@ -646,7 +598,7 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Cargar video de fondo (login.mp4)
+  // Cargar video de fondo
   const video = document.querySelector('.login-video-bg');
   if (video) {
     const src = video.dataset.srcMp4;
@@ -663,7 +615,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // Crear partículas decorativas
+  // Partículas decorativas
   const particlesContainer = document.getElementById('loginParticles');
   if (particlesContainer) {
     const particleCount = 12;
@@ -688,7 +640,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // Toggle de visibilidad de contraseña
+  // Toggle visibilidad contraseña
   const passwordToggle = document.getElementById('passwordToggle');
   const passwordField = document.getElementById('id_password');
   
@@ -696,13 +648,12 @@ document.addEventListener('DOMContentLoaded', function() {
     passwordToggle.addEventListener('click', function() {
       const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
       passwordField.setAttribute('type', type);
-      
       const icon = this.querySelector('i');
       icon.className = type === 'password' ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
     });
   }
 
-  // Efectos de focus mejorados
+  // Efectos de focus
   const inputs = document.querySelectorAll('input');
   inputs.forEach(input => {
     if (input.type !== 'checkbox') {
@@ -710,21 +661,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     input.addEventListener('focus', function() {
-      this.parentElement.style.transform = 'translateY(-2px)';
-      this.parentElement.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.2)';
+      const wrapper = this.parentElement;
+      if (wrapper && wrapper.classList.contains('input-wrapper')) {
+        wrapper.style.transform = 'translateY(-1px)';
+      }
     });
     
     input.addEventListener('blur', function() {
-      this.parentElement.style.transform = 'translateY(0)';
-      this.parentElement.style.boxShadow = 'none';
+      const wrapper = this.parentElement;
+      if (wrapper && wrapper.classList.contains('input-wrapper')) {
+        wrapper.style.transform = 'translateY(0)';
+      }
     });
-
-    if (input.value) {
-      input.parentElement.classList.add('focused');
-    }
   });
 
-  // Efecto de carga del formulario
+  // Efecto de carga en submit
   const form = document.querySelector('form');
   if (form) {
     form.addEventListener('submit', function(e) {

@@ -1,9 +1,65 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}Sin conexión · Nexo{% endblock %}
+
 {% block content %}
-<section class="section text-center">
-  <h2 class="text-2xl font-semibold mb-2">Estás sin conexión</h2>
-  <p class="text-white/70">Parte del contenido no está disponible. Lo cacheado sigue accesible.</p>
-  <a href="/" class="mt-6 inline-block btn-ghost">Volver al inicio</a>
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+
+  {# Fondo con imagen a pantalla completa #}
+  <img
+    src="{% static 'core/img/offline-bg-nexo.jpg' %}"
+    alt="Sin conexión en el Nexo de los Ecos"
+    class="absolute inset-0 w-full h-full object-cover"
+  />
+
+  {# Capa oscura, pero dejando ver bien la imagen #}
+  <div
+    class="absolute inset-0 bg-gradient-to-b
+           from-slate-950/55 via-slate-950/35 to-slate-950/75
+           backdrop-blur-[1px]"
+  ></div>
+
+  {# Contenido centrado #}
+  <div class="relative z-10 text-center px-6">
+    <div
+      class="inline-flex items-center gap-2 rounded-full border border-white/15
+             bg-slate-900/60 px-4 py-1 text-xs sm:text-sm text-white/70 mb-6"
+    >
+      <span class="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
+      <span>Sin conexión en el Nexo de los Ecos</span>
+    </div>
+
+    <h1 class="text-3xl sm:text-4xl font-semibold text-white mb-3">
+      Estás fuera de línea
+    </h1>
+
+    <p class="text-white/80 text-sm sm:text-base max-w-xl mx-auto mb-6">
+      Parte del contenido no puede cargarse. Lo que ya visitaste sigue disponible
+      hasta que vuelva la señal.
+    </p>
+
+    <div class="flex flex-wrap items-center justify-center gap-3">
+      <a href="/" class="btn-primary inline-flex items-center gap-2">
+        <i class="fa-solid fa-house"></i>
+        Volver al inicio
+      </a>
+
+      <button
+        type="button"
+        onclick="location.reload()"
+        class="btn-ghost inline-flex items-center gap-2"
+      >
+        <i class="fa-solid fa-rotate-right"></i>
+        Reintentar
+      </button>
+    </div>
+  </div>
+
+  {# Suaviza la transición con el resto del sitio #}
+  <div
+    class="pointer-events-none absolute inset-x-0 bottom-0 h-32
+           bg-gradient-to-t from-slate-950 to-transparent"
+  ></div>
 </section>
 {% endblock %}

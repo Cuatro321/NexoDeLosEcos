@@ -1,42 +1,214 @@
-{% extends 'base.html' %}
-{% block title %}{% if form.instance.pk %}Editar publicación{% else %}Nueva publicación{% endif %} · Comunidad{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}
+  {% if form.instance.pk %}
+    Editar publicación · Comunidad
+  {% else %}
+    Nueva publicación · Comunidad
+  {% endif %}
+{% endblock %}
+
+{% block head %}
+<style>
+  /* Contenedor del formulario de comunidad */
+  .community-form .field-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(248, 250, 252, 0.95);
+    margin-bottom: 0.35rem;
+  }
+
+  .community-form .field-wrapper {
+    border-radius: 0.75rem;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    padding: 0.15rem 0.1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease,
+                transform 0.1s ease;
+  }
+
+  .community-form .field-wrapper:focus-within {
+    border-color: rgba(251, 191, 36, 0.9);
+    box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.5);
+    transform: translateY(-1px);
+  }
+
+  .community-form input[type="text"],
+  .community-form textarea,
+  .community-form select {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #e5e7eb;
+    font-size: 0.95rem;
+    padding: 0.65rem 0.9rem;
+  }
+
+  .community-form textarea {
+    min-height: 180px;
+    resize: vertical;
+  }
+
+  .community-form input::placeholder,
+  .community-form textarea::placeholder {
+    color: rgba(148, 163, 184, 0.9);
+  }
+
+  /* === SELECT OSCURO + OPCIONES OSCURAS === */
+  .community-form select {
+    background-color: #020617;   /* fondo del desplegable cerrado */
+    color: #e5e7eb;
+    border-radius: 0.75rem;
+    cursor: pointer;
+  }
+
+  .community-form select option {
+    background-color: #020617;   /* fondo de cada opción */
+    color: #e5e7eb;
+  }
+
+  .community-form select option:checked,
+  .community-form select option:hover {
+    background-color: #111827;
+    color: #fbbf24;
+  }
+
+  /* File input */
+  .community-form input[type="file"] {
+    font-size: 0.85rem;
+    color: #e5e7eb;
+  }
+
+  .community-form .help-text {
+    font-size: 0.8rem;
+    color: rgba(148, 163, 184, 0.95);
+  }
+
+  .community-form .error-text {
+    font-size: 0.8rem;
+    color: #f97373;
+  }
+
+  /* Preview de imagen actual */
+  .post-image-preview {
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    background: radial-gradient(circle at top, #111827 0, #020617 55%);
+  }
+
+  .post-image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+</style>
+{% endblock %}
 
 {% block content %}
 <section class="section">
-  <h1 class="h1-glow text-2xl md:text-3xl">
-    {% if form.instance.pk %}Editar{% else %}Nueva{% endif %} publicación
-  </h1>
-
-  <form method="post" enctype="multipart/form-data" class="grid md:grid-cols-2 gap-5 form-light mt-4">
-    {% csrf_token %}
-    <div class="card">
-      <label class="block mb-2">Título</label>
-      {{ form.title }}
-
-      <div class="hr-soft"></div>
-      <label class="block mb-2 mt-1">Tipo</label>
-      {{ form.type }}
-
-      <div class="hr-soft"></div>
-      <label class="block mb-2 mt-1">Contenido</label>
-      {{ form.body }}
-      <p class="help mt-2">Puedes usar saltos de línea.</p>
+  <div class="flex items-center justify-between gap-3">
+    <div>
+      <p class="kicker">Comunidad</p>
+      <h1 class="h1-glow text-2xl md:text-3xl">
+        {% if form.instance.pk %}
+          Editar publicación
+        {% else %}
+          Nueva publicación
+        {% endif %}
+      </h1>
+      <p class="text-white/60 text-sm mt-1 max-w-xl">
+        Ajusta el título, el texto y la imagen para que tu publicación luzca perfecta en el Nexo.
+      </p>
     </div>
 
-    <div class="card">
-      <label class="block mb-2">Imagen (opcional)</label>
-      {{ form.image }}
-      {% if form.instance.image %}
-        <div class="mt-3" style="aspect-ratio:16/9;overflow:hidden;border:1px solid var(--line);border-radius:.5rem">
-          <img src="{{ form.instance.image.url }}" style="width:100%;height:100%;object-fit:cover" alt="">
+    <a href="/comunidad/" class="btn-ghost">
+      <i class="fa-solid fa-arrow-left mr-2"></i>Volver al feed
+    </a>
+  </div>
+</section>
+
+<section class="grid lg:grid-cols-3 gap-5">
+  <article class="card lg:col-span-2 community-form">
+    <h2 class="card-title mb-4">
+      Detalles de la publicación
+    </h2>
+
+    {# Preview grande de la imagen actual #}
+    {% if form.instance.pk and form.instance.image %}
+      <div class="mb-6">
+        <p class="text-xs text-white/60 mb-2">
+          Imagen actual de la publicación
+        </p>
+        <div class="post-image-preview" style="aspect-ratio:16/9;">
+          <img src="{{ form.instance.image.url }}" alt="Imagen actual de la publicación">
         </div>
+      </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="space-y-5">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+      <div class="alert-error mb-4">
+        <i class="fa-solid fa-circle-exclamation mr-2"></i>
+        {{ form.non_field_errors.0 }}
+      </div>
       {% endif %}
 
-      <button class="lol-button mt-4">
-        <span class="lol-button-text"><i class="fa-solid fa-check mr-2"></i>Guardar</span>
-        <span class="lol-button-shine"></span>
-      </button>
-    </div>
-  </form>
+      {% for field in form %}
+      <div class="space-y-1">
+        <label for="{{ field.id_for_label }}" class="field-label">
+          {{ field.label }}
+        </label>
+
+        <div class="field-wrapper">
+          {{ field }}
+        </div>
+
+        {% if field.help_text %}
+          <p class="help-text mt-1">
+            <i class="fa-solid fa-circle-info mr-1"></i>{{ field.help_text }}
+          </p>
+        {% endif %}
+
+        {% if field.errors %}
+          <p class="error-text mt-1">
+            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ field.errors.0 }}
+          </p>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        <button type="submit" class="lol-button">
+          <span class="lol-button-text">
+            <i class="fa-solid fa-floppy-disk mr-2"></i>
+            {% if form.instance.pk %}Guardar cambios{% else %}Publicar{% endif %}
+          </span>
+          <span class="lol-button-shine"></span>
+        </button>
+
+        <a href="/comunidad/" class="btn-ghost">
+          Cancelar
+        </a>
+      </div>
+    </form>
+  </article>
+
+  <aside class="card">
+    <h3 class="card-title mb-3">
+      <i class="fa-solid fa-lightbulb mr-2"></i>Consejos
+    </h3>
+    <ul class="space-y-2 text-sm text-white/70">
+      <li>• Usa un título claro para que otros sepan de qué trata tu publicación.</li>
+      <li>• En el cuerpo puedes escribir reseñas, ideas, teorías o avances de tu partida.</li>
+      <li>• Si cambias la imagen, procura que tenga buen contraste y buena calidad.</li>
+      <li>• Revisa el texto antes de guardar para evitar errores.</li>
+      <li>• Sé respetuoso con la comunidad del Nexo.</li>
+    </ul>
+  </aside>
 </section>
 {% endblock %}

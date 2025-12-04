@@ -4,7 +4,20 @@
 
 {% block head %}
 <style>
-  /* Estructura base con video de fondo */
+  :root {
+    --brand: #8B5CF6;
+    --accent: #3B82F6;
+    --accent-rgb: 59, 130, 246;
+    --dark-bg: #0F172A;
+    --light-bg: rgba(255, 255, 255, 0.03);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --text-primary: rgba(255, 255, 255, 0.95);
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --success: #10B981;
+    --error: #EF4444;
+  }
+
+  /* Estructura base con video de fondo del sitio */
   .register-container {
     min-height: 100vh;
     display: flex;
@@ -12,6 +25,7 @@
     justify-content: center;
     position: relative;
     overflow: hidden;
+    padding: 1rem;
   }
 
   .register-video-bg {
@@ -30,236 +44,268 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(
-      135deg,
-      rgba(0, 0, 0, 0.8) 0%,
-      rgba(0, 0, 0, 0.6) 50%,
-      rgba(0, 0, 0, 0.8) 100%
-    );
+    background:
+      radial-gradient(circle at top, rgba(15,23,42,0.75), transparent 45%),
+      linear-gradient(
+        135deg,
+        rgba(15, 23, 42, 0.96) 0%,
+        rgba(15, 23, 42, 0.82) 50%,
+        rgba(15, 23, 42, 0.96) 100%
+      );
     z-index: -1;
   }
 
-  /* Partículas decorativas */
-  .register-particles {
+  /* Partículas en el fondo */
+  .particles-container {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1;
+    z-index: 0;
     pointer-events: none;
   }
 
-  .register-particle {
+  .particle {
     position: absolute;
-    background: rgba(var(--accent-rgb), 0.3);
     border-radius: 50%;
-    animation: floatRegister 8s infinite ease-in-out;
+    background: linear-gradient(135deg, var(--brand), var(--accent));
+    opacity: 0;
+    animation: particleFloat 20s infinite linear;
   }
 
-  @keyframes floatRegister {
-    0%, 100% { 
-      transform: translateY(0px) rotate(0deg) scale(1);
-      opacity: 0.3;
+  @keyframes particleFloat {
+    0% {
+      transform: translateY(100vh) rotate(0deg);
+      opacity: 0;
     }
-    50% { 
-      transform: translateY(-30px) rotate(180deg) scale(1.2);
-      opacity: 0.6;
+    10% { opacity: 0.3; }
+    90% { opacity: 0.3; }
+    100% {
+      transform: translateY(-100px) rotate(360deg);
+      opacity: 0;
     }
   }
 
-  /* Tarjeta principal con imagen de fondo DENTRO del formulario */
+  /* TARJETA PRINCIPAL – FONDO GAMER OSCURO + OVERLAY */
   .register-card {
-    background: 
-      /* Capa de color semitransparente */
+    background:
+      radial-gradient(circle at 20% 0%, rgba(56,189,248,0.10), transparent 55%),
       linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.1) 0%,
-        rgba(255, 255, 255, 0.05) 100%
+        145deg,
+        rgba(15,23,42,0.98) 0%,
+        rgba(15,23,42,0.92) 35%,
+        rgba(15,23,42,0.90) 65%,
+        rgba(15,23,42,0.98) 100%
       ),
-      /* Imagen de fondo DENTRO de la card */
-      url('{% static "img/fotologin.png" %}') center/cover;
-    
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 24px;
-    padding: 3rem;
-    box-shadow: 
-      0 25px 50px rgba(0, 0, 0, 0.5),
-      0 0 100px rgba(var(--accent-rgb), 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    animation: cardEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      url('https://images.unsplash.com/photo-1605902711622-cfb43c4437b5?auto=format&fit=crop&w=1400&q=80')
+        center/cover;   /* setup gamer oscuro */
+    background-blend-mode: soft-light, normal, normal;
+
+    backdrop-filter: blur(22px);
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    border-radius: 26px;
+    padding: 3.5rem;
+    box-shadow:
+      0 26px 60px rgba(0, 0, 0, 0.75),
+      0 0 90px rgba(15,23,42,0.9);
     position: relative;
     overflow: hidden;
     max-width: 480px;
     width: 100%;
-    min-height: 600px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    z-index: 2;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
 
-  /* Efecto de animación sutil en el fondo de la card */
+  /* Capa extra para que NADA quede demasiado claro */
   .register-card::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-      45deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.03) 50%,
-      transparent 100%
-    );
-    animation: bgShine 6s ease-in-out infinite;
-    z-index: 1;
-    pointer-events: none;
+    inset: 0;
+    background:
+      radial-gradient(circle at center, rgba(15,23,42,0.86) 0%, rgba(15,23,42,0.96) 55%, rgba(15,23,42,0.99) 100%);
+    mix-blend-mode: multiply;
+    z-index: -1;
   }
 
-  @keyframes bgShine {
-    0%, 100% {
-      opacity: 0;
-      transform: translateX(-100%);
-    }
-    50% {
-      opacity: 1;
-      transform: translateX(100%);
-    }
+  .register-card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 35px 70px rgba(0, 0, 0, 0.9),
+      0 0 120px rgba(139,92,246,0.35);
   }
 
   .register-card::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
+    inset: 1px;
+    border-radius: 25px;
     background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.1),
-      transparent
+      135deg,
+      rgba(129, 140, 248, 0.18),
+      rgba(59, 130, 246, 0.18),
+      rgba(236, 72, 153, 0.2)
     );
-    transition: left 0.8s ease;
-    z-index: 1;
+    z-index: -2;
+    animation: borderGlow 4s ease-in-out infinite;
   }
 
-  .register-card:hover::before {
-    left: 100%;
+  @keyframes borderGlow {
+    0%, 100% { opacity: 0.45; }
+    50% { opacity: 0.9; }
   }
 
-  @keyframes cardEntrance {
-    0% {
-      opacity: 0;
-      transform: translateY(50px) scale(0.9);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+  .fade-in {
+    animation: fadeIn 0.6s ease-out;
   }
 
-  /* Contenido de la card (sobre el fondo de imagen) */
-  .register-content {
-    position: relative;
-    z-index: 2;
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* Header mejorado */
+  /* Header */
   .register-header {
     text-align: center;
-    margin-bottom: 2.5rem;
-    position: relative;
+    margin-bottom: 3rem;
   }
 
-  .register-icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 1.5rem;
-    background: linear-gradient(135deg, var(--brand), var(--accent));
+  .logo-container {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 2.5rem;
+  }
+
+  .logo-glow {
+    position: absolute;
+    inset: -18px;
+    background: radial-gradient(circle at 50% 30%, rgba(236,72,153,0.7), transparent 60%);
+    border-radius: 50%;
+    filter: blur(32px);
+    opacity: 0.6;
+    animation: logoPulse 3s ease-in-out infinite;
+  }
+
+  @keyframes logoPulse {
+    0%, 100% { transform: scale(1); opacity: 0.45; }
+    50% { transform: scale(1.08); opacity: 0.8; }
+  }
+
+  .logo-icon {
+    position: relative;
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    animation: iconGlow 3s ease-in-out infinite alternate;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(14px);
+    background: radial-gradient(
+      circle at 30% 20%,
+      rgba(255, 255, 255, 0.25) 0,
+      rgba(148,163,184,0.12) 35%,
+      rgba(15, 23, 42, 0.98) 100%
+    );
+    box-shadow:
+      0 0 40px rgba(236,72,153,0.45),
+      inset 0 0 18px rgba(0, 0, 0, 0.7);
   }
 
-  .register-icon::after {
-    content: '';
-    position: absolute;
-    inset: -3px;
-    background: linear-gradient(135deg, var(--brand), var(--accent));
-    border-radius: 50%;
-    z-index: -1;
-    filter: blur(15px);
-    opacity: 0.5;
+  .logo-icon img {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    filter: none;
   }
 
-  @keyframes iconGlow {
-    0% {
-      box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.4);
-    }
-    100% {
-      box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.8);
-    }
+  .title-main {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #FFFFFF 0%, rgba(191, 219, 254, 0.95) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.04em;
   }
 
-  /* Formulario mejorado */
-  .form-group {
-    margin-bottom: 1.5rem;
-    position: relative;
+  .title-sub {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    font-weight: 400;
+    letter-spacing: 0.4px;
   }
+
+  /* Formulario */
+  .form-container { margin-bottom: 2.5rem; }
+
+  .form-group { margin-bottom: 1.75rem; }
 
   .form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.95);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-label i {
+    color: var(--accent);
+    font-size: 0.75rem;
   }
 
   .input-wrapper {
     position: relative;
     border-radius: 12px;
+    background: rgba(15,23,42,0.9);
+    border: 1px solid rgba(148, 163, 184, 0.7);
     transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(15px);
+    overflow: hidden;
+  }
+
+  .input-wrapper::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, var(--brand), var(--accent));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
   }
 
   .input-wrapper:focus-within {
-    border-color: var(--accent);
-    box-shadow: 
-      0 0 0 3px rgba(var(--accent-rgb), 0.2),
-      0 8px 25px rgba(0, 0, 0, 0.4);
-    transform: translateY(-2px);
-    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(var(--accent-rgb), 0.7);
+    background: rgba(15,23,42,0.98);
+    box-shadow:
+      0 0 0 1px rgba(var(--accent-rgb), 0.6),
+      0 14px 35px rgba(15,23,42,0.9);
+  }
+
+  .input-wrapper:focus-within::before {
+    transform: scaleX(1);
   }
 
   .input-wrapper input {
     width: 100%;
-    padding: 1rem 1rem 1rem 3rem;
+    padding: 1.125rem 1rem 1.125rem 3rem;
     background: transparent;
     border: none;
-    color: white;
+    color: var(--text-primary);
     font-size: 1rem;
-    transition: all 0.3s ease;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  }
-
-  .input-wrapper input:focus {
+    font-weight: 400;
     outline: none;
   }
 
   .input-wrapper input::placeholder {
-    color: rgba(255, 255, 255, 0.6);
-    text-shadow: none;
+    color: rgba(148, 163, 184, 0.9);
   }
 
   .input-icon {
@@ -267,15 +313,13 @@
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(148, 163, 184, 0.9);
     transition: all 0.3s ease;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
   .input-wrapper:focus-within .input-icon {
     color: var(--accent);
-    transform: translateY(-50%) scale(1.1);
-    text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
+    transform: translateY(-50%) scale(1.08);
   }
 
   .password-toggle {
@@ -285,38 +329,60 @@
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(148, 163, 184, 0.8);
     cursor: pointer;
     transition: all 0.3s ease;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    padding: 0.5rem;
   }
 
   .password-toggle:hover {
     color: var(--accent);
     transform: translateY(-50%) scale(1.1);
-    text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
   }
 
-  /* Botón de submit mejorado */
-  .register-submit {
+  /* AYUDA DE CAMPOS – QUE NO SE PIERDA */
+  .field-help {
+    margin-top: 0.6rem;
+    padding: 0.65rem 0.9rem;
+    border-radius: 10px;
+    background: rgba(15,23,42,0.96);
+    border: 1px solid rgba(148,163,184,0.8);
+    color: rgba(226, 232, 240, 0.96);
+    font-size: 0.78rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    line-height: 1.4;
+  }
+
+  .field-help i {
+    margin-top: 2px;
+    color: rgba(96,165,250,0.9);
+  }
+
+  /* Botón de submit */
+  .submit-btn {
     width: 100%;
-    padding: 1rem 2rem;
-    background: linear-gradient(135deg, var(--brand), var(--accent));
+    padding: 1.25rem 2rem;
+    background: linear-gradient(135deg, #ec4899, #8B5CF6);
     border: none;
     border-radius: 12px;
-    color: var(--coal);
-    font-weight: 700;
+    color: white;
     font-size: 1.1rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
     position: relative;
     overflow: hidden;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(10px);
+    letter-spacing: 0.5px;
+    margin-top: 0.5rem;
+    text-shadow: 0 1px 2px rgba(15,23,42,0.6);
+    box-shadow:
+      0 18px 40px rgba(236,72,153,0.45),
+      0 0 40px rgba(236,72,153,0.5);
   }
 
-  .register-submit::before {
+  .submit-btn::before {
     content: '';
     position: absolute;
     top: 0;
@@ -326,248 +392,184 @@
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 255, 255, 0.4),
+      rgba(255, 255, 255, 0.35),
       transparent
     );
-    transition: left 0.6s ease;
+    transition: left 0.55s ease;
   }
 
-  .register-submit:hover::before {
-    left: 100%;
+  .submit-btn:hover::before { left: 100%; }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 22px 55px rgba(236,72,153,0.6),
+      0 0 55px rgba(236,72,153,0.8);
   }
 
-  .register-submit:hover {
-    transform: translateY(-3px);
-    box-shadow: 
-      0 15px 30px rgba(var(--accent-rgb), 0.4),
-      0 0 30px rgba(var(--accent-rgb), 0.2);
-  }
+  .submit-btn:active { transform: translateY(0); }
 
-  .register-submit:active {
-    transform: translateY(-1px);
-  }
-
-  .register-submit:disabled {
+  .submit-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    transform: none;
+    transform: none !important;
+    box-shadow: none !important;
   }
 
-  .register-submit:disabled:hover {
-    transform: none;
-    box-shadow: none;
-  }
-
-  /* Estados de error mejorados */
+  /* Errores */
   .form-error {
-    color: #ff6b6b;
+    color: var(--error);
     font-size: 0.875rem;
     margin-top: 0.5rem;
-    display: flex;
+    display: none;
     align-items: center;
     gap: 0.5rem;
-    animation: shake 0.5s ease-in-out;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    animation: slideIn 0.3s ease;
+  }
+
+  .form-error.show { display: flex; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
   .alert-error {
-    background: rgba(255, 107, 107, 0.2);
-    border: 1px solid rgba(255, 107, 107, 0.4);
-    color: #ff6b6b;
-    padding: 1rem;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.45);
+    color: #fee2e2;
+    padding: 1rem 1.25rem;
     border-radius: 12px;
     margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    animation: slideDown 0.5s ease-out;
-    backdrop-filter: blur(15px);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  }
-
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
-  }
-
-  @keyframes slideDown {
-    0% {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* Checkbox mejorado */
-  .checkbox-container {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    cursor: pointer;
-    margin-bottom: 1rem;
-  }
-
-  .custom-checkbox {
-    width: 20px;
-    height: 20px;
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    border-radius: 4px;
-    position: relative;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    flex-shrink: 0;
-  }
-
-  .checkbox-input:checked + .custom-checkbox {
-    background: var(--accent);
-    border-color: var(--accent);
-    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
-  }
-
-  .checkbox-input:checked + .custom-checkbox::after {
-    content: '✓';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: var(--coal);
-    font-weight: bold;
     font-size: 0.875rem;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(16px);
   }
 
-  .checkbox-label {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.9rem;
-    line-height: 1.4;
+  /* Enlace a login */
+  .login-link {
+    text-align: center;
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(148, 163, 184, 0.35);
   }
 
-  /* Enlaces en los checkboxes */
-  .link-accent {
-    color: var(--accent);
+  .login-link p {
+    color: var(--text-secondary);
+    margin-bottom: 0.85rem;
+    font-size: 0.875rem;
+  }
+
+  .login-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.85rem 1.9rem;
+    border-radius: 999px;
+    border: 1px solid rgba(129, 140, 248, 0.9);
+    background: radial-gradient(circle at top,
+                rgba(129,140,248,0.25),
+                rgba(15,23,42,0.98));
+    color: #e5e7eb;
     text-decoration: none;
-    transition: all 0.3s ease;
     font-weight: 600;
-  }
-
-  .link-accent:hover {
-    color: var(--brand);
-    text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
-  }
-
-  /* Sección de beneficios */
-  .benefits-section {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-top: 2rem;
-    backdrop-filter: blur(10px);
-  }
-
-  .benefits-title {
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.95);
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .benefits-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    space-y: 0.75rem;
-  }
-
-  .benefit-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    color: rgba(255, 255, 255, 0.8);
     font-size: 0.9rem;
+    transition: all 0.25s ease;
+    box-shadow: 0 0 24px rgba(129,140,248,0.35);
   }
 
-  .benefit-icon {
-    color: #10b981;
-    font-size: 0.75rem;
+  .login-btn i {
+    font-size: 0.9rem;
+    color: #bfdbfe;
+    transition: transform 0.25s ease;
   }
 
-  /* Texto de ayuda del formulario */
-  .form-help {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-top: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  .login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 16px 34px rgba(129,140,248,0.6),
+      0 0 40px rgba(129,140,248,0.7);
+    border-color: rgba(191, 219, 254, 0.95);
   }
 
-  /* Separador */
-  .separator {
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    margin: 2rem 0;
-    position: relative;
+  .login-btn:hover i { transform: translateX(4px); }
+
+  /* Validación visual */
+  .input-wrapper.valid {
+    border-color: rgba(16, 185, 129, 0.6);
   }
 
-  .separator-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: transparent;
-    padding: 0 1rem;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.875rem;
-    font-weight: 500;
+  .input-wrapper.valid::before {
+    background: linear-gradient(90deg, var(--success), #34D399);
+    transform: scaleX(1);
   }
 
-  /* Efectos de texto */
-  .text-glow {
-    text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.5);
+  .input-wrapper.invalid {
+    border-color: rgba(239, 68, 68, 0.6);
   }
 
-  .fade-in-up {
-    animation: fadeInUp 0.8s ease-out;
-  }
-
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .input-wrapper.invalid::before {
+    background: linear-gradient(90deg, var(--error), #F87171);
+    transform: scaleX(1);
   }
 
   /* Responsive */
   @media (max-width: 640px) {
     .register-card {
-      margin: 1rem;
       padding: 2rem;
-      min-height: auto;
+      margin: 1rem;
     }
     
-    .register-icon {
-      width: 70px;
-      height: 70px;
+    .title-main { font-size: 2rem; }
+    
+    .logo-container {
+      width: 110px;
+      height: 110px;
+      margin-bottom: 2rem;
+    }
+    
+    .logo-icon img {
+      width: 72px;
+      height: 72px;
     }
   }
 
-  /* Estilo para el icono personalizado */
-  .register-custom-icon {
-    width: 40px;
-    height: 40px;
-    object-fit: contain;
-    filter: brightness(0) invert(1);
+  /* Estado de carga */
+  .loading {
+    position: relative;
+    color: transparent !important;
+  }
+
+  .loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 </style>
 {% endblock %}
@@ -575,158 +577,107 @@
 {% block content %}
 <div class="register-container">
   <!-- Video de fondo general -->
-  <video class="register-video-bg" muted loop playsinline
-         preload="none"
+  <video class="register-video-bg" autoplay muted loop playsinline
+         preload="auto"
          poster="{% static 'img/hero-poster.jpg' %}"
-         data-src-mp4="{% static 'videos/login.mp4' %}"
-         data-src-webm="{% static 'videos/login.webm' %}"
          aria-label="Video de fondo del Nexo de los Ecos">
+    <source src="{% static 'videos/login.mp4' %}" type="video/mp4">
+    <source src="{% static 'videos/login.webm' %}" type="video/webm">
     <img src="{% static 'img/hero-poster.jpg' %}" alt="Fondo del Nexo de los Ecos">
   </video>
 
   <div class="register-overlay"></div>
-  <div class="register-particles" id="registerParticles"></div>
+  <div class="particles-container" id="particles"></div>
 
-  <div class="max-w-md w-full mx-4">
-    <!-- Tarjeta principal con imagen de fondo DENTRO -->
-    <div class="register-card">
-      <div class="register-content">
-        <!-- Header -->
-        <div class="register-header fade-in-up" style="animation-delay: 0.1s">
-          <div class="register-icon">
-            <img src="{% static 'core/icons/NeoForceGames.png' %}" alt="NeoForce Games" class="register-custom-icon">
-          </div>
-          <h1 class="h1-glow text-3xl font-bold mb-2 text-glow">Unirse al Nexo</h1>
-          <p class="text-white/80 text-lg">
-            Comienza tu viaje a través de los dominios
-          </p>
-        </div>
-
-        <!-- Formulario -->
-        <form method="post" class="space-y-6" novalidate id="registerForm">
-          {% csrf_token %}
-          
-          <!-- Errores generales -->
-          {% if form.non_field_errors %}
-          <div class="alert-error" role="alert">
-            <i class="fa-solid fa-circle-exclamation"></i>
-            {{ form.non_field_errors.0 }}
-          </div>
-          {% endif %}
-
-          <!-- Campos del formulario -->
-          {% for field in form %}
-          <div class="form-group fade-in-up" style="animation-delay: {{ forloop.counter|add:1|divisibleby:10 }}s">
-            <label for="{{ field.id_for_label }}" class="form-label">
-              {% if field.name == 'username' %}
-                <i class="fa-solid fa-user mr-2"></i>
-              {% elif field.name == 'email' %}
-                <i class="fa-solid fa-envelope mr-2"></i>
-              {% elif field.name == 'password1' %}
-                <i class="fa-solid fa-lock mr-2"></i>
-              {% elif field.name == 'password2' %}
-                <i class="fa-solid fa-lock mr-2"></i>
-              {% else %}
-                <i class="fa-solid fa-pen mr-2"></i>
-              {% endif %}
-              {{ field.label }}
-            </label>
-            
-            <div class="input-wrapper">
-              {{ field }}
-              
-              {% if field.name == 'username' %}
-                <i class="fa-solid fa-user input-icon"></i>
-              {% elif field.name == 'email' %}
-                <i class="fa-solid fa-envelope input-icon"></i>
-              {% elif field.name == 'password1' or field.name == 'password2' %}
-                <i class="fa-solid fa-key input-icon"></i>
-                <button type="button" class="password-toggle" data-target="{{ field.id_for_label }}">
-                  <i class="fa-solid fa-eye"></i>
-                </button>
-              {% endif %}
-            </div>
-            
-            {% if field.help_text %}
-            <div class="form-help">
-              <i class="fa-solid fa-circle-info"></i>
-              {{ field.help_text }}
-            </div>
-            {% endif %}
-            
-            {% if field.errors %}
-            <div class="form-error">
-              <i class="fa-solid fa-circle-exclamation"></i>
-              {{ field.errors.0 }}
-            </div>
-            {% endif %}
-          </div>
-          {% endfor %}
-
-          <!-- Términos y condiciones -->
-          <div class="checkbox-container fade-in-up" style="animation-delay: 0.6s">
-            <input type="checkbox" name="terms" required class="checkbox-input sr-only" id="terms">
-            <span class="custom-checkbox"></span>
-            <span class="checkbox-label">
-              Acepto los 
-              <a href="/terms/" class="link-accent">Términos de Servicio</a>
-              y la 
-              <a href="/privacy/" class="link-accent">Política de Privacidad</a>
-            </span>
-          </div>
-
-          <!-- Newsletter -->
-          <div class="checkbox-container fade-in-up" style="animation-delay: 0.7s">
-            <input type="checkbox" name="newsletter" class="checkbox-input sr-only" id="newsletter">
-            <span class="custom-checkbox"></span>
-            <span class="checkbox-label">
-              Recibir notificaciones sobre actualizaciones del Nexo
-            </span>
-          </div>
-
-          <!-- Submit -->
-          <button type="submit" class="register-submit fade-in-up" style="animation-delay: 0.8s" id="submitBtn">
-            <span>Crear Cuenta</span>
-            <i class="fa-solid fa-sparkles ml-2"></i>
-          </button>
-        </form>
-
-        <!-- Separador -->
-        <div class="separator fade-in-up" style="animation-delay: 0.9s">
-          <span class="separator-text">¿Ya tienes una cuenta?</span>
-        </div>
-
-        <!-- Enlace a login -->
-        <div class="text-center fade-in-up" style="animation-delay: 1s">
-          <p class="text-white/70">
-            <a href="/accounts/login/" class="link-accent font-semibold text-lg">
-              Entrar al Nexo
-            </a>
-          </p>
-        </div>
-
-        <!-- Beneficios -->
-        <div class="benefits-section fade-in-up" style="animation-delay: 1.1s">
-          <h4 class="benefits-title">
-            <i class="fa-solid fa-gift text-accent"></i>
-            Al unirte recibes:
-          </h4>
-          <ul class="benefits-list">
-            <li class="benefit-item">
-              <i class="fa-solid fa-check benefit-icon"></i>
-              Acceso a todos los dominios
-            </li>
-            <li class="benefit-item">
-              <i class="fa-solid fa-check benefit-icon"></i>
-              Artefacto de inicio gratuito
-            </li>
-            <li class="benefit-item">
-              <i class="fa-solid fa-check benefit-icon"></i>
-              Progreso guardado en la nube
-            </li>
-          </ul>
+  <div class="register-card fade-in">
+    <div class="register-header">
+      <div class="logo-container">
+        <div class="logo-glow"></div>
+        <div class="logo-icon">
+          <img src="{% static 'core/icons/NeoForceGames.png' %}" alt="NeoForce Games">
         </div>
       </div>
+      
+      <h1 class="title-main">Crear Cuenta</h1>
+      <p class="title-sub">Únete a la aventura dentro del Nexo</p>
+    </div>
+
+    <div class="form-container">
+      <form method="post" class="space-y-6" novalidate id="registerForm">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="alert-error" role="alert">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          {{ form.non_field_errors.0 }}
+        </div>
+        {% endif %}
+
+        {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}" class="form-label">
+            {% if field.name == 'username' %}
+              <i class="fa-solid fa-user"></i>
+              Nombre de usuario
+            {% elif field.name == 'email' %}
+              <i class="fa-solid fa-envelope"></i>
+              Correo electrónico
+            {% elif field.name == 'password1' %}
+              <i class="fa-solid fa-lock"></i>
+              Contraseña
+            {% elif field.name == 'password2' %}
+              <i class="fa-solid fa-lock"></i>
+              Confirmar contraseña
+            {% else %}
+              <i class="fa-solid fa-pen"></i>
+              {{ field.label }}
+            {% endif %}
+          </label>
+          
+          <div class="input-wrapper">
+            {{ field }}
+            
+            {% if field.name == 'username' %}
+              <i class="fa-solid fa-user input-icon"></i>
+            {% elif field.name == 'email' %}
+              <i class="fa-solid fa-envelope input-icon"></i>
+            {% elif field.name == 'password1' or field.name == 'password2' %}
+              <i class="fa-solid fa-key input-icon"></i>
+              <button type="button" class="password-toggle" data-target="{{ field.id_for_label }}" aria-label="Mostrar/ocultar contraseña">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            {% endif %}
+          </div>
+          
+          {% if field.help_text %}
+          <div class="field-help">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>{{ field.help_text }}</span>
+          </div>
+          {% endif %}
+          
+          {% if field.errors %}
+          <div class="form-error" id="error-{{ field.name }}">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            {{ field.errors.0 }}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <span id="btnText">Crear Cuenta</span>
+          <i class="fa-solid fa-arrow-right ml-2"></i>
+        </button>
+      </form>
+    </div>
+
+    <div class="login-link">
+      <p>¿Ya tienes una cuenta?</p>
+      <a href="/accounts/login/" class="login-btn">
+        <span>Iniciar sesión</span>
+        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+      </a>
     </div>
   </div>
 </div>
@@ -735,136 +686,168 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Cargar video de fondo
   const video = document.querySelector('.register-video-bg');
   if (video) {
-    const src = video.dataset.srcMp4;
-    if (src && !video.src) {
-      video.src = src;
-      video.load();
-      video.play().catch(e => {
-        console.log('Autoplay prevented:', e);
-        document.addEventListener('click', function playVideo() {
-          video.play();
-          document.removeEventListener('click', playVideo);
-        });
-      });
-    }
+    video.play().catch(() => {});
   }
 
-  // Crear partículas decorativas
-  const particlesContainer = document.getElementById('registerParticles');
+  const particlesContainer = document.getElementById('particles');
   if (particlesContainer) {
-    const particleCount = 12;
+    const particleCount = 15;
     for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'register-particle';
-      
-      const size = Math.random() * 6 + 2;
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = Math.random() * 4 + 1;
       const posX = Math.random() * 100;
-      const posY = Math.random() * 100;
-      const delay = Math.random() * 5;
-      const duration = Math.random() * 4 + 6;
-      
-      particle.style.width = `${size}px`;
-      particle.style.height = `${size}px`;
-      particle.style.left = `${posX}vw`;
-      particle.style.top = `${posY}vh`;
-      particle.style.animationDelay = `${delay}s`;
-      particle.style.animationDuration = `${duration}s`;
-      
-      particlesContainer.appendChild(particle);
+      const delay = Math.random() * 20;
+      const duration = Math.random() * 10 + 20;
+      p.style.width = `${size}px`;
+      p.style.height = `${size}px`;
+      p.style.left = `${posX}%`;
+      p.style.animationDelay = `${delay}s`;
+      p.style.animationDuration = `${duration}s`;
+      particlesContainer.appendChild(p);
     }
   }
 
-  // Toggle de visibilidad para contraseñas
   const passwordToggles = document.querySelectorAll('.password-toggle');
-  
   passwordToggles.forEach(toggle => {
     toggle.addEventListener('click', function() {
       const targetId = this.getAttribute('data-target');
       const passwordField = document.getElementById(targetId);
-      
       if (passwordField) {
         const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
         passwordField.setAttribute('type', type);
-        
         const icon = this.querySelector('i');
         icon.className = type === 'password' ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
+        this.setAttribute('aria-label', type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña');
       }
     });
   });
 
-  // Validación en tiempo real
   const form = document.getElementById('registerForm');
   const submitBtn = document.getElementById('submitBtn');
-  
-  if (form) {
-    const inputs = form.querySelectorAll('input[required]');
-    
-    function validateForm() {
-      let isValid = true;
-      
-      inputs.forEach(input => {
+  const btnText = document.getElementById('btnText');
+
+  function validateRequiredFields() {
+    let ok = true;
+    form.querySelectorAll('input[required]').forEach(input => {
+      if (!input.value.trim()) ok = false;
+    });
+    return ok;
+  }
+
+  function validatePasswords() {
+    const p1 = document.getElementById('id_password1');
+    const p2 = document.getElementById('id_password2');
+    const errorDiv = document.getElementById('password-mismatch-error');
+    if (p1 && p2 && p1.value && p2.value) {
+      if (p1.value !== p2.value) {
+        if (!errorDiv) {
+          const container = p2.parentElement.parentElement;
+          const newError = document.createElement('div');
+          newError.className = 'form-error';
+          newError.id = 'password-mismatch-error';
+          newError.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Las contraseñas no coinciden';
+          container.appendChild(newError);
+        }
+        return false;
+      } else if (errorDiv) {
+        errorDiv.remove();
+      }
+    }
+    return true;
+  }
+
+  function validateEmail() {
+    const emailInput = document.getElementById('id_email');
+    if (!emailInput || !emailInput.value) return true;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(emailInput.value);
+  }
+
+  function validateOnSubmit() {
+    let isValid = true;
+
+    if (!validateRequiredFields()) {
+      isValid = false;
+      form.querySelectorAll('input[required]').forEach(input => {
         if (!input.value.trim()) {
-          isValid = false;
+          const err = input.parentElement.parentElement.querySelector('.form-error');
+          if (err) err.classList.add('show');
         }
       });
-      
-      const terms = form.querySelector('input[name="terms"]');
-      if (terms && !terms.checked) {
-        isValid = false;
-      }
-      
-      submitBtn.disabled = !isValid;
     }
-    
-    inputs.forEach(input => {
-      input.addEventListener('input', validateForm);
-      input.addEventListener('change', validateForm);
-    });
-    
-    const termsCheckbox = form.querySelector('input[name="terms"]');
-    if (termsCheckbox) {
-      termsCheckbox.addEventListener('change', validateForm);
+
+    if (!validatePasswords()) {
+      isValid = false;
+      const err = document.getElementById('password-mismatch-error');
+      if (err) err.classList.add('show');
     }
-    
-    // Validación inicial
-    validateForm();
+
+    if (!validateEmail()) {
+      isValid = false;
+      const err = document.getElementById('error-email');
+      if (err) err.classList.add('show');
+    }
+
+    return isValid;
   }
 
-  // Efecto de carga del formulario
+  const textInputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
+  textInputs.forEach(input => {
+    if (!input.style.paddingLeft) input.style.paddingLeft = '3rem';
+
+    input.addEventListener('input', function() {
+      const wrapper = this.parentElement;
+      wrapper.classList.remove('valid', 'invalid');
+
+      const err = wrapper.parentElement.querySelector('.form-error');
+      if (err && !err.id.includes('password-mismatch')) err.classList.remove('show');
+
+      if (this.type === 'email' && this.value) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        wrapper.classList.add(emailRegex.test(this.value) ? 'valid' : 'invalid');
+      }
+
+      if (this.id === 'id_password2' && this.value) {
+        const p1 = document.getElementById('id_password1');
+        if (p1 && p1.value === this.value) {
+          wrapper.classList.add('valid');
+          const mismatch = document.getElementById('password-mismatch-error');
+          if (mismatch) mismatch.classList.remove('show');
+        } else {
+          wrapper.classList.add('invalid');
+        }
+      }
+
+      submitBtn.disabled = !validateRequiredFields();
+    });
+  });
+
   if (form) {
     form.addEventListener('submit', function(e) {
-      const submitBtn = this.querySelector('button[type="submit"]');
-      if (submitBtn) {
-        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Creando cuenta...';
-        submitBtn.disabled = true;
+      e.preventDefault();
+      document.querySelectorAll('.form-error').forEach(err => err.classList.remove('show'));
+
+      if (!validateOnSubmit()) {
+        const firstError = document.querySelector('.form-error');
+        if (firstError) {
+          firstError.classList.add('show');
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        return;
       }
+
+      submitBtn.classList.add('loading');
+      btnText.textContent = 'Creando cuenta...';
+      submitBtn.disabled = true;
+
+      setTimeout(() => form.submit(), 300);
     });
   }
 
-  // Efectos de focus mejorados
-  const inputs = document.querySelectorAll('input');
-  inputs.forEach(input => {
-    if (input.type !== 'checkbox') {
-      input.style.paddingLeft = '3rem';
-    }
-
-    input.addEventListener('focus', function() {
-      this.parentElement.style.transform = 'translateY(-2px)';
-      this.parentElement.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.2)';
-    });
-    
-    input.addEventListener('blur', function() {
-      this.parentElement.style.transform = 'translateY(0)';
-      this.parentElement.style.boxShadow = 'none';
-    });
-
-    if (input.value) {
-      input.parentElement.classList.add('focused');
-    }
-  });
+  submitBtn.disabled = !validateRequiredFields();
 });
 </script>
 {% endblock %}
