@@ -30,10 +30,14 @@ except LookupError:
 
 def feed(request):
     """
-    Feed principal de la comunidad, con filtro por tipo (?tipo=post|review|all)
-    y datos agregados para las cards. Siempre ordenado por lo más nuevo.
+    Feed principal de la comunidad, con:
+    - filtro por tipo (?tipo=post|review|all)
+    - búsqueda por texto (?q=...)
+    - filtro por autor (?autor=username)
     """
     current_type = request.GET.get("tipo", "all")
+    query = (request.GET.get("q") or "").strip()
+    author_username = (request.GET.get("autor") or "").strip()
 
     # Base: sólo posts no eliminados
     qs = Post.objects.filter(is_removed=False).select_related("author")
@@ -46,7 +50,18 @@ def feed(request):
     else:
         current_type = "all"
 
-  
+    # Búsqueda por texto
+    if query:
+        qs = qs.filter(
+            Q(title__icontains=query) |
+            Q(body__icontains=query)
+        )
+
+    # Filtro por autor
+    if author_username:
+        qs = qs.filter(author__username__iexact=author_username)
+
+    # Anotaciones agregadas
     qs = (
         qs.annotate(
             num_comments=Count(
@@ -60,31 +75,34 @@ def feed(request):
                 "comments",
                 queryset=Comment.objects.filter(is_removed=False)
                 .select_related("author")
-                .order_by("-created"),      
+                .order_by("-created"),
                 to_attr="all_comments",
             )
         )
-        .order_by("-created")               
+        .order_by("-created")
     )
 
     paginator = Paginator(qs, 10)
     page = request.GET.get("page")
     posts = paginator.get_page(page)
 
-    # Últimos 2 comentarios (los más recientes gracias al order_by de arriba)
+    # Últimos 2 comentarios recientes para preview
     for p in posts:
         p.latest_comments = getattr(p, "all_comments", [])[:2]
 
     context = {
         "posts": posts,
         "current_type": current_type,
+        "query": query,
+        "author_username": author_username,
     }
     return render(request, "community/index.html", context)
 
 
 def post_detail(request, slug):
     """
-    Detalle de un post: cuerpo, imagen, estadísticas, comentarios
+    Detalle de un post: cuerpo, imagen, estadísticas,
+    comentarios (en árbol simple: raíz + respuestas)
     y reacciones.
     """
     post = get_object_or_404(
@@ -102,15 +120,16 @@ def post_detail(request, slug):
     comments_qs = (
         post.comments.filter(is_removed=False)
         .select_related("author")
-        .annotate(
-            num_reactions=Count("reactions", distinct=True),
-        )
+        .annotate(num_reactions=Count("reactions", distinct=True))
         .order_by("created")
     )
-    comments = list(comments_qs)
+    all_comments = list(comments_qs)
 
     form = CommentForm()
     user_post_reaction = None
+
+    # Mapa de reacciones del usuario a cada comentario
+    reactions_by_comment = {}
 
     if request.user.is_authenticated:
         # Reacción del usuario al post
@@ -118,24 +137,33 @@ def post_detail(request, slug):
             post=post, user=request.user
         ).first()
 
-        # Reacciones del usuario a cada comentario
         user_comment_reactions = CommentReaction.objects.filter(
-            comment__in=comments, user=request.user
+            comment__in=all_comments, user=request.user
         )
         reactions_by_comment = {r.comment_id: r for r in user_comment_reactions}
 
-        for c in comments:
-            c.user_reaction = reactions_by_comment.get(c.id)
-    else:
-        for c in comments:
-            c.user_reaction = None
+    for c in all_comments:
+        c.user_reaction = reactions_by_comment.get(c.id)
+
+    # Construimos árbol: comentarios raíz + sus respuestas
+    root_comments = []
+    replies_map = {}
+
+    for c in all_comments:
+        if c.parent_id:
+            replies_map.setdefault(c.parent_id, []).append(c)
+        else:
+            root_comments.append(c)
+
+    for c in root_comments:
+        c.replies_list = replies_map.get(c.id, [])
 
     return render(
         request,
         "community/post_detail.html",
         {
             "post": post,
-            "comments": comments,
+            "comments": root_comments,
             "form": form,
             "user_post_reaction": user_post_reaction,
         },
@@ -181,7 +209,7 @@ def post_delete(request, slug):
     post = get_object_or_404(Post, slug=slug)
 
     if request.method == "POST":
-        reason = request.POST.get("reason", "").strip()
+        reason = (request.POST.get("reason") or "").strip()
         owner = post.author
 
         if request.user.is_superuser:
@@ -223,8 +251,12 @@ def post_delete(request, slug):
 
 # ========= COMENTARIOS =========
 
+
 @login_required
 def comment_create(request, slug):
+    """
+    Nuevo comentario raíz.
+    """
     post = get_object_or_404(Post, slug=slug, is_removed=False)
     form = CommentForm(request.POST or None)
 
@@ -232,6 +264,7 @@ def comment_create(request, slug):
         c = form.save(commit=False)
         c.post = post
         c.author = request.user
+        # parent = None por defecto → comentario raíz
         c.save()
         messages.success(request, "Comentario publicado.")
 
@@ -241,7 +274,7 @@ def comment_create(request, slug):
 @login_required
 def comment_reply(request, pk):
     """
-    Responder a un comentario.
+    Responder a un comentario (se crea otro Comment con parent=pk).
     """
     parent = get_object_or_404(Comment, pk=pk, is_removed=False)
     post = parent.post
@@ -250,34 +283,41 @@ def comment_reply(request, pk):
         body = (request.POST.get("body") or "").strip()
         if not body:
             messages.error(request, "Escribe un mensaje para responder.")
-            return redirect(post.get_absolute_url())
-
-        Comment.objects.create(
-            post=post,
-            author=request.user,
-            body=f"↪ @{parent.author.username} {body}",
-        )
-        messages.success(request, "Respuesta publicada.")
+        else:
+            Comment.objects.create(
+                post=post,
+                author=request.user,
+                parent=parent,
+                body=body,
+            )
+            messages.success(request, "Respuesta publicada.")
 
     return redirect(post.get_absolute_url())
 
 
 @login_required
 def comment_delete(request, pk):
+    """
+    Eliminar comentario (y opcionalmente sus respuestas).
+    Superuser: registra ModerationLog, motivo opcional.
+    Autor normal: sólo marca como eliminado.
+    """
     comment = get_object_or_404(Comment, pk=pk)
     post = comment.post
+    owner = comment.author
 
     if request.method == "POST":
-        reason = request.POST.get("reason", "").strip()
-        owner = comment.author
+        reason = (request.POST.get("reason") or "").strip()
 
         if request.user.is_superuser:
             if not reason:
-                messages.error(request, "Indica un motivo de moderación.")
-                return redirect(post.get_absolute_url())
+                reason = "Eliminado por moderación."
 
             comment.is_removed = True
             comment.save()
+
+            # Ocultamos también sus respuestas directas
+            Comment.objects.filter(parent=comment).update(is_removed=True)
 
             ModerationLog.objects.create(
                 content_type="comment",
@@ -296,6 +336,7 @@ def comment_delete(request, pk):
         elif request.user == owner:
             comment.is_removed = True
             comment.save()
+            Comment.objects.filter(parent=comment).update(is_removed=True)
             messages.success(request, "Comentario eliminado por ti.")
         else:
             return HttpResponseForbidden()
@@ -304,6 +345,7 @@ def comment_delete(request, pk):
 
 
 # ========= REACCIONES =========
+
 
 @login_required
 def post_react(request, slug, reaction):
@@ -335,7 +377,9 @@ def post_react(request, slug, reaction):
 
 @login_required
 def comment_react(request, pk, reaction):
-    """Crear / actualizar / quitar la reacción de un usuario a un comentario."""
+    """
+    Crear / actualizar / quitar la reacción de un usuario a un comentario.
+    """
     comment = get_object_or_404(Comment, pk=pk, is_removed=False)
     post = comment.post
 
@@ -361,6 +405,7 @@ def comment_react(request, pk, reaction):
 
 
 # ========= FOROS =========
+
 
 def forum_index(request):
     forums = Forum.objects.all().order_by("title")
@@ -427,7 +472,7 @@ def reply_delete(request, pk):
     thread = reply.thread
 
     if request.method == "POST":
-        reason = request.POST.get("reason", "").strip()
+        reason = (request.POST.get("reason") or "").strip()
         owner = reply.author
 
         if request.user.is_superuser:
@@ -467,7 +512,7 @@ def thread_delete(request, slug):
     thread = get_object_or_404(Thread, slug=slug)
 
     if request.method == "POST":
-        reason = request.POST.get("reason", "").strip()
+        reason = (request.POST.get("reason") or "").strip()
         owner = thread.author
 
         if request.user.is_superuser:

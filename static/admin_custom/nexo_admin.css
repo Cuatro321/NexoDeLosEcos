@@ -1,42 +1,270 @@
+/* ===== Paleta específica del dashboard del Nexo ===== */
 :root{
-  --bg:#0b0f14; --panel:#0f141b; --line:rgba(255,255,255,.08);
-  --muted:#a8b0bb; --brand:#60a5fa; --chip:#1a2430;
+  --nxa-bg: #020617;
+  --nxa-panel: #020617;
+  --nxa-border-soft: rgba(148,163,184,.35);
+  --nxa-border-strong: rgba(148,163,184,.6);
+  --nxa-text: #e5e7eb;
+  --nxa-muted: #9ca3af;
+  --nxa-brand: #38bdf8;   /* cian */
+  --nxa-accent: #facc15;  /* dorado */
 }
-html,body{background:var(--bg);}
-body, input, select, textarea { font-family: Inter, system-ui, Segoe UI, Roboto, sans-serif; }
 
-/* Barra superior */
-#header{ background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
-  border-bottom:1px solid var(--line); }
-.nx-brand{display:flex;align-items:center;gap:.8rem;text-decoration:none}
-.nx-logo{height:34px;width:auto;filter:drop-shadow(0 6px 14px rgba(96,165,250,.25))}
-.nx-title{font-weight:700;color:#fff}
-
-/* Contenido */
-#content{padding:24px 28px 40px;}
-.nx-wrap{max-width:1200px;margin:0 auto}
-
-/* Hero */
-.nx-hero{
-  display:grid;grid-template-columns:1.2fr .8fr;gap:24px;
-  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.02));
-  border:1px solid var(--line);border-radius:16px;padding:24px 22px;margin-bottom:22px;
-  box-shadow:0 18px 40px rgba(0,0,0,.25);
+/* Solo afecta al dashboard (página de inicio del admin) */
+body.dashboard {
+  background: radial-gradient(circle at top, #0f172a 0, #020617 55%);
+  color: var(--nxa-text);
 }
-.nx-hero__title{font-size:28px;font-weight:800;margin:0 0 8px;color:#fff}
-.nx-hero__lead{color:var(--muted);margin:0 0 14px}
-.nx-btn{background:linear-gradient(180deg,#3080ff,#2b6edb);color:#fff;border:1px solid #3b82f6;
-  border-radius:10px;padding:.6rem .9rem;font-weight:700;text-decoration:none}
 
-/* Tarjetas de apps */
-.nx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
-.nx-card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.02));
-  border:1px solid var(--line);border-radius:14px;padding:16px}
-.nx-card__head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.nx-card__title{margin:0;color:#fff;font-weight:700}
-.nx-link{color:#9ec2ff;text-decoration:none}
-.nx-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
-.nx-list__item{background:rgba(0,0,0,.25);border:1px dashed var(--line);border-radius:10px;padding:10px 12px}
-.nx-list__main{display:flex;justify-content:space-between;gap:10px;align-items:center;color:#e9eef8}
-.nx-chip{display:inline-block;background:var(--chip);border:1px solid var(--line);color:#dfe8f6;
-  padding:.25rem .6rem;border-radius:999px;text-decoration:none;margin-left:6px;font-size:.9em}
+body.dashboard #container {
+  background: transparent;
+}
+
+body.dashboard #content {
+  margin: 0;
+  padding: 24px 32px 40px;
+}
+
+body.dashboard #content-main {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+/* ===== HERO SUPERIOR ===== */
+
+.nx-wrap {
+  width: 100%;
+}
+
+.nx-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) auto;
+  gap: 24px;
+  padding: 22px 24px;
+  border-radius: 22px;
+  border: 1px solid var(--nxa-border-soft);
+  background:
+    radial-gradient(circle at top left, rgba(56,189,248,.24), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(129,140,248,.24), transparent 60%),
+    #020617;
+  box-shadow: 0 24px 60px rgba(15,23,42,.9);
+  margin-bottom: 26px;
+}
+
+.nx-hero-main small {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  font-size: .7rem;
+  color: var(--nxa-muted);
+}
+
+.nx-hero-title {
+  font-size: 1.9rem;
+  margin: .2rem 0 .4rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.nx-hero-lead {
+  margin: 0 0 .6rem;
+  color: var(--nxa-muted);
+}
+
+.nx-hero-meta {
+  margin: 0;
+  font-size: .85rem;
+  color: rgba(148,163,184,.9);
+}
+
+.nx-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+/* Botones del hero */
+
+.nx-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  border-radius: 999px;
+  padding: .45rem 1rem;
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: .85rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nx-btn-primary {
+  background: radial-gradient(circle at top, #38bdf8, #1d4ed8);
+  border-color: rgba(56,189,248,.7);
+  color: #0b1120;
+  box-shadow: 0 0 25px rgba(56,189,248,.65);
+}
+
+.nx-btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+.nx-btn-ghost {
+  background: transparent;
+  border-color: var(--nxa-border-soft);
+  color: var(--nxa-text);
+}
+
+.nx-btn-ghost:hover {
+  border-color: var(--nxa-border-strong);
+}
+
+/* ===== GRID DE TARJETAS DE APPS ===== */
+
+.nx-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.nx-card {
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at top, rgba(30,64,175,.35), transparent 55%),
+    radial-gradient(circle at bottom, rgba(15,118,110,.25), transparent 55%),
+    #020617;
+  border: 1px solid var(--nxa-border-soft);
+  box-shadow: 0 18px 45px rgba(15,23,42,.85);
+  padding: 16px 18px 14px;
+}
+
+/* Cabecera de cada tarjeta */
+
+.nx-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.nx-card-kicker {
+  margin: 0 0 2px;
+  font-size: .7rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--nxa-muted);
+}
+
+.nx-card-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f9fafb;
+}
+
+.nx-chip-link {
+  align-self: flex-start;
+  font-size: .75rem;
+  padding: .2rem .6rem;
+  border-radius: 999px;
+  border: 1px solid var(--nxa-border-soft);
+  color: var(--nxa-muted);
+  text-decoration: none;
+}
+
+.nx-chip-link:hover {
+  border-color: var(--nxa-border-strong);
+  color: var(--nxa-text);
+}
+
+/* ===== LISTA DE MODELOS DENTRO DE CADA APP ===== */
+
+.nx-model-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nx-model-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 8px;
+  border-radius: 12px;
+  background: rgba(15,23,42,.9);
+}
+
+.nx-model-name {
+  color: var(--nxa-text);
+  font-size: .85rem;
+}
+
+.nx-model-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* Pills Añadir / Administrar */
+
+.nx-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .25rem .7rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+
+.nx-pill-main {
+  background: radial-gradient(circle at top, #38bdf8, #1d4ed8);
+  border-color: rgba(56,189,248,.7);
+  color: #0b1120;
+}
+
+.nx-pill-main:hover {
+  filter: brightness(1.05);
+}
+
+.nx-pill-soft {
+  background: rgba(15,23,42,1);
+  border-color: var(--nxa-border-soft);
+  color: var(--nxa-muted);
+}
+
+.nx-pill-soft:hover {
+  border-color: var(--nxa-border-strong);
+  color: var(--nxa-text);
+}
+
+/* Mensaje vacío */
+.nx-empty {
+  margin-top: 20px;
+  color: var(--nxa-muted);
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 960px) {
+  body.dashboard #content {
+    padding: 16px 16px 30px;
+  }
+
+  .nx-hero {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .nx-hero-actions {
+    justify-content: flex-start;
+  }
+}

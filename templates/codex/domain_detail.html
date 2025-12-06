@@ -5,139 +5,360 @@
 {% block title %}{{ item.name }} · Dominio{% endblock %}
 
 {% block content %}
-<section class="section">
-  <div class="card">
-    <h1 class="h1-glow text-3xl">
-      {% if item.icon %}<i class="{{ item.icon }} mr-2"></i>{% endif %}{{ item.name }}
-    </h1>
-    <p class="text-white/70 mt-1">{{ item.short_description }}</p>
+<style>
+  /* ===== Domain detail (local) ===== */
+  #domain-detail .top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:1rem;
+    margin-bottom:1.4rem;
+  }
 
-    {% if item.banner_image %}
-      <div class="mt-3" style="aspect-ratio:21/9;overflow:hidden;border:1px solid var(--line);border-radius:.5rem">
-        <img src="{{ item.banner_image.url }}" alt="" style="width:100%;height:100%;object-fit:cover">
-      </div>
-    {% endif %}
+  .domain-hero{
+    border-radius:20px;
+    padding:1.4rem 1.5rem 1.6rem;
+    background:
+      radial-gradient(circle at top left,rgba(56,189,248,.4),transparent 55%),
+      radial-gradient(circle at bottom right,rgba(250,204,21,.30),transparent 60%),
+      #020617;
+    border:1px solid rgba(148,163,184,.55);
+    box-shadow:0 22px 60px rgba(15,23,42,.95);
+    display:grid;
+    grid-template-columns:minmax(0,1.5fr) minmax(0,1.1fr);
+    gap:1.6rem;
+    margin-bottom:1.6rem;
+  }
 
-    {% if item.video_url %}
-      {% with embed=item.video_url|youtube_embed %}
-        {% if embed %}
-          <div class="mt-4 flex justify-center">
-            <div style="width:100%;max-width:960px;aspect-ratio:16/9;border:1px solid var(--line);border-radius:.6rem;overflow:hidden;">
-              <iframe
-                src="{{ embed }}"
-                style="width:100%;height:100%;display:block"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="origin-when-cross-origin"
-                allowfullscreen>
-              </iframe>
-            </div>
-          </div>
-        {% elif item.video_url|is_http_video %}
-          <div class="mt-4 flex justify-center">
-            <video controls style="width:100%;max-width:960px;border:1px solid var(--line);border-radius:.6rem;display:block">
-              <source src="{{ item.video_url }}">
-              Tu navegador no soporta el tag video.
-            </video>
-          </div>
-        {% else %}
-          <p class="mt-4 text-white/70">
-            Este video tiene la incrustación deshabilitada por su autor (Error 153).
-            <a class="link-soft" href="{{ item.video_url }}" target="_blank" rel="noopener">Abrir en YouTube</a>.
-          </p>
-        {% endif %}
-      {% endwith %}
-    {% endif %}
+  .domain-hero-main h1{margin:0 0 .4rem;}
+
+  .domain-kicker{
+    font-size:.75rem;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    color:rgba(148,163,184,.9);
+    margin-bottom:.3rem;
+  }
+
+  .domain-hero-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.4rem;
+    margin-top:.4rem;
+    font-size:.78rem;
+  }
+  .domain-pill{
+    padding:.2rem .7rem;
+    border-radius:999px;
+    border:1px solid rgba(148,163,184,.85);
+    background:rgba(15,23,42,.96);
+    display:inline-flex;
+    align-items:center;
+    gap:.35rem;
+  }
+
+  .domain-hero-banner{
+    border-radius:16px;
+    overflow:hidden;
+    border:1px solid rgba(148,163,184,.7);
+    aspect-ratio:21/9;
+    background:radial-gradient(circle at 20% 0,rgba(255,255,255,.2),transparent 60%);
+  }
+  .domain-hero-banner img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
+  .domain-video-card{
+    margin-top:1rem;
+    border-radius:16px;
+    border:1px solid rgba(148,163,184,.6);
+    background:rgba(15,23,42,.95);
+    padding:.75rem;
+  }
+  .domain-video-frame{
+    width:100%;
+    max-width:960px;
+    aspect-ratio:16/9;
+    border-radius:.9rem;
+    border:1px solid rgba(148,163,184,.55);
+    overflow:hidden;
+    margin-inline:auto;
+  }
+  .domain-video-frame iframe,
+  .domain-video-frame video{
+    width:100%;
+    height:100%;
+    display:block;
+  }
+
+  .domain-section-grid{
+    margin-top:1.6rem;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:1.4rem;
+  }
+  .domain-card{
+    border-radius:18px;
+    border:1px solid rgba(148,163,184,.35);
+    background:rgba(15,23,42,.96);
+    padding:1.15rem 1.2rem 1.25rem;
+    box-shadow:0 18px 45px rgba(15,23,42,.9);
+  }
+
+  .domain-list{
+    margin-top:.4rem;
+    padding-left:1.2rem;
+    font-size:.9rem;
+  }
+  .domain-list li + li{
+    margin-top:.2rem;
+  }
+
+  .domain-sprite-grid{
+    margin-top:.6rem;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:.75rem;
+  }
+  @media (min-width:768px){
+    .domain-sprite-grid{
+      grid-template-columns:repeat(4,minmax(0,1fr));
+    }
+  }
+  .sprite-card{
+    border-radius:14px;
+    border:1px solid rgba(148,163,184,.35);
+    background:radial-gradient(circle at 50% 10%,rgba(255,255,255,.18),transparent 65%);
+    padding:.6rem .55rem .7rem;
+    text-align:center;
+  }
+  .sprite-thumb{
+    aspect-ratio:1/1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .sprite-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    image-rendering:pixelated;
+  }
+  .sprite-name{
+    margin-top:.3rem;
+    font-size:.8rem;
+  }
+
+  .trap-grid{
+    margin-top:.6rem;
+    display:grid;
+    grid-template-columns:repeat(1,minmax(0,1fr));
+    gap:.8rem;
+  }
+  @media (min-width:900px){
+    .trap-grid{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+  }
+  .trap-card{
+    border-radius:14px;
+    border:1px solid rgba(148,163,184,.4);
+    background:rgba(15,23,42,.98);
+    padding:.7rem .8rem .85rem;
+  }
+  .trap-card img{
+    margin-top:.45rem;
+    width:100%;
+    border-radius:.6rem;
+    border:1px solid rgba(148,163,184,.45);
+  }
+
+  @media (max-width:1024px){
+    .domain-hero{
+      grid-template-columns:1fr;
+    }
+  }
+  @media (max-width:900px){
+    .domain-section-grid{
+      grid-template-columns:1fr;
+    }
+  }
+</style>
+
+<section id="domain-detail" class="section">
+  <div class="top-bar">
+    <div class="flex flex-wrap gap-2">
+      <a href="{% url 'codex:domains_index' %}" class="btn-ghost">
+        <i class="fa-solid fa-arrow-left mr-1"></i> Volver a Dominios
+      </a>
+      <a href="{% url 'codex:index' %}" class="btn-ghost">
+        <i class="fa-solid fa-book mr-1"></i> Volver al Códex
+      </a>
+    </div>
   </div>
 
-  <div class="mt-6 grid md:grid-cols-2 gap-5">
-    <div class="card">
-      <h3 class="card-title"><i class="fa-solid fa-book-open"></i> Historias</h3>
-      <ul class="list-disc ml-5">
+  <!-- Hero del Dominio -->
+  <section class="domain-hero">
+    <div class="domain-hero-main">
+      <p class="domain-kicker">DOMINIO DEL NEXO</p>
+      <h1 class="h1-glow text-3xl">
+        {% if item.icon %}<i class="{{ item.icon }} mr-2"></i>{% endif %}{{ item.name }}
+      </h1>
+      <p class="text-white/70 mt-1">{{ item.short_description }}</p>
+
+      <div class="domain-hero-meta">
+        <span class="domain-pill">
+          <i class="fa-solid fa-location-dot"></i> Región temática del videojuego
+        </span>
+        <span class="domain-pill">
+          <i class="fa-solid fa-book-open"></i> Contenido: historias, personajes, enemigos y guías
+        </span>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-3">
+      {% if item.banner_image %}
+        <div class="domain-hero-banner">
+          <img src="{{ item.banner_image.url }}" alt="{{ item.name }}">
+        </div>
+      {% endif %}
+
+      {% if item.video_url %}
+        <div class="domain-video-card">
+          {% with embed=item.video_url|youtube_embed %}
+            {% if embed %}
+              <div class="domain-video-frame">
+                <iframe
+                  src="{{ embed }}"
+                  frameborder="0"
+                  style="width:100%;height:100%;display:block"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="origin-when-cross-origin"
+                  allowfullscreen>
+                </iframe>
+              </div>
+            {% elif item.video_url|is_http_video %}
+              <div class="domain-video-frame">
+                <video controls>
+                  <source src="{{ item.video_url }}">
+                  Tu navegador no soporta el tag video.
+                </video>
+              </div>
+            {% else %}
+              <p class="text-white/70 text-sm px-1">
+                Este video tiene la incrustación deshabilitada por su autor (Error 153).
+                <a class="link-soft" href="{{ item.video_url }}" target="_blank" rel="noopener">Abrir en YouTube</a>.
+              </p>
+            {% endif %}
+          {% endwith %}
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- Historias / Artefactos -->
+  <div class="domain-section-grid">
+    <section class="domain-card">
+      <h3 class="card-title"><i class="fa-solid fa-book-open mr-1"></i> Historias</h3>
+      <ul class="domain-list list-disc">
         {% for x in lore %}
           <li><a class="link-soft" href="{{ x.get_absolute_url }}">{{ x.title }}</a></li>
         {% empty %}
-          <li class="text-white/60">—</li>
+          <li class="text-white/60">No hay historias registradas para este dominio.</li>
         {% endfor %}
       </ul>
-    </div>
+    </section>
 
-    <div class="card">
-      <h3 class="card-title"><i class="fa-solid fa-gem"></i> Consumibles</h3>
-      <ul class="list-disc ml-5">
+    <section class="domain-card">
+      <h3 class="card-title"><i class="fa-solid fa-gem mr-1"></i> Artefactos / Consumibles</h3>
+      <ul class="domain-list list-disc">
         {% for a in artifacts %}
           <li><a class="link-soft" href="{{ a.get_absolute_url }}">{{ a.name }}</a></li>
         {% empty %}
-          <li class="text-white/60">—</li>
+          <li class="text-white/60">No hay artefactos asociados todavía.</li>
         {% endfor %}
       </ul>
-    </div>
+    </section>
   </div>
 
-  <div class="mt-6 grid md:grid-cols-2 gap-5">
-    <div class="card">
-      <h3 class="card-title"><i class="fa-solid fa-user-ninja"></i> Personajes</h3>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+  <!-- Personajes / Enemigos -->
+  <div class="domain-section-grid">
+    <section class="domain-card">
+      <h3 class="card-title"><i class="fa-solid fa-user-ninja mr-1"></i> Personajes</h3>
+      <div class="domain-sprite-grid">
         {% for c in characters %}
-          <a class="card text-center" href="{{ c.get_absolute_url }}">
-            {% if c.sprite_gif %}<img src="{{ c.sprite_gif.url }}" alt="">
-            {% elif c.sprite_still %}<img src="{{ c.sprite_still.url }}" alt="">
-            {% endif %}
-            <div class="mt-1">{{ c.name }}</div>
+          <a class="sprite-card" href="{{ c.get_absolute_url }}">
+            <div class="sprite-thumb">
+              {% if c.sprite_gif %}
+                <img src="{{ c.sprite_gif.url }}" alt="{{ c.name }}">
+              {% elif c.sprite_still %}
+                <img src="{{ c.sprite_still.url }}" alt="{{ c.name }}">
+              {% endif %}
+            </div>
+            <div class="sprite-name">{{ c.name }}</div>
           </a>
         {% empty %}
-          <p class="text-white/60">—</p>
+          <p class="text-white/60 mt-2">No hay personajes asignados a este dominio.</p>
         {% endfor %}
       </div>
-    </div>
+    </section>
 
-    <div class="card">
-      <h3 class="card-title"><i class="fa-solid fa-skull"></i> Enemigos</h3>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <section class="domain-card">
+      <h3 class="card-title"><i class="fa-solid fa-skull mr-1"></i> Enemigos</h3>
+      <div class="domain-sprite-grid">
         {% for e in enemies %}
-          <a class="card text-center" href="{{ e.get_absolute_url }}">
-            {% if e.sprite_gif %}<img src="{{ e.sprite_gif.url }}" alt="">
-            {% elif e.sprite_still %}<img src="{{ e.sprite_still.url }}" alt="">
-            {% endif %}
-            <div class="mt-1">{{ e.name }}</div>
+          <a class="sprite-card" href="{{ e.get_absolute_url }}">
+            <div class="sprite-thumb">
+              {% if e.sprite_gif %}
+                <img src="{{ e.sprite_gif.url }}" alt="{{ e.name }}">
+              {% elif e.sprite_still %}
+                <img src="{{ e.sprite_still.url }}" alt="{{ e.name }}">
+              {% endif %}
+            </div>
+            <div class="sprite-name">{{ e.name }}</div>
           </a>
         {% empty %}
-          <p class="text-white/60">—</p>
+          <p class="text-white/60 mt-2">No hay enemigos definidos en este dominio.</p>
         {% endfor %}
       </div>
-    </div>
+    </section>
   </div>
 
-  <div class="mt-6 grid md:grid-cols-2 gap-5">
-    <div class="card">
-      <h3 class="card-title"><i class="fa-solid fa-bomb"></i> Trampas</h3>
-      <div class="grid md:grid-cols-2 gap-3">
+  <!-- Trampas / Guías -->
+  <div class="domain-section-grid">
+    <section class="domain-card">
+      <h3 class="card-title"><i class="fa-solid fa-bomb mr-1"></i> Trampas</h3>
+      <div class="trap-grid">
         {% for t in traps %}
-          <div class="card">
+          <article class="trap-card">
             <strong>{{ t.title }}</strong>
-            <p class="text-white/70 mt-1">{{ t.description }}</p>
+            <p class="text-white/70 text-sm mt-1">{{ t.description }}</p>
             {% if t.gif %}
-              <img class="mt-2" src="{{ t.gif.url }}" alt="">
+              <img src="{{ t.gif.url }}" alt="{{ t.title }}">
             {% elif t.image %}
-              <img class="mt-2" src="{{ t.image.url }}" alt="">
+              <img src="{{ t.image.url }}" alt="{{ t.title }}">
             {% endif %}
-          </div>
+          </article>
         {% empty %}
-          <p class="text-white/60">—</p>
+          <p class="text-white/60 mt-2">No hay trampas registradas para este dominio.</p>
         {% endfor %}
       </div>
-    </div>
+    </section>
 
-    <div class="card">
-      <h3 class="card-title"><i class="fa-solid fa-lightbulb"></i> Guías</h3>
-      <ul class="list-disc ml-5">
+    <section class="domain-card">
+      <h3 class="card-title"><i class="fa-solid fa-lightbulb mr-1"></i> Guías</h3>
+      <ul class="domain-list list-disc">
         {% for g in guides %}
           <li><a class="link-soft" href="{{ g.get_absolute_url }}">{{ g.title }}</a></li>
         {% empty %}
-          <li class="text-white/60">—</li>
+          <li class="text-white/60">Aún no hay guías para este dominio.</li>
         {% endfor %}
       </ul>
-    </div>
+    </section>
   </div>
 </section>
 {% endblock %}

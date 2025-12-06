@@ -17,14 +17,20 @@
     margin-bottom:.25rem;
   }
 
-  /* Filtros (Todo / Publicación / Reseña) */
+  /* --- FILTROS + BUSCADOR --- */
   .feed-filters{
     margin-top:1.5rem;
     display:flex;
     justify-content:space-between;
-    align-items:center;
-    gap:.75rem;
+    align-items:flex-start;
+    gap:1rem;
     flex-wrap:wrap;
+  }
+  .feed-filter-left{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:.7rem;
   }
   .feed-filters-label{
     font-size:.8rem;
@@ -67,6 +73,52 @@
                 rgba(15,23,42,.97));
     color:#fefce8;
     box-shadow:0 0 22px rgba(250,204,21,.55);
+  }
+
+  /* Buscador */
+  .feed-search{
+    display:flex;
+    align-items:center;
+    gap:.4rem;
+    padding:.35rem .45rem .35rem .85rem;
+    border-radius:999px;
+    border:1px solid rgba(148,163,184,.6);
+    background:rgba(15,23,42,.96);
+    box-shadow:0 0 20px rgba(15,23,42,.95);
+    min-width:260px;
+  }
+  .feed-search-icon{
+    color:rgba(148,163,184,.9);
+    font-size:.85rem;
+  }
+  .feed-search-input{
+    flex:1;
+    border:none;
+    outline:none;
+    background:transparent;
+    color:#e5e7eb;
+    font-size:.85rem;
+  }
+  .feed-search-input::placeholder{
+    color:rgba(148,163,184,.8);
+  }
+  .feed-search-btn{
+    border:none;
+    border-radius:999px;
+    padding:.3rem .85rem;
+    background:linear-gradient(135deg,#0ea5e9,#22d3ee);
+    color:#e5e7eb;
+    font-weight:600;
+    font-size:.78rem;
+    display:inline-flex;
+    align-items:center;
+    gap:.35rem;
+    cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .feed-search-btn:hover{
+    transform:translateY(-1px);
+    box-shadow:0 0 20px rgba(56,189,248,.7);
   }
 
   /* --- TARJETA DE PUBLICACIÓN --- */
@@ -252,6 +304,13 @@
       width:100%;
       justify-content:center;
     }
+    .feed-filters{
+      flex-direction:column;
+      align-items:flex-start;
+    }
+    .feed-search{
+      width:100%;
+    }
   }
 </style>
 {% endblock %}
@@ -284,32 +343,51 @@
     {% endif %}
   </div>
 
-  {# Filtros tipo de post #}
+  {# Filtros tipo de post + buscador #}
   {% with current_type=current_type|default:"all" %}
   <div class="feed-filters">
-    <span class="feed-filters-label">
-      Filtrar por tipo
-    </span>
+    <div class="feed-filter-left">
+      <span class="feed-filters-label">
+        Filtrar por tipo
+      </span>
 
-    <div class="feed-filter-chips">
-      <a href="{% url 'community:feed' %}"
-         class="feed-filter-chip {% if current_type == 'all' %}is-active{% endif %}">
-        <i class="fa-solid fa-stream"></i>
-        Todo
-      </a>
+      <div class="feed-filter-chips">
+        <a href="{% url 'community:feed' %}{% if query %}?q={{ query|urlencode }}{% endif %}"
+           class="feed-filter-chip {% if current_type == 'all' %}is-active{% endif %}">
+          <i class="fa-solid fa-stream"></i>
+          Todo
+        </a>
 
-      <a href="?tipo=post"
-         class="feed-filter-chip {% if current_type == 'post' %}is-active{% endif %}">
-        <i class="fa-solid fa-bolt"></i>
-        Publicaciones
-      </a>
+        <a href="?tipo=post{% if query %}&q={{ query|urlencode }}{% endif %}"
+           class="feed-filter-chip {% if current_type == 'post' %}is-active{% endif %}">
+          <i class="fa-solid fa-bolt"></i>
+          Publicaciones
+        </a>
 
-      <a href="?tipo=review"
-         class="feed-filter-chip {% if current_type == 'review' %}is-active{% endif %}">
-        <i class="fa-solid fa-star-half-stroke"></i>
-        Reseñas
-      </a>
+        <a href="?tipo=review{% if query %}&q={{ query|urlencode }}{% endif %}"
+           class="feed-filter-chip {% if current_type == 'review' %}is-active{% endif %}">
+          <i class="fa-solid fa-star-half-stroke"></i>
+          Reseñas
+        </a>
+      </div>
     </div>
+
+    <form method="get" class="feed-search">
+      {% if current_type and current_type != 'all' %}
+        <input type="hidden" name="tipo" value="{{ current_type }}">
+      {% endif %}
+      <i class="fa-solid fa-magnifying-glass feed-search-icon"></i>
+      <input
+        type="text"
+        name="q"
+        class="feed-search-input"
+        value="{{ query }}"
+        placeholder="Buscar por título, texto o autor…">
+      <button type="submit" class="feed-search-btn">
+        <i class="fa-solid fa-search"></i>
+        <span>Buscar</span>
+      </button>
+    </form>
   </div>
   {% endwith %}
 </section>
@@ -417,15 +495,23 @@
   {% endfor %}
 </section>
 
+{% with current_type=current_type|default:"all" %}
 {% if posts.has_other_pages %}
 <nav class="mt-6 flex items-center gap-2">
   {% if posts.has_previous %}
-    <a class="btn-ghost" href="?page={{ posts.previous_page_number }}{% if current_type and current_type != 'all' %}&tipo={{ current_type }}{% endif %}">‹ Anterior</a>
+    <a class="btn-ghost"
+       href="?page={{ posts.previous_page_number }}{% if current_type and current_type != 'all' %}&tipo={{ current_type }}{% endif %}{% if query %}&q={{ query|urlencode }}{% endif %}">
+      ‹ Anterior
+    </a>
   {% endif %}
   <span class="text-white/60">Página {{ posts.number }} de {{ posts.paginator.num_pages }}</span>
   {% if posts.has_next %}
-    <a class="btn-ghost" href="?page={{ posts.next_page_number }}{% if current_type and current_type != 'all' %}&tipo={{ current_type }}{% endif %}">Siguiente ›</a>
+    <a class="btn-ghost"
+       href="?page={{ posts.next_page_number }}{% if current_type and current_type != 'all' %}&tipo={{ current_type }}{% endif %}{% if query %}&q={{ query|urlencode }}{% endif %}">
+      Siguiente ›
+    </a>
   {% endif %}
 </nav>
 {% endif %}
+{% endwith %}
 {% endblock %}

@@ -1,21 +1,166 @@
 {% extends "base.html" %}
 {% block title %}Dominios · Códex{% endblock %}
+
 {% block content %}
-<section class="section">
-  <h1 class="h1-glow text-3xl">Dominios</h1>
-  <div class="grid md:grid-cols-3 gap-4 mt-4">
+<style>
+  /* ===== Dominios index (local) ===== */
+  #domains-page .lead{
+    color:rgba(241,245,249,.82);
+    font-size:.9rem;
+  }
+
+  .domains-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:1rem;
+    margin-bottom:1.6rem;
+  }
+  .domains-header h1{margin:0;}
+
+  .domains-toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.5rem;
+    justify-content:flex-end;
+  }
+
+  .domain-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:1.3rem;
+  }
+
+  .domain-card{
+    position:relative;
+    border-radius:18px;
+    padding:1rem 1rem .95rem;
+    background:
+      radial-gradient(circle at top left,rgba(56,189,248,.35),transparent 55%),
+      radial-gradient(circle at bottom right,rgba(250,204,21,.32),transparent 60%),
+      #020617;
+    border:1px solid rgba(148,163,184,.5);
+    box-shadow:0 18px 42px rgba(15,23,42,.95);
+    display:flex;
+    flex-direction:column;
+    gap:.6rem;
+    text-decoration:none;
+    color:inherit;
+    transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+  }
+  .domain-card::before{
+    content:"";
+    position:absolute;
+    inset:-1px;
+    border-radius:inherit;
+    pointer-events:none;
+    background:conic-gradient(from 210deg,
+      rgba(56,189,248,.8),
+      rgba(37,99,235,.3),
+      rgba(15,23,42,1),
+      rgba(250,204,21,.85));
+    opacity:.12;
+  }
+  .domain-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 24px 55px rgba(15,23,42,1);
+    border-color:rgba(56,189,248,.9);
+  }
+
+  .domain-thumb{
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid rgba(148,163,184,.6);
+    aspect-ratio:16/9;
+    background:radial-gradient(circle at 30% 10%,rgba(255,255,255,.25),transparent 60%);
+  }
+  .domain-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
+  .domain-name-row{
+    display:flex;
+    justify-content:space-between;
+    gap:.4rem;
+    align-items:center;
+  }
+  .domain-name-row h3{
+    margin:0;
+    font-size:1.02rem;
+  }
+
+  .domain-tag{
+    padding:.15rem .6rem;
+    border-radius:999px;
+    border:1px solid rgba(148,163,184,.85);
+    background:rgba(15,23,42,.96);
+    font-size:.72rem;
+    white-space:nowrap;
+  }
+
+  .domain-description{
+    font-size:.86rem;
+    color:rgba(226,232,240,.9);
+    min-height:2.8em;
+  }
+
+  @media (max-width:768px){
+    .domains-header{
+      flex-direction:column;
+      align-items:flex-start;
+    }
+    .domains-toolbar{
+      justify-content:flex-start;
+    }
+  }
+</style>
+
+<section id="domains-page" class="section">
+  <div class="domains-header">
+    <div>
+      <h1 class="h1-glow text-2xl md:text-3xl">
+        <i class="fa-solid fa-mountain-sun mr-2"></i>Dominios
+      </h1>
+      <p class="lead mt-1">
+        Regiones principales del Nexo, con su ambientación, peligros y contenido asociado.
+      </p>
+    </div>
+
+    <div class="domains-toolbar">
+      <a href="{% url 'codex:index' %}" class="btn-ghost">
+        <i class="fa-solid fa-book mr-1"></i> Volver al Códex
+      </a>
+    </div>
+  </div>
+
+  <div class="domain-grid">
     {% for d in items %}
-    <a class="card" href="{{ d.get_absolute_url }}">
-      {% if d.cover_image %}
-      <div style="aspect-ratio:16/9;overflow:hidden;border-radius:.5rem;border:1px solid var(--line)">
-        <img src="{{ d.cover_image.url }}" alt="" style="width:100%;height:100%;object-fit:cover">
-      </div>
-      {% endif %}
-      <h3 class="mt-2">{% if d.icon %}<i class="{{ d.icon }} mr-2"></i>{% endif %}{{ d.name }}</h3>
-      <p class="text-white/60 text-sm">{{ d.short_description|truncatechars:160 }}</p>
-    </a>
+      <a class="domain-card" href="{{ d.get_absolute_url }}">
+        {% if d.cover_image %}
+          <div class="domain-thumb">
+            <img src="{{ d.cover_image.url }}" alt="{{ d.name }}">
+          </div>
+        {% endif %}
+
+        <div class="domain-name-row mt-2">
+          <h3 class="card-title">
+            {% if d.icon %}<i class="{{ d.icon }} mr-2"></i>{% endif %}
+            {{ d.name }}
+          </h3>
+          <span class="domain-tag">
+            <i class="fa-regular fa-compass mr-1"></i>Dominio
+          </span>
+        </div>
+
+        <p class="domain-description">
+          {{ d.short_description|truncatechars:160 }}
+        </p>
+      </a>
     {% empty %}
-    <p class="text-white/60">Sin dominios.</p>
+      <p class="text-white/60">Sin dominios.</p>
     {% endfor %}
   </div>
 </section>

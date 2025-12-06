@@ -1,76 +1,399 @@
-:root{
-  --bg:#0b0f14;
-  --panel:#10161d;
-  --surface:#121a22;
-  --line:rgba(255,255,255,.08);
-  --text:#d4d8dd;
-  --muted:#9aa3ad;
-  --accent:#d9b66f;         /* dorado */
-  --brand:#6fb7ff;          /* cian sutil */
-  --ok:#3ec275;
-  --err:#ef5b5b;
+/* ===========================
+   Paleta y fuentes base
+   =========================== */
+:root {
+  --nx-bg-dark: #050816;
+  --nx-panel-dark: #08101c;
+  --nx-line: rgba(148, 163, 184, 0.45);
+  --nx-text-soft: #9ca3af;
+  --nx-brand: #60a5fa;
+  --nx-accent: #d9b66f;
+  --nx-chip-bg: #0f172a;
+  --nx-ok: #16a34a;
+  --nx-error: #ef4444;
 }
 
-html, body { background: var(--bg) !important; color:var(--text) !important; }
-a { color: var(--brand); }
-a:hover { color:#a9d6ff; }
+/* Dejamos que Django controle colores de fondo/texto globales.
+   Solo definimos tipografía. */
+body,
+input,
+select,
+textarea {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+}
 
-#header { background: linear-gradient(180deg,#0f141a,#0b1118); border-bottom:1px solid var(--line); }
-#header a:link, #header a:visited { color: #e7ecf2; }
-#content { padding: 24px; }
+/* ===========================
+   HEADER / BRANDING
+   =========================== */
 
-.nx-brand{display:flex;align-items:center;gap:.6rem;font-weight:700;font-size:15px;color:#fff}
-.nx-brand img{height:28px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.45))}
-.nx-user-tools{display:flex;gap:.6rem;align-items:center}
-.nx-chip{display:inline-flex;align-items:center;border:1px solid var(--line);
-  padding:.25rem .55rem;border-radius:999px;background:rgba(255,255,255,.04);color:#dfe6ee}
-.nx-chip:hover{background:rgba(255,255,255,.07)}
+#header {
+  background: linear-gradient(180deg, #020617, #020617 60%, #020617);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.7);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.7);
+}
 
-.nx-dashboard{display:grid;gap:18px}
-.nx-hero{display:flex;justify-content:space-between;align-items:end;padding:18px 20px;
-  border:1px solid var(--line);border-radius:14px;background:
-  linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));box-shadow:0 24px 60px rgba(0,0,0,.3)}
-.nx-hero__title{font-size:28px;margin:0 0 6px; text-shadow:0 6px 30px rgba(0,0,0,.4)}
-.nx-hero__sub{margin:0;color:var(--muted)}
+#header a:link,
+#header a:visited {
+  color: #e5e7eb;
+}
 
-.nx-panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
-@media (max-width:1200px){ .nx-panels{grid-template-columns:repeat(2,1fr)} }
-@media (max-width:800px){ .nx-panels{grid-template-columns:1fr} }
+/* Marca arriba a la izquierda */
+.nx-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  color: #f9fafb;
+}
 
-.nx-card{border:1px solid var(--line);border-radius:14px;background:
-  linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));overflow:hidden}
-.nx-card__head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
-.nx-card__head h2{margin:0;font-size:16px;letter-spacing:.2px}
+.nx-brand img {
+  height: 30px;
+  width: auto;
+  filter: drop-shadow(0 6px 16px rgba(96, 165, 250, 0.35));
+}
 
-.nx-resources{list-style:none;margin:0;padding:6px}
-.nx-resource{display:flex;justify-content:space-between;align-items:center;
-  padding:10px 10px;border-radius:10px;transition:background .25s,border-color .25s}
-.nx-resource:hover{background:rgba(255,255,255,.04)}
-.nx-resource__name{display:flex;align-items:center;gap:.6rem}
-.nx-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent)}
-.nx-actions{display:flex;gap:.35rem}
+.nx-brand span {
+  letter-spacing: 0.03em;
+}
 
-.nx-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.42rem .7rem;border-radius:10px;
-  border:1px solid var(--line);background:rgba(255,255,255,.03);color:#e9eef5;text-decoration:none}
-.nx-btn:hover{background:rgba(255,255,255,.06)}
-.nx-btn--primary{border-color:color-mix(in oklab,var(--brand) 40%,transparent);
-  background:linear-gradient(180deg,color-mix(in oklab,var(--brand) 16%,transparent),rgba(255,255,255,.02))}
-.nx-btn--ghost{background:transparent}
+/* Herramientas de usuario (bienvenido, ver sitio, etc.) */
+.nx-user-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
 
-.nx-fade{opacity:0;transform:translateY(6px);animation:nxFade .55s ease both}
-@keyframes nxFade{to{opacity:1;transform:none}}
+.nx-user-tools span {
+  color: #e5e7eb;
+  font-size: 13px;
+}
 
-.change-list .actions select, .selector, .related-widget-wrapper { filter:none }
-.breadcrumbs { background: transparent; border:0; color:var(--muted); }
-.module caption, .module h2 { background: transparent; color: #e7ecf2; }
+/* Chips de usuario / ver sitio / logout */
+.nx-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  background: rgba(15, 23, 42, 0.75);
+  color: #e5e7eb;
+  font-size: 12px;
+  text-decoration: none;
+}
 
-/* LOGIN */
-.nx-login{min-height:calc(100dvh - 72px);display:grid;place-items:center}
-.nx-login__panel{width:min(420px,92vw);padding:24px;border:1px solid var(--line);border-radius:16px;background:
-  radial-gradient(800px 400px at 50% 0, rgba(217,182,111,.07), rgba(17,22,28,.5));box-shadow:0 24px 80px rgba(0,0,0,.35)}
-.nx-login__panel h1{margin:.4rem 0 1rem}
-.nx-login__logo{height:46px;display:block;margin:0 auto .6rem}
-.nx-field{display:grid;gap:.35rem;margin:.6rem 0}
-.nx-field input{background:#0f151c;border:1px solid var(--line);border-radius:10px;color:#e9eef5;padding:.55rem .7rem}
-.nx-login__cta{width:100%;margin-top:.4rem}
-.nx-alert{background:rgba(239,91,91,.14);border:1px solid rgba(239,91,91,.4);color:#ffb3b3;padding:.5rem .7rem;border-radius:10px}
+.nx-chip:hover {
+  background: rgba(30, 64, 175, 0.9);
+  border-color: rgba(129, 140, 248, 0.9);
+  color: #f9fafb;
+}
+
+/* ===========================
+   CONTENIDO GENERAL
+   =========================== */
+
+#content {
+  padding: 24px 28px 40px;
+}
+
+/* Breadcrumbs más discretas pero legibles en tema claro */
+.breadcrumbs {
+  background: transparent;
+  border: 0;
+  color: #4b5563;
+}
+
+/* Títulos de módulos del admin */
+.module caption,
+.module h2 {
+  background: transparent;
+  color: #111827;
+}
+
+/* Evita filtros raros en selects / widgets relacionados */
+.change-list .actions select,
+.selector,
+.related-widget-wrapper {
+  filter: none;
+}
+
+/* ===========================
+   DASHBOARD (admin/index.html)
+   =========================== */
+
+.nx-dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  gap: 18px;
+}
+
+/* Hero superior oscuro */
+.nx-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.9fr);
+  gap: 24px;
+  padding: 22px 24px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.45), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(129, 140, 248, 0.55), transparent 60%),
+    radial-gradient(circle at bottom left, rgba(217, 182, 111, 0.35), transparent 60%),
+    #020617;
+  color: #e5e7eb;
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.95),
+    0 0 0 1px rgba(15, 23, 42, 0.9);
+}
+
+@media (max-width: 1024px) {
+  .nx-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.nx-hero__title {
+  font-size: 26px;
+  margin: 0 0 6px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+}
+
+.nx-hero__sub {
+  margin: 0 0 10px;
+  color: var(--nx-text-soft);
+  font-size: 14px;
+}
+
+.nx-hero__meta {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(226, 232, 240, 0.85);
+}
+
+.nx-hero__meta strong {
+  color: #f9fafb;
+}
+
+/* Botones a la derecha del hero */
+.nx-hero__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.nx-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  background: rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nx-btn:hover {
+  background: rgba(30, 64, 175, 0.95);
+  border-color: rgba(129, 140, 248, 0.95);
+  color: #f9fafb;
+}
+
+.nx-btn--primary {
+  border-color: rgba(59, 130, 246, 0.9);
+  background: radial-gradient(circle at top, #3b82f6, #1d4ed8);
+  box-shadow: 0 12px 35px rgba(37, 99, 235, 0.7);
+}
+
+/* ===========================
+   Tarjetas de apps (grid)
+   =========================== */
+
+.nx-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+/* Cada app */
+.nx-card {
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background:
+    radial-gradient(circle at top left, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.98));
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.85);
+  overflow: hidden;
+  color: #e5e7eb;
+}
+
+.nx-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.95));
+}
+
+.nx-card__head h2 {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #f9fafb;
+}
+
+.nx-card__head .nx-chip {
+  font-size: 11px;
+}
+
+/* Lista de modelos dentro de cada app */
+.nx-resources {
+  list-style: none;
+  margin: 0;
+  padding: 8px 8px 10px;
+}
+
+.nx-resource {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 8px 9px;
+  border-radius: 10px;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.nx-resource:hover {
+  background: rgba(31, 41, 55, 0.9);
+  transform: translateY(-1px);
+}
+
+.nx-resource__name {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 13px;
+}
+
+.nx-resource__name a {
+  color: #e5e7eb;
+  text-decoration: none;
+}
+
+.nx-resource__name a:hover {
+  text-decoration: underline;
+}
+
+/* Punto luminoso al lado del nombre del modelo */
+.nx-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--nx-accent);
+  box-shadow: 0 0 10px rgba(217, 182, 111, 0.9);
+}
+
+/* Botones "Añadir" / "Administrar" */
+.nx-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.nx-btn--ghost {
+  background: transparent;
+  border-color: rgba(148, 163, 184, 0.5);
+  font-size: 11px;
+  padding: 0.28rem 0.6rem;
+}
+
+.nx-btn--ghost:hover {
+  background: rgba(31, 41, 55, 1);
+}
+
+/* Animación de entrada suave de las tarjetas */
+.nx-fade {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: nxFadeIn 0.45s ease forwards;
+}
+
+@keyframes nxFadeIn {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ===========================
+   LOGIN personalizable (opcional)
+   =========================== */
+
+.nx-login {
+  min-height: calc(100vh - 80px);
+  display: grid;
+  place-items: center;
+}
+
+.nx-login__panel {
+  width: min(420px, 92vw);
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background:
+    radial-gradient(circle at top, rgba(37, 99, 235, 0.4), transparent 55%),
+    radial-gradient(circle at bottom, rgba(15, 23, 42, 0.95), #020617);
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.95);
+  color: #e5e7eb;
+}
+
+.nx-login__logo {
+  display: block;
+  height: 46px;
+  margin: 0 auto 0.8rem;
+}
+
+.nx-login__panel h1 {
+  margin: 0 0 0.5rem;
+  font-size: 22px;
+}
+
+.nx-field {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.7rem 0;
+}
+
+.nx-field input {
+  background: #020617;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  color: #e5e7eb;
+  padding: 0.55rem 0.7rem;
+}
+
+.nx-login__cta {
+  width: 100%;
+  margin-top: 0.7rem;
+}
+
+.nx-alert {
+  margin-top: 0.6rem;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.6);
+  color: #fecaca;
+  padding: 0.45rem 0.6rem;
+  border-radius: 10px;
+  font-size: 13px;
+}

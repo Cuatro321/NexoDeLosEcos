@@ -3,69 +3,217 @@
 {% block title %}Códex · Guías{% endblock %}
 
 {% block content %}
-<section class="section">
-  <div class="flex items-center justify-between">
-    <h1 class="h1-glow text-2xl md:text-3xl">
-      <i class="fa-solid fa-compass mr-2"></i>Guías y Estrategias
-    </h1>
-    <a href="{% url 'codex:index' %}" class="link-soft">
-      <i class="fa-solid fa-arrow-left mr-2"></i>Volver al Códex
-    </a>
-  </div>
-  <p class="text-white/70 mt-2">
-    Rutas, recomendaciones de emblemas y consejos por entorno, personaje y enemigo.
-  </p>
-</section>
+<style>
+  /* ===== Guías index (local) ===== */
+  #guides-page .guides-hero{
+    border-radius:20px;
+    padding:1.4rem 1.6rem 1.6rem;
+    border:1px solid rgba(148,163,184,.55);
+    background:
+      radial-gradient(circle at top left,rgba(56,189,248,.45),transparent 55%),
+      radial-gradient(circle at bottom right,rgba(250,204,21,.32),transparent 60%),
+      #020617;
+    box-shadow:0 24px 60px rgba(15,23,42,.9);
+    display:flex;
+    justify-content:space-between;
+    gap:1.5rem;
+    align-items:flex-start;
+    margin-bottom:1.8rem;
+  }
+  #guides-page .guides-hero-main h1{margin:0 0 .4rem;}
+  #guides-page .guides-kicker{
+    font-size:.78rem;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    color:rgba(148,163,184,.9);
+    margin-bottom:.25rem;
+  }
+  #guides-page .guides-hero-text{
+    color:rgba(226,232,240,.88);
+    font-size:.9rem;
+  }
+  #guides-page .guides-hero-actions{
+    display:flex;
+    flex-direction:column;
+    gap:.45rem;
+    align-items:flex-end;
+  }
 
-<section class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-  {% for g in page_obj %}
-    <article class="card hover:translate-y-[-2px] transition">
-      {% if g.cover_image %}
-        <div style="aspect-ratio:16/9;overflow:hidden;border-radius:.5rem;border:1px solid var(--line)">
-          <img src="{{ g.cover_image.url }}" alt="{{ g.title }}" style="width:100%;height:100%;object-fit:cover">
-        </div>
-      {% else %}
-        <div style="aspect-ratio:16/9;display:grid;place-items:center;border-radius:.5rem;border:1px solid var(--line);background:rgba(255,255,255,.05)">
-          <img src="{% static 'img/placeholders/cover.png' %}" alt="" style="height:56px;opacity:.7">
-        </div>
+  #guides-page .guide-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:1.25rem;
+  }
+
+  #guides-page .guide-card{
+    position:relative;
+    border-radius:18px;
+    padding:1rem 1rem .9rem;
+    background:rgba(15,23,42,.98);
+    border:1px solid rgba(148,163,184,.45);
+    box-shadow:0 18px 42px rgba(15,23,42,.9);
+    display:flex;
+    flex-direction:column;
+    gap:.55rem;
+    text-decoration:none;
+    color:inherit;
+    transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+  }
+  #guides-page .guide-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 22px 60px rgba(15,23,42,1);
+    border-color:rgba(56,189,248,.9);
+  }
+
+  #guides-page .guide-thumb{
+    aspect-ratio:16/9;
+    overflow:hidden;
+    border-radius:12px;
+    border:1px solid rgba(148,163,184,.6);
+    background:radial-gradient(circle at 20% 0,rgba(255,255,255,.18),transparent 60%);
+  }
+  #guides-page .guide-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  #guides-page .guide-thumb.placeholder{
+    display:grid;
+    place-items:center;
+    background:rgba(15,23,42,.96);
+  }
+  #guides-page .guide-meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:.45rem;
+  }
+  #guides-page .guide-meta-right{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.3rem;
+    justify-content:flex-end;
+  }
+  #guides-page .guide-summary{
+    font-size:.86rem;
+    color:rgba(226,232,240,.86);
+  }
+  #guides-page .guide-footer{
+    margin-top:.35rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:.8rem;
+  }
+
+  @media (max-width:900px){
+    #guides-page .guides-hero{
+      flex-direction:column;
+      align-items:flex-start;
+    }
+    #guides-page .guides-hero-actions{
+      flex-direction:row;
+      align-items:center;
+      justify-content:flex-start;
+      flex-wrap:wrap;
+    }
+  }
+</style>
+
+<section id="guides-page" class="section">
+  <!-- HERO -->
+  <div class="guides-hero">
+    <div class="guides-hero-main">
+      <p class="guides-kicker">GUÍAS DEL NEXO</p>
+      <h1 class="h1-glow text-2xl md:text-3xl flex items-center gap-2">
+        <i class="fa-solid fa-compass"></i> Guías y estrategias
+      </h1>
+      <p class="guides-hero-text mt-2">
+        Rutas recomendadas, combinaciones de emblemas y consejos rápidos para avanzar
+        en <strong>El Nexo de los Ecos</strong> sin salir del Códex.
+      </p>
+    </div>
+
+    <div class="guides-hero-actions">
+      <a href="{% url 'codex:index' %}" class="btn-ghost">
+        <i class="fa-solid fa-book mr-1"></i> Volver al Códex
+      </a>
+      {% if page_obj.paginator.count %}
+        <span class="text-white/60 text-xs">
+          {{ page_obj.paginator.count }} guías disponibles
+        </span>
       {% endif %}
+    </div>
+  </div>
 
-      <header class="mt-3">
-        <div class="flex items-center justify-between gap-2">
-          <h3 class="card-title">{{ g.title }}</h3>
-          <div class="flex items-center gap-2">
-            {% if g.domain %}<span class="chip"><i class="fa-solid fa-scroll mr-1"></i>{{ g.domain.name }}</span>{% endif %}
-            {% if g.read_time %}<span class="tag">{{ g.read_time }} min</span>{% endif %}
+  <!-- LISTADO -->
+  <section class="guide-grid">
+    {% for g in page_obj %}
+      <article class="card guide-card">
+        {% if g.cover_image %}
+          <div class="guide-thumb">
+            <img src="{{ g.cover_image.url }}" alt="{{ g.title }}">
           </div>
-        </div>
-        {% if g.summary %}
-          <p class="text-white/60 text-sm mt-1">{{ g.summary|truncatechars:140 }}</p>
+        {% else %}
+          <div class="guide-thumb placeholder">
+            <img src="{% static 'img/placeholders/cover.png' %}" alt="" style="height:52px;opacity:.7">
+          </div>
         {% endif %}
-      </header>
 
-      <footer class="mt-3 flex items-center justify-between">
-        <a class="link-soft" href="{% url 'codex:guide_detail' g.slug %}">
-          Leer guía <i class="fa-solid fa-arrow-right ml-1"></i>
-        </a>
-        {% if g.updated %}
-          <span class="text-white/50 text-xs">Actualizada {{ g.updated|date:"d M Y" }}</span>
-        {% endif %}
-      </footer>
-    </article>
-  {% empty %}
-    <p class="text-white/70">Aún no hay guías cargadas.</p>
-  {% endfor %}
+        <header class="mt-2 guide-header">
+          <div class="guide-meta-row">
+            <h3 class="card-title">{{ g.title }}</h3>
+            <div class="guide-meta-right">
+              {% if g.domain %}
+                <span class="chip text-xs">
+                  <i class="fa-solid fa-scroll mr-1"></i>{{ g.domain.name }}
+                </span>
+              {% endif %}
+              {% if g.read_time %}
+                <span class="tag text-xs">
+                  <i class="fa-regular fa-clock mr-1"></i>{{ g.read_time }} min
+                </span>
+              {% endif %}
+            </div>
+          </div>
+
+          {% if g.summary %}
+            <p class="guide-summary mt-1">
+              {{ g.summary|truncatechars:140 }}
+            </p>
+          {% endif %}
+        </header>
+
+        <footer class="guide-footer">
+          <a class="link-soft" href="{% url 'codex:guide_detail' g.slug %}">
+            Leer guía <i class="fa-solid fa-arrow-right ml-1"></i>
+          </a>
+          {% if g.updated %}
+            <span class="text-white/50 text-xs">
+              Actualizada {{ g.updated|date:"d M Y" }}
+            </span>
+          {% endif %}
+        </footer>
+      </article>
+    {% empty %}
+      <p class="text-white/70">Aún no hay guías cargadas.</p>
+    {% endfor %}
+  </section>
+
+  <!-- Paginación -->
+  {% if page_obj.has_other_pages %}
+  <nav class="mt-6 flex items-center gap-2">
+    {% if page_obj.has_previous %}
+      <a class="btn-ghost" href="?page={{ page_obj.previous_page_number }}">‹ Anterior</a>
+    {% endif %}
+    <span class="text-white/60">
+      Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+    </span>
+    {% if page_obj.has_next %}
+      <a class="btn-ghost" href="?page={{ page_obj.next_page_number }}">Siguiente ›</a>
+    {% endif %}
+  </nav>
+  {% endif %}
 </section>
-
-{% if page_obj.has_other_pages %}
-<nav class="mt-6 flex items-center gap-2">
-  {% if page_obj.has_previous %}
-    <a class="btn-ghost" href="?page={{ page_obj.previous_page_number }}">‹ Anterior</a>
-  {% endif %}
-  <span class="text-white/60">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-  {% if page_obj.has_next %}
-    <a class="btn-ghost" href="?page={{ page_obj.next_page_number }}">Siguiente ›</a>
-  {% endif %}
-</nav>
-{% endif %}
 {% endblock %}

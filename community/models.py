@@ -31,9 +31,7 @@ class Post(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(
-                f"{self.title}-{self.author_id}-{int(time.time())}"
-            )
+            self.slug = slugify(f"{self.title}-{self.author_id}-{int(time.time())}")
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -45,7 +43,6 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
-    # Helpers para las plantillas
     @property
     def comments_count(self):
         return self.comments.filter(is_removed=False).count()
@@ -62,6 +59,14 @@ class Comment(models.Model):
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="comments"
     )
+    # NUEVO: jerarquía de comentarios
+    parent = models.ForeignKey(
+        "self",
+        related_name="replies",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
     body = models.TextField(max_length=1000)
     created = models.DateTimeField(auto_now_add=True)
     is_removed = models.BooleanField(default=False)
@@ -76,14 +81,17 @@ class Comment(models.Model):
     def reactions_count(self):
         return self.reactions.count()
 
+    @property
+    def is_root(self):
+        return self.parent_id is None
 
-# ========= NUEVOS MODELOS DE REACCIONES =========
 
 class PostReaction(models.Model):
     REACTION_CHOICES = (
         ("like", "Me gusta"),
-        ("fire", "🔥 Épico"),
         ("gg", "GG"),
+        ("wow", "Wow"),
+        ("salt", "Salado"),
     )
 
     post = models.ForeignKey(
@@ -108,8 +116,9 @@ class PostReaction(models.Model):
 class CommentReaction(models.Model):
     REACTION_CHOICES = (
         ("like", "Me gusta"),
-        ("fire", "🔥 Épico"),
         ("gg", "GG"),
+        ("wow", "Wow"),
+        ("salt", "Salado"),
     )
 
     comment = models.ForeignKey(
@@ -131,7 +140,8 @@ class CommentReaction(models.Model):
         return f"{self.user} → Comment#{self.comment_id} ({self.reaction})"
 
 
-# ========= FOROS (tal como ya los tenías) =========
+# ========= FOROS =========
+
 
 class Forum(models.Model):
     title = models.CharField(max_length=120)

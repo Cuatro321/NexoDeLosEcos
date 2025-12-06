@@ -3,96 +3,227 @@
 {% block title %}{{ item.title }} · Guía{% endblock %}
 
 {% block content %}
-<section class="section">
-  <!-- BREADCRUMB -->
-  <nav class="text-white/60 text-sm mb-2">
-    <a href="{% url 'codex:index' %}" class="link-soft">Códex</a>
-    <span class="mx-1">/</span>
-    <a href="{% url 'codex:guides_index' %}" class="link-soft">Guías</a>
-    <span class="mx-1">/</span>
-    <span class="text-white">{{ item.title }}</span>
-  </nav>
+<style>
+  /* ===== Guía detalle (local) ===== */
+  #guide-detail .breadcrumb{
+    font-size:.8rem;
+    color:rgba(148,163,184,.9);
+  }
 
-  <article class="card">
-    <header>
-      <h1 class="h1-glow text-3xl">{{ item.title }}</h1>
+  #guide-detail .guide-article{
+    border-radius:20px;
+    padding:1.3rem 1.4rem 1.5rem;
+    border:1px solid rgba(148,163,184,.55);
+    background:rgba(15,23,42,.98);
+    box-shadow:0 24px 60px rgba(15,23,42,.95);
+  }
 
-      <div class="flex flex-wrap items-center gap-2 text-sm mt-2">
-        {% if item.domain %}
-          <span class="chip">
-            <i class="fa-solid fa-scroll mr-1"></i>
-            <a class="link-soft" href="{{ item.domain.get_absolute_url }}">{{ item.domain.name }}</a>
-          </span>
-        {% endif %}
-        {% if item.read_time %}<span class="tag">{{ item.read_time }} min</span>{% endif %}
-        {% if item.updated %}
-          <span class="text-white/50">Actualizada {{ item.updated|date:"d M Y" }}</span>
+  #guide-detail .guide-hero{
+    border-radius:16px;
+    padding:1.1rem 1.2rem 1.25rem;
+    margin:-.2rem -0.2rem 1.1rem;
+    background:
+      radial-gradient(circle at top left,rgba(56,189,248,.42),transparent 55%),
+      radial-gradient(circle at bottom right,rgba(250,204,21,.30),transparent 60%),
+      #020617;
+    border:1px solid rgba(148,163,184,.6);
+    display:grid;
+    grid-template-columns:minmax(0,1.6fr) minmax(0,1.2fr);
+    gap:1.2rem;
+  }
+
+  #guide-detail .guide-kicker{
+    font-size:.78rem;
+    letter-spacing:.25em;
+    text-transform:uppercase;
+    color:rgba(148,163,184,.9);
+    margin-bottom:.3rem;
+  }
+
+  #guide-detail .guide-hero h1{margin:0 0 .4rem;}
+
+  #guide-detail .guide-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.4rem;
+    margin-top:.4rem;
+    font-size:.78rem;
+  }
+  #guide-detail .guide-pill{
+    padding:.22rem .75rem;
+    border-radius:999px;
+    border:1px solid rgba(148,163,184,.9);
+    background:rgba(15,23,42,.95);
+    display:inline-flex;
+    align-items:center;
+    gap:.35rem;
+  }
+
+  #guide-detail .guide-cover{
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid rgba(148,163,184,.75);
+    aspect-ratio:16/9;
+    background:radial-gradient(circle at 20% 0,rgba(255,255,255,.18),transparent 60%);
+  }
+  #guide-detail .guide-cover img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
+  #guide-detail .guide-summary{
+    color:rgba(226,232,240,.9);
+    font-size:.92rem;
+    margin-top:.6rem;
+  }
+
+  #guide-detail .guide-body{
+    margin-top:.6rem;
+  }
+
+  #guide-detail .guide-related{
+    margin-top:1.2rem;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:1rem;
+  }
+  #guide-detail .guide-related-section ul{
+    margin-top:.35rem;
+    padding-left:1.2rem;
+    font-size:.9rem;
+  }
+
+  @media (max-width:1024px){
+    #guide-detail .guide-hero{
+      grid-template-columns:1fr;
+    }
+  }
+  @media (max-width:900px){
+    #guide-detail .guide-related{
+      grid-template-columns:1fr;
+    }
+  }
+</style>
+
+<section id="guide-detail" class="section">
+  <!-- Breadcrumb + botón volver -->
+  <div class="flex items-center justify-between mb-3 gap-3">
+    <nav class="breadcrumb">
+      <a href="{% url 'codex:index' %}" class="link-soft">Códex</a>
+      <span class="mx-1">/</span>
+      <a href="{% url 'codex:guides_index' %}" class="link-soft">Guías</a>
+      <span class="mx-1">/</span>
+      <span class="text-white">{{ item.title }}</span>
+    </nav>
+
+    <a href="{% url 'codex:guides_index' %}" class="btn-ghost">
+      <i class="fa-solid fa-arrow-left mr-1"></i> Volver a Guías
+    </a>
+  </div>
+
+  <article class="guide-article card">
+    <!-- HERO -->
+    <header class="guide-hero">
+      <div>
+        <p class="guide-kicker">GUÍA DEL NEXO</p>
+        <h1 class="h1-glow text-2xl md:text-3xl">{{ item.title }}</h1>
+
+        <div class="guide-meta">
+          {% if item.domain %}
+            <span class="guide-pill">
+              <i class="fa-solid fa-scroll"></i>
+              <a class="link-soft" href="{{ item.domain.get_absolute_url }}">{{ item.domain.name }}</a>
+            </span>
+          {% endif %}
+          {% if item.read_time %}
+            <span class="guide-pill">
+              <i class="fa-regular fa-clock"></i>{{ item.read_time }} min
+            </span>
+          {% endif %}
+          {% if item.updated %}
+            <span class="guide-pill">
+              <i class="fa-regular fa-pen-to-square"></i>
+              Actualizada {{ item.updated|date:"d M Y" }}
+            </span>
+          {% endif %}
+        </div>
+
+        {% if item.summary %}
+          <p class="guide-summary">
+            {{ item.summary }}
+          </p>
         {% endif %}
       </div>
 
       {% if item.cover_image %}
-        <div class="mt-3" style="aspect-ratio:16/9;overflow:hidden;border:1px solid var(--line);border-radius:.5rem">
-          <img src="{{ item.cover_image.url }}" alt="" style="width:100%;height:100%;object-fit:cover">
-        </div>
-      {% endif %}
-
-      {% if item.summary %}
-        <p class="text-white/70 mt-3">{{ item.summary }}</p>
+        <figure class="guide-cover">
+          <img src="{{ item.cover_image.url }}" alt="{{ item.title }}">
+        </figure>
       {% endif %}
     </header>
 
-    <div class="hr-soft"></div>
-
     <!-- CUERPO -->
-    <div class="prose prose-invert max-w-none">
-      {{ item.body|linebreaks }}
-    </div>
+    <section class="guide-body">
+      <div class="prose prose-invert max-w-none">
+        {{ item.body|linebreaks }}
+      </div>
+    </section>
 
     <div class="hr-soft"></div>
 
     <!-- TAGS -->
     {% if item.tags %}
-      <p class="text-white/50 text-sm">Tags: {{ item.tags }}</p>
+      <p class="text-white/50 text-sm">
+        <i class="fa-solid fa-tags mr-2"></i>Tags: {{ item.tags }}
+      </p>
+      <div class="hr-soft"></div>
     {% endif %}
 
     <!-- RELACIONADOS -->
     {% with arts=item.related_artifacts.all chars=item.related_characters.all enems=item.related_enemies.all %}
       {% if arts or chars or enems %}
-        <div class="hr-soft"></div>
-        <div class="grid md:grid-cols-3 gap-3">
+        <section class="guide-related">
           {% if arts %}
-            <section>
-              <h3 class="card-title"><i class="fa-solid fa-gem"></i> Emblemas</h3>
-              <ul class="list-disc ml-5">
+            <div class="guide-related-section">
+              <h3 class="card-title">
+                <i class="fa-solid fa-gem mr-1"></i> Emblemas
+              </h3>
+              <ul class="list-disc">
                 {% for a in arts %}
                   <li><a class="link-soft" href="{{ a.get_absolute_url }}">{{ a.name }}</a></li>
                 {% endfor %}
               </ul>
-            </section>
+            </div>
           {% endif %}
 
           {% if chars %}
-            <section>
-              <h3 class="card-title"><i class="fa-solid fa-user-ninja"></i> Personajes</h3>
-              <ul class="list-disc ml-5">
+            <div class="guide-related-section">
+              <h3 class="card-title">
+                <i class="fa-solid fa-user-ninja mr-1"></i> Personajes
+              </h3>
+              <ul class="list-disc">
                 {% for c in chars %}
                   <li><a class="link-soft" href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>
                 {% endfor %}
               </ul>
-            </section>
+            </div>
           {% endif %}
 
           {% if enems %}
-            <section>
-              <h3 class="card-title"><i class="fa-solid fa-skull"></i> Enemigos</h3>
-              <ul class="list-disc ml-5">
+            <div class="guide-related-section">
+              <h3 class="card-title">
+                <i class="fa-solid fa-skull mr-1"></i> Enemigos
+              </h3>
+              <ul class="list-disc">
                 {% for e in enems %}
                   <li><a class="link-soft" href="{{ e.get_absolute_url }}">{{ e.name }}</a></li>
                 {% endfor %}
               </ul>
-            </section>
+            </div>
           {% endif %}
-        </div>
+        </section>
       {% endif %}
     {% endwith %}
   </article>

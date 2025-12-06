@@ -1,30 +1,220 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Artefactos · Códex{% endblock %}
+
 {% block content %}
-<section class="section">
-  <h1 class="h1-glow text-3xl">Artefactos</h1>
-  <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+<style>
+  /* ===== Artefactos index (local) ===== */
+  #artifacts-page .lead{
+    color:rgba(241,245,249,.82);
+    font-size:.9rem;
+  }
+
+  .artifacts-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:1rem;
+    margin-bottom:1.6rem;
+  }
+  .artifacts-header h1{margin:0;}
+
+  .artifacts-toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.5rem;
+    justify-content:flex-end;
+  }
+
+  .artifact-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(210px,240px));
+    gap:1.3rem;
+    justify-content:flex-start;
+  }
+
+  .artifact-card{
+    position:relative;
+    border-radius:18px;
+    padding:.9rem .9rem .85rem;
+    background:
+      radial-gradient(circle at top, rgba(234,179,8,.26), transparent 55%),
+      radial-gradient(circle at bottom, rgba(96,165,250,.20), transparent 60%),
+      #020617;
+    border:1px solid rgba(148,163,184,.4);
+    box-shadow:0 18px 42px rgba(15,23,42,.95);
+    display:flex;
+    flex-direction:column;
+    gap:.55rem;
+    text-decoration:none;
+    color:inherit;
+    transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+  }
+  .artifact-card::before{
+    content:"";
+    position:absolute;
+    inset:-1px;
+    border-radius:inherit;
+    pointer-events:none;
+    background:conic-gradient(from 200deg,
+      rgba(250,204,21,.8),
+      rgba(96,165,250,.35),
+      rgba(15,23,42,1),
+      rgba(250,204,21,.8));
+    opacity:.12;
+  }
+  .artifact-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 24px 55px rgba(15,23,42,1);
+    border-color:rgba(250,204,21,.9);
+  }
+
+  .artifact-thumb{
+    border-radius:14px;
+    border:1px solid rgba(148,163,184,.55);
+    background:
+      radial-gradient(circle at 40% 20%,rgba(255,255,255,.28),transparent 60%),
+      radial-gradient(circle at 70% 85%,rgba(250,204,21,.45),transparent 60%),
+      #020617;
+    aspect-ratio:1/1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .artifact-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    image-rendering:pixelated;
+  }
+
+  .artifact-name-row{
+    display:flex;
+    justify-content:space-between;
+    gap:.35rem;
+    align-items:flex-start;
+  }
+  .artifact-name-row h3{
+    margin:0;
+    font-size:.96rem;
+  }
+
+  .artifact-domain-chip{
+    padding:.16rem .55rem;
+    border-radius:999px;
+    border:1px solid rgba(148,163,184,.85);
+    background:rgba(15,23,42,.96);
+    font-size:.7rem;
+    white-space:nowrap;
+    max-width:55%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .artifact-quote{
+    font-size:.8rem;
+    color:rgba(226,232,240,.9);
+    min-height:2.6em;
+  }
+  .artifact-meta{
+    margin-top:.2rem;
+    font-size:.75rem;
+    color:rgba(209,213,219,.9);
+    display:flex;
+    justify-content:space-between;
+    gap:.5rem;
+    align-items:center;
+  }
+  .artifact-rarity{
+    padding:.15rem .55rem;
+    border-radius:999px;
+    border:1px solid rgba(251,191,36,.9);
+    background:rgba(15,23,42,.96);
+    font-size:.7rem;
+    white-space:nowrap;
+  }
+
+  @media (max-width:768px){
+    .artifacts-header{
+      flex-direction:column;
+      align-items:flex-start;
+    }
+    .artifacts-toolbar{
+      justify-content:flex-start;
+    }
+  }
+</style>
+
+<section id="artifacts-page" class="section">
+  <div class="artifacts-header">
+    <div>
+      <h1 class="h1-glow text-2xl md:text-3xl">
+        <i class="fa-regular fa-gem mr-2"></i>Artefactos
+      </h1>
+      <p class="lead mt-1">
+        Reliquias, armas y objetos únicos del Nexo. Consulta su historia, rareza y usos recomendados.
+      </p>
+    </div>
+
+    <div class="artifacts-toolbar">
+      <a href="{% url 'codex:index' %}" class="btn-ghost">
+        <i class="fa-solid fa-book mr-1"></i> Volver al Códex
+      </a>
+    </div>
+  </div>
+
+  <div class="artifact-grid">
     {% for a in page_obj %}
-    <a class="card" href="{{ a.get_absolute_url }}">
-      {% if a.gif %}
-        <img src="{{ a.gif.url }}" alt="" style="width:100%;object-fit:contain">
-      {% elif a.image %}
-        <img src="{{ a.image.url }}" alt="" style="width:100%;object-fit:contain">
-      {% endif %}
-      <h3 class="mt-2">{{ a.name }}</h3>
-      <p class="text-white/60 text-sm">{{ a.quote }}</p>
-      {% if a.domain %}<span class="tag mt-2">{{ a.domain.name }}</span>{% endif %}
-    </a>
+      <a class="artifact-card" href="{{ a.get_absolute_url }}">
+        <div class="artifact-thumb">
+          {% if a.gif %}
+            <img src="{{ a.gif.url }}" alt="{{ a.name }}">
+          {% elif a.image %}
+            <img src="{{ a.image.url }}" alt="{{ a.name }}">
+          {% else %}
+            <img src="{% static 'img/placeholders/artifact.png' %}" alt="{{ a.name }}">
+          {% endif %}
+        </div>
+
+        <div class="artifact-name-row mt-2">
+          <h3 class="card-title">{{ a.name }}</h3>
+          {% if a.domain %}
+            <span class="artifact-domain-chip">
+              <i class="fa-solid fa-mountain mr-1"></i>{{ a.domain.name }}
+            </span>
+          {% endif %}
+        </div>
+
+        {% if a.quote %}
+          <p class="artifact-quote italic">“{{ a.quote|truncatechars:110 }}”</p>
+        {% else %}
+          <p class="artifact-quote">Artefacto del Nexo sin cita registrada.</p>
+        {% endif %}
+
+        <div class="artifact-meta">
+          {% if a.get_rarity_display %}
+            <span class="artifact-rarity">{{ a.get_rarity_display }}</span>
+          {% endif %}
+          <span class="text-xs text-white/50 flex-1 text-right">
+            Ver detalles →
+          </span>
+        </div>
+      </a>
     {% empty %}
-    <p class="text-white/60">Aún no hay artefactos.</p>
+      <p class="text-white/60">Aún no hay artefactos.</p>
     {% endfor %}
   </div>
 
   {% if page_obj.has_other_pages %}
   <nav class="mt-6 flex items-center gap-2">
-    {% if page_obj.has_previous %}<a class="btn-ghost" href="?page={{ page_obj.previous_page_number }}">‹ Anterior</a>{% endif %}
+    {% if page_obj.has_previous %}
+      <a class="btn-ghost" href="?page={{ page_obj.previous_page_number }}">‹ Anterior</a>
+    {% endif %}
     <span class="text-white/60">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}<a class="btn-ghost" href="?page={{ page_obj.next_page_number }}">Siguiente ›</a>{% endif %}
+    {% if page_obj.has_next %}
+      <a class="btn-ghost" href="?page={{ page_obj.next_page_number }}">Siguiente ›</a>
+    {% endif %}
   </nav>
   {% endif %}
 </section>

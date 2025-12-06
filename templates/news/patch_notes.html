@@ -3,38 +3,197 @@
 {% block title %}Notas de parche{% endblock %}
 
 {% block content %}
-<section class="section">
-  <h1 class="h1-glow text-3xl"><i class="fa-solid fa-screwdriver-wrench mr-2"></i> Notas de parche</h1>
-  <div class="grid md:grid-cols-2 gap-5 mt-4">
+<style>
+  /* ===== Patch notes listado (local) ===== */
+  #patch-notes-page .patch-hero{
+    border-radius:20px;
+    padding:1.3rem 1.5rem 1.5rem;
+    border:1px solid rgba(148,163,184,.55);
+    background:
+      radial-gradient(circle at top left,rgba(59,130,246,.4),transparent 55%),
+      radial-gradient(circle at bottom right,rgba(251,191,36,.35),transparent 60%),
+      #020617;
+    box-shadow:0 24px 60px rgba(15,23,42,.95);
+    display:flex;
+    justify-content:space-between;
+    gap:1.25rem;
+    align-items:flex-start;
+    margin-bottom:1.6rem;
+  }
+  #patch-notes-page .patch-hero-main h1{margin:0 0 .35rem;}
+  #patch-notes-page .patch-hero-sub{
+    color:rgba(226,232,240,.9);
+    font-size:.9rem;
+  }
+  #patch-notes-page .patch-hero-meta{
+    margin-top:.6rem;
+    font-size:.8rem;
+    color:rgba(148,163,184,.9);
+  }
+  #patch-notes-page .patch-hero-side{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:.4rem;
+  }
+  @media (max-width:900px){
+    #patch-notes-page .patch-hero{
+      flex-direction:column;
+      align-items:flex-start;
+    }
+    #patch-notes-page .patch-hero-side{
+      align-items:flex-start;
+    }
+  }
+
+  #patch-notes-page .patch-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:1.1rem;
+  }
+
+  #patch-notes-page .patch-card{
+    border-radius:16px;
+    padding:1rem 1rem .9rem;
+    background:rgba(15,23,42,.97);
+    border:1px solid rgba(31,41,55,.9);
+    box-shadow:0 18px 40px rgba(0,0,0,.85);
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  #patch-notes-page .patch-card:hover{
+    transform:translateY(-3px);
+    border-color:rgba(250,204,21,.9);
+    box-shadow:0 22px 55px rgba(0,0,0,.95);
+  }
+
+  #patch-notes-page .patch-head{
+    display:flex;
+    justify-content:space-between;
+    gap:.8rem;
+    align-items:flex-start;
+  }
+  #patch-notes-page .patch-title{
+    font-size:1rem;
+    font-weight:600;
+  }
+
+  #patch-notes-page .patch-meta{
+    margin-top:.35rem;
+    font-size:.78rem;
+    color:rgba(148,163,184,.9);
+  }
+
+  #patch-notes-page .patch-version{
+    display:inline-flex;
+    align-items:center;
+    gap:.3rem;
+    padding:.16rem .6rem;
+    border-radius:999px;
+    font-size:.75rem;
+    background:rgba(15,23,42,.95);
+    border:1px solid rgba(251,191,36,.9);
+    color:#facc15;
+    white-space:nowrap;
+  }
+
+  #patch-notes-page .patch-thumb{
+    width:90px;
+    height:56px;
+    border-radius:10px;
+    overflow:hidden;
+    border:1px solid rgba(148,163,184,.35);
+    flex-shrink:0;
+  }
+  #patch-notes-page .patch-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+
+  #patch-notes-page .patch-summary{
+    margin-top:.45rem;
+    font-size:.85rem;
+    color:rgba(226,232,240,.88);
+  }
+
+  #patch-notes-page .pagination-bar{
+    margin-top:1.6rem;
+    display:flex;
+    flex-wrap:wrap;
+    gap:.75rem;
+    align-items:center;
+    font-size:.85rem;
+  }
+</style>
+
+<section id="patch-notes-page" class="section">
+  <!-- HERO -->
+  <header class="patch-hero">
+    <div class="patch-hero-main">
+      <h1 class="h1-glow text-2xl md:text-3xl">
+        <i class="fa-solid fa-screwdriver-wrench mr-2"></i> Notas de parche
+      </h1>
+      <p class="patch-hero-sub">
+        Cambios de balance, correcciones de errores y mejoras del juego,
+        agrupados por versión del Nexo.
+      </p>
+      <p class="patch-hero-meta">
+        <i class="fa-solid fa-code-branch mr-1"></i>
+        {{ page_obj.paginator.count }} registros de actualización.
+      </p>
+    </div>
+    <div class="patch-hero-side">
+      <a href="{% url 'news:index' %}" class="btn-ghost">
+        <i class="fa-solid fa-newspaper mr-1"></i> Volver a Noticias
+      </a>
+    </div>
+  </header>
+
+  <!-- LISTADO -->
+  <section class="patch-list">
     {% for a in page_obj %}
-      <a class="card hover-card" href="{{ a.get_absolute_url }}">
-        <div class="flex items-start justify-between gap-3">
+      <a class="card patch-card" href="{{ a.get_absolute_url }}">
+        <div class="patch-head">
           <div>
-            <h3 class="text-xl font-semibold">{{ a.title }}</h3>
-            <p class="text-white/60 text-sm mt-1">
-              {% if a.version %}<span class="chip mr-2">{{ a.version }}</span>{% endif %}
-              <i class="fa-regular fa-clock mr-1"></i> {{ a.publish_at|naturaltime }} · {{ a.reading_time }} min
+            <h3 class="patch-title">{{ a.title }}</h3>
+            <p class="patch-meta">
+              {% if a.version %}
+                <span class="patch-version">
+                  <i class="fa-solid fa-code-branch"></i> {{ a.version }}
+                </span>
+                ·
+              {% endif %}
+              <i class="fa-regular fa-clock mr-1"></i>{{ a.publish_at|naturaltime }} · {{ a.reading_time }} min
             </p>
           </div>
           {% if a.hero_image %}
-            <div class="w-28 h-16 rounded-md overflow-hidden border border-white/10">
-              <img src="{{ a.hero_image.url }}" style="width:100%;height:100%;object-fit:cover">
+            <div class="patch-thumb">
+              <img src="{{ a.hero_image.url }}" alt="">
             </div>
           {% endif %}
         </div>
-        <p class="text-white/70 mt-2 line-clamp-3">{{ a.summary }}</p>
+        {% if a.summary %}
+          <p class="patch-summary line-clamp-3">{{ a.summary }}</p>
+        {% endif %}
       </a>
     {% empty %}
       <p class="text-white/60">No hay notas de parche aún.</p>
     {% endfor %}
-  </div>
+  </section>
 
+  <!-- PAGINACIÓN -->
   {% if page_obj.has_other_pages %}
-  <nav class="mt-6 flex items-center gap-2">
-    {% if page_obj.has_previous %}<a class="btn-ghost" href="?page={{ page_obj.previous_page_number }}">‹ Anterior</a>{% endif %}
-    <span class="text-white/60">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}<a class="btn-ghost" href="?page={{ page_obj.next_page_number }}">Siguiente ›</a>{% endif %}
-  </nav>
+    <nav class="pagination-bar">
+      {% if page_obj.has_previous %}
+        <a class="btn-ghost" href="?page={{ page_obj.previous_page_number }}">‹ Anterior</a>
+      {% endif %}
+      <span class="text-white/60">
+        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+      </span>
+      {% if page_obj.has_next %}
+        <a class="btn-ghost" href="?page={{ page_obj.next_page_number }}">Siguiente ›</a>
+      {% endif %}
+    </nav>
   {% endif %}
 </section>
 {% endblock %}

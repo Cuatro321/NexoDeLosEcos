@@ -1,4 +1,3 @@
-/* simple progressive service worker */
 const CACHE_STATIC = 'nexo-static-v3';
 const CORE_ASSETS = [
   '/', '/offline/',
@@ -22,7 +21,7 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
-// Network-first para documentos HTML
+
 async function networkFirst(req) {
   try {
     const fresh = await fetch(req);
@@ -37,7 +36,7 @@ async function networkFirst(req) {
   }
 }
 
-// Stale-while-revalidate para estáticos
+
 async function swr(req) {
   const cache = await caches.open(CACHE_STATIC);
   const cached = await cache.match(req);

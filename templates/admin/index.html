@@ -1,40 +1,68 @@
 {% extends "admin/base_site.html" %}
 {% load i18n static %}
 
+{% block extrastyle %}
+  {{ block.super }}
+  {# CSS específico del dashboard #}
+  <link rel="stylesheet" href="{% static 'admin_custom/nexo_admin.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="nx-dashboard">
+<div class="nx-wrap">
   <header class="nx-hero">
-    <div>
-      <h1 class="nx-hero__title">Centro de control</h1>
-      <p class="nx-hero__sub">Gestiona contenido del Códex, Comunidad y Noticias con una interfaz rápida y clara.</p>
+    <div class="nx-hero-main">
+      <small>Panel del Nexo</small>
+      <h1 class="nx-hero-title">Centro de control</h1>
+      <p class="nx-hero-lead">
+        Gestiona el Códex, la Comunidad y las Noticias con una vista rápida y clara, pensada para el flujo de trabajo diario.
+      </p>
+      <p class="nx-hero-meta">
+        {{ app_list|length }} aplicaciones registradas · Sesión: {{ user.get_short_name|default:user.username }}
+      </p>
     </div>
-    <a href="/" class="nx-btn nx-btn--primary">⤴ Ver sitio</a>
+
+    <div class="nx-hero-actions">
+      <a href="/" class="nx-btn nx-btn-primary">Ver sitio</a>
+      <a href="{% url 'admin:password_change' %}" class="nx-btn nx-btn-ghost">Seguridad</a>
+    </div>
   </header>
 
-  <div class="nx-panels">
-    {% for app in app_list %}
-      <section class="nx-card nx-fade">
-        <header class="nx-card__head">
-          <h2>{{ app.name }}</h2>
-          <a href="{{ app.app_url }}" class="nx-chip">Ver todos</a>
-        </header>
+  {% if app_list %}
+    <section class="nx-grid">
+      {% for app in app_list %}
+        <article class="nx-card">
+          <header class="nx-card-head">
+            <div>
+              <p class="nx-card-kicker">{{ app.app_label|upper }}</p>
+              <h2 class="nx-card-title">{{ app.name }}</h2>
+            </div>
+            <a href="{{ app.app_url }}" class="nx-chip-link">
+              {% trans "Ver todo" %}
+            </a>
+          </header>
 
-        <ul class="nx-resources">
-          {% for model in app.models %}
-            <li class="nx-resource">
-              <div class="nx-resource__name">
-                <span class="nx-dot"></span>
-                <a href="{{ model.admin_url }}">{{ model.name }}</a>
-              </div>
-              <div class="nx-actions">
-                {% if model.add_url %}<a class="nx-btn nx-btn--ghost" href="{{ model.add_url }}">+ Añadir</a>{% endif %}
-                {% if model.admin_url %}<a class="nx-btn nx-btn--ghost" href="{{ model.admin_url }}">✎ Cambiar</a>{% endif %}
-              </div>
-            </li>
-          {% endfor %}
-        </ul>
-      </section>
-    {% endfor %}
-  </div>
+          <ul class="nx-model-list">
+            {% for model in app.models %}
+              <li class="nx-model-row">
+                <span class="nx-model-name">{{ model.name }}</span>
+                <span class="nx-model-actions">
+                  {% if model.add_url %}
+                    <a href="{{ model.add_url }}" class="nx-pill nx-pill-main">Añadir</a>
+                  {% endif %}
+                  {% if model.admin_url %}
+                    <a href="{{ model.admin_url }}" class="nx-pill nx-pill-soft">Administrar</a>
+                  {% endif %}
+                </span>
+              </li>
+            {% endfor %}
+          </ul>
+        </article>
+      {% endfor %}
+    </section>
+  {% else %}
+    <p class="nx-empty">
+      {% trans "No hay aplicaciones registradas en el panel de administración." %}
+    </p>
+  {% endif %}
 </div>
 {% endblock %}

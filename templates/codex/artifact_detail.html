@@ -1,34 +1,249 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}{{ item.name }} · Artefacto{% endblock %}
+
 {% block content %}
-<section class="section">
-  <div class="card">
-    <h1 class="h1-glow text-3xl">{{ item.name }}</h1>
-    {% if item.domain %}<p class="text-white/60">Dominio: <a class="link-soft" href="{{ item.domain.get_absolute_url }}">{{ item.domain.name }}</a></p>{% endif %}
-    {% if item.quote %}<p class="text-white/70 italic mt-1">“{{ item.quote }}”</p>{% endif %}
-    <div class="mt-3">
-      {% if item.gif %}
-        <img src="{{ item.gif.url }}" alt="" style="max-width:320px">
-      {% elif item.image %}
-        <img src="{{ item.image.url }}" alt="" style="max-width:320px">
+<style>
+  /* ===== Artefacto detail (local) ===== */
+  #artifact-detail .top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:1rem;
+    margin-bottom:1.2rem;
+  }
+
+  .artifact-hero{
+    border-radius:20px;
+    padding:1.4rem 1.5rem;
+    background:
+      radial-gradient(circle at top left,rgba(250,204,21,.55),transparent 55%),
+      radial-gradient(circle at bottom right,rgba(56,189,248,.45),transparent 60%),
+      #020617;
+    border:1px solid rgba(148,163,184,.45);
+    box-shadow:0 22px 60px rgba(15,23,42,.95);
+    display:grid;
+    grid-template-columns:minmax(0,260px) minmax(0,1fr);
+    gap:1.5rem;
+    margin-bottom:1.6rem;
+  }
+
+  .artifact-hero-left{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:.75rem;
+  }
+  .artifact-hero-thumb{
+    border-radius:18px;
+    border:1px solid rgba(148,163,184,.7);
+    background:
+      radial-gradient(circle at 40% 20%,rgba(255,255,255,.28),transparent 60%),
+      radial-gradient(circle at 70% 85%,rgba(250,204,21,.6),transparent 60%),
+      #020617;
+    aspect-ratio:1/1;
+    width:100%;
+    max-width:260px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .artifact-hero-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    image-rendering:pixelated;
+  }
+
+  .artifact-hero-right h1{
+    margin:0 0 .4rem;
+  }
+
+  .artifact-pill-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.35rem;
+    font-size:.78rem;
+    margin-bottom:.4rem;
+  }
+  .artifact-pill{
+    padding:.18rem .6rem;
+    border-radius:999px;
+    border:1px solid rgba(148,163,184,.75);
+    background:rgba(15,23,42,.96);
+    display:inline-flex;
+    align-items:center;
+    gap:.3rem;
+  }
+  .artifact-pill--rarity{
+    border-color:rgba(250,204,21,.9);
+    color:#fef9c3;
+  }
+
+  .artifact-quote{
+    margin-top:.6rem;
+    font-style:italic;
+    color:rgba(226,232,240,.94);
+  }
+
+  .artifact-meta-line{
+    font-size:.8rem;
+    color:rgba(209,213,219,.92);
+    margin-top:.45rem;
+  }
+
+  .artifact-layout{
+    display:grid;
+    grid-template-columns:2fr minmax(0,1.1fr);
+    gap:1.4rem;
+  }
+  .artifact-main,
+  .artifact-aside{
+    border-radius:18px;
+    border:1px solid rgba(148,163,184,.35);
+    background:rgba(15,23,42,.96);
+    padding:1.15rem 1.2rem 1.25rem;
+    box-shadow:0 18px 45px rgba(15,23,42,.9);
+  }
+
+  .artifact-main-media{
+    margin-top:1rem;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid rgba(148,163,184,.55);
+  }
+  .artifact-main-media video{
+    width:100%;
+    height:100%;
+    display:block;
+  }
+
+  .artifact-aside .card{
+    background:rgba(15,23,42,.95);
+    border-radius:14px;
+    border:1px solid rgba(148,163,184,.35);
+    padding:.8rem .9rem .9rem;
+  }
+
+  @media (max-width:1024px){
+    .artifact-hero{
+      grid-template-columns:1fr;
+    }
+  }
+  @media (max-width:900px){
+    .artifact-layout{
+      grid-template-columns:1fr;
+    }
+  }
+</style>
+
+<section id="artifact-detail" class="section">
+  <div class="top-bar">
+    <div>
+      <a href="{% url 'codex:artifacts_index' %}" class="btn-ghost mr-2">
+        <i class="fa-solid fa-arrow-left mr-1"></i> Volver a artefactos
+      </a>
+      <a href="{% url 'codex:index' %}" class="btn-ghost">
+        <i class="fa-solid fa-book mr-1"></i> Volver al Códex
+      </a>
+    </div>
+  </div>
+
+  <section class="artifact-hero">
+    <div class="artifact-hero-left">
+      <div class="artifact-hero-thumb">
+        {% if item.gif %}
+          <img src="{{ item.gif.url }}" alt="{{ item.name }}">
+        {% elif item.image %}
+          <img src="{{ item.image.url }}" alt="{{ item.name }}">
+        {% else %}
+          <img src="{% static 'img/placeholders/artifact.png' %}" alt="{{ item.name }}">
+        {% endif %}
+      </div>
+
+      {% if item.domain %}
+        <span class="artifact-pill mt-1">
+          <i class="fa-solid fa-mountain"></i>
+          Dominio:
+          <a class="link-soft" href="{{ item.domain.get_absolute_url }}">{{ item.domain.name }}</a>
+        </span>
       {% endif %}
     </div>
-    {% if item.video_url %}
-    <video class="mt-3" controls style="width:100%;border-radius:.5rem;border:1px solid var(--line)">
-      <source src="{{ item.video_url }}" type="video/mp4">
-    </video>
-    {% endif %}
 
-    {% if item.description %}
-      <div class="prose mt-4">{{ item.description|linebreaks }}</div>
-    {% endif %}
-    {% if item.usage %}
-      <div class="hr-soft"></div>
-      <h3 class="card-title">Uso recomendado</h3>
-      <div class="prose">{{ item.usage|linebreaks }}</div>
-    {% endif %}
-    <div class="hr-soft"></div>
-    <p class="text-white/60 text-sm">Rareza: {{ item.get_rarity_display }}{% if item.bearer %} · Portador: {{ item.bearer }}{% endif %}{% if item.epoch %} · Época: {{ item.epoch }}{% endif %}</p>
+    <div class="artifact-hero-right">
+      <p class="text-xs tracking-[.25em] text-white/50 mb-1">ARTEFACTO DEL NEXO</p>
+      <h1 class="h1-glow text-3xl">{{ item.name }}</h1>
+
+      <div class="artifact-pill-row">
+        {% if item.get_rarity_display %}
+          <span class="artifact-pill artifact-pill--rarity">
+            <i class="fa-regular fa-star"></i> {{ item.get_rarity_display }}
+          </span>
+        {% endif %}
+        {% if item.epoch %}
+          <span class="artifact-pill">
+            <i class="fa-solid fa-hourglass-half"></i> Época: {{ item.epoch }}
+          </span>
+        {% endif %}
+        {% if item.bearer %}
+          <span class="artifact-pill">
+            <i class="fa-solid fa-user"></i> Portador: {{ item.bearer }}
+          </span>
+        {% endif %}
+      </div>
+
+      {% if item.quote %}
+        <p class="artifact-quote">“{{ item.quote }}”</p>
+      {% endif %}
+
+      <p class="artifact-meta-line">
+        Artefacto único del Nexo. Consulta abajo su historia y recomendaciones de uso.
+      </p>
+    </div>
+  </section>
+
+  <div class="artifact-layout">
+    <article class="artifact-main">
+      <h3 class="card-title"><i class="fa-solid fa-scroll mr-2"></i> Historia y descripción</h3>
+
+      {% if item.video_url %}
+        <div class="artifact-main-media mt-3">
+          <video controls>
+            <source src="{{ item.video_url }}" type="video/mp4">
+          </video>
+        </div>
+      {% endif %}
+
+      {% if item.description %}
+        <div class="prose mt-4">
+          {{ item.description|linebreaks }}
+        </div>
+      {% else %}
+        <p class="text-white/60 mt-4">Este artefacto aún no tiene una descripción completa.</p>
+      {% endif %}
+    </article>
+
+    <aside class="artifact-aside">
+      <h3 class="card-title"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Uso recomendado</h3>
+
+      {% if item.usage %}
+        <div class="prose mt-2">
+          {{ item.usage|linebreaks }}
+        </div>
+      {% else %}
+        <p class="text-white/60 mt-2">Todavía no se han definido estrategias de uso para este artefacto.</p>
+      {% endif %}
+
+      <div class="hr-soft my-4"></div>
+
+      <h3 class="card-title"><i class="fa-solid fa-circle-info mr-2"></i> Detalles</h3>
+      <p class="text-white/70 text-sm mt-2">
+        Rareza: {{ item.get_rarity_display|default:"Desconocida" }}
+        {% if item.bearer %} · Portador: {{ item.bearer }}{% endif %}
+        {% if item.epoch %} · Época: {{ item.epoch }}{% endif %}
+      </p>
+    </aside>
   </div>
 </section>
 {% endblock %}

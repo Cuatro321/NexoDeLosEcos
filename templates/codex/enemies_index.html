@@ -1,28 +1,209 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Enemigos · Códex{% endblock %}
+
 {% block content %}
-<section class="section">
-  <h1 class="h1-glow text-3xl">Enemigos</h1>
-  <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-4">
+<style>
+  /* ===== Enemigos index (local) ===== */
+  #enemies-page .lead {
+    color: rgba(241,245,249,.8);
+    font-size: .9rem;
+  }
+
+  .enemies-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:1rem;
+    margin-bottom:1.5rem;
+  }
+  .enemies-header h1{
+    margin:0;
+  }
+
+  .enemies-toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.5rem;
+    justify-content:flex-end;
+  }
+
+  .enemies-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,230px));
+    gap:1.3rem;
+    justify-content:flex-start;
+  }
+
+  .enemy-card{
+    position:relative;
+    border-radius:18px;
+    padding:0.85rem 0.9rem 0.8rem;
+    background:
+      radial-gradient(circle at top, rgba(248,113,113,.18), transparent 55%),
+      radial-gradient(circle at bottom, rgba(59,130,246,.18), transparent 50%),
+      #020617;
+    border:1px solid rgba(148,163,184,.35);
+    box-shadow:0 18px 40px rgba(15,23,42,.85);
+    display:flex;
+    flex-direction:column;
+    gap:.55rem;
+    text-align:left;
+    transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+  }
+  .enemy-card::before{
+    content:"";
+    position:absolute;
+    inset:-1px;
+    border-radius:inherit;
+    pointer-events:none;
+    background:conic-gradient(from 160deg,
+      rgba(248,113,113,.55),
+      rgba(129,140,248,.25),
+      rgba(15,23,42,1),
+      rgba(248,113,113,.55));
+    opacity:.10;
+  }
+  .enemy-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 22px 52px rgba(15,23,42,.95);
+    border-color:rgba(248,113,113,.85);
+  }
+
+  .enemy-thumb{
+    border-radius:14px;
+    border:1px solid rgba(148,163,184,.45);
+    background:
+      radial-gradient(circle at 35% 20%,rgba(255,255,255,.2),transparent 60%),
+      radial-gradient(circle at 70% 85%,rgba(239,68,68,.35),transparent 55%),
+      #020617;
+    aspect-ratio:4/3;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .enemy-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    image-rendering:pixelated;
+  }
+
+  .enemy-name-row{
+    display:flex;
+    justify-content:space-between;
+    gap:.35rem;
+    align-items:flex-start;
+  }
+  .enemy-name-row h3{
+    margin:0;
+    font-size:.95rem;
+  }
+
+  .enemy-domain-chip{
+    padding:.12rem .55rem;
+    border-radius:999px;
+    border:1px solid rgba(148,163,184,.7);
+    background:rgba(15,23,42,.96);
+    font-size:.7rem;
+    white-space:nowrap;
+    max-width:60%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .enemy-meta{
+    font-size:.8rem;
+    color:rgba(203,213,225,.95);
+  }
+  .enemy-link{
+    margin-top:.2rem;
+    font-size:.78rem;
+    display:inline-flex;
+    align-items:center;
+    gap:.25rem;
+  }
+
+  @media (max-width:768px){
+    .enemies-header{
+      flex-direction:column;
+      align-items:flex-start;
+    }
+    .enemies-toolbar{
+      justify-content:flex-start;
+    }
+  }
+</style>
+
+<section id="enemies-page" class="section">
+  <div class="enemies-header">
+    <div>
+      <h1 class="h1-glow text-2xl md:text-3xl">
+        <i class="fa-solid fa-skull-crossbones mr-2"></i>Enemigos
+      </h1>
+      <p class="lead mt-1">
+        Bestiario del Nexo: criaturas hostiles, patrones de ataque y dominios de origen.
+      </p>
+    </div>
+    <div class="enemies-toolbar">
+      <a href="{% url 'codex:index' %}" class="btn-ghost">
+        <i class="fa-solid fa-book mr-1"></i> Volver al Códex
+      </a>
+    </div>
+  </div>
+
+  <div class="enemies-grid">
     {% for e in page_obj %}
-    <a class="card text-center" href="{{ e.get_absolute_url }}">
-      {% if e.sprite_gif %}
-        <img src="{{ e.sprite_gif.url }}" alt="" style="width:100%;object-fit:contain">
-      {% elif e.sprite_still %}
-        <img src="{{ e.sprite_still.url }}" alt="" style="width:100%;object-fit:contain">
-      {% endif %}
-      <div class="mt-1 font-semibold">{{ e.name }}</div>
-      {% if e.domain %}<div class="text-white/60 text-sm">{{ e.domain.name }}</div>{% endif %}
-    </a>
+      <article class="enemy-card">
+        <a href="{{ e.get_absolute_url }}">
+          <div class="enemy-thumb">
+            {% if e.sprite_gif %}
+              <img src="{{ e.sprite_gif.url }}" alt="{{ e.name }}">
+            {% elif e.sprite_still %}
+              <img src="{{ e.sprite_still.url }}" alt="{{ e.name }}">
+            {% elif e.image_full %}
+              <img src="{{ e.image_full.url }}" alt="{{ e.name }}">
+            {% else %}
+              <img src="{% static 'img/placeholders/enemy.png' %}" alt="{{ e.name }}">
+            {% endif %}
+          </div>
+        </a>
+
+        <div class="enemy-name-row mt-2">
+          <h3 class="card-title">{{ e.name }}</h3>
+          {% if e.domain %}
+            <span class="enemy-domain-chip">
+              <i class="fa-solid fa-mountain mr-1"></i>{{ e.domain.name }}
+            </span>
+          {% endif %}
+        </div>
+
+        <div class="enemy-meta">
+          {% if e.summary %}
+            {{ e.summary|truncatechars:110 }}
+          {% else %}
+            Criatura hostil del Nexo.
+          {% endif %}
+        </div>
+
+        <a class="enemy-link link-soft" href="{{ e.get_absolute_url }}">
+          Ver detalles <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </article>
     {% empty %}
-    <p class="text-white/60">No hay enemigos.</p>
+      <p class="text-white/60">No hay enemigos registrados aún.</p>
     {% endfor %}
   </div>
+
   {% if page_obj.has_other_pages %}
   <nav class="mt-6 flex items-center gap-2">
-    {% if page_obj.has_previous %}<a class="btn-ghost" href="?page={{ page_obj.previous_page_number }}">‹ Anterior</a>{% endif %}
+    {% if page_obj.has_previous %}
+      <a class="btn-ghost" href="?page={{ page_obj.previous_page_number }}">‹ Anterior</a>
+    {% endif %}
     <span class="text-white/60">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}<a class="btn-ghost" href="?page={{ page_obj.next_page_number }}">Siguiente ›</a>{% endif %}
+    {% if page_obj.has_next %}
+      <a class="btn-ghost" href="?page={{ page_obj.next_page_number }}">Siguiente ›</a>
+    {% endif %}
   </nav>
   {% endif %}
 </section>

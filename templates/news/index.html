@@ -2,132 +2,639 @@
 {% load humanize %}
 {% block title %}Noticias{% endblock %}
 
+{% block head %}
+<style>
+  /* ===== Layout general ===== */
+  .news-hero {
+    margin-bottom: 1.75rem;
+    padding: 1.5rem 1.75rem;
+    border-radius: 20px;
+    background:
+      radial-gradient(circle at top left, rgba(56,189,248,.25), transparent 55%),
+      radial-gradient(circle at bottom right, rgba(147,51,234,.25), transparent 60%),
+      rgba(15,23,42,.96);
+    box-shadow:
+      0 24px 60px rgba(0,0,0,.8),
+      0 0 0 1px rgba(148,163,184,.35);
+    position: relative;
+    overflow: hidden;
+  }
+  .news-hero::after{
+    content:"";
+    position:absolute;
+    inset:-1px;
+    border-radius:inherit;
+    background:conic-gradient(from 160deg,
+      rgba(56,189,248,.4),
+      rgba(129,140,248,.45),
+      rgba(236,72,153,.5),
+      rgba(56,189,248,.4));
+    opacity:.14;
+    pointer-events:none;
+  }
+  .news-hero-inner{
+    position:relative;
+    z-index:1;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:1.5rem;
+  }
+  .news-hero-main{
+    max-width:540px;
+  }
+  .news-hero-title{
+    font-size:1.8rem;
+    font-weight:700;
+  }
+  .news-hero-sub{
+    margin-top:.35rem;
+    color:rgba(226,232,240,.8);
+    font-size:.9rem;
+  }
+  .news-hero-meta{
+    margin-top:.75rem;
+    display:flex;
+    flex-wrap:wrap;
+    gap:.75rem;
+    font-size:.8rem;
+    color:rgba(148,163,184,.9);
+  }
+
+  /* ===== Search pill ===== */
+  .news-search-wrap{
+    display:flex;
+    flex-direction:column;
+    gap:.75rem;
+    min-width:260px;
+    max-width:360px;
+    margin-left:auto;
+  }
+  @media (max-width: 900px){
+    .news-search-wrap{
+      width:100%;
+      max-width:none;
+    }
+  }
+  .news-search-label{
+    font-size:.75rem;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    color:rgba(191,219,254,.9);
+  }
+  .news-search{
+    display:flex;
+    align-items:center;
+    gap:.35rem;
+    padding:.35rem .35rem .35rem .9rem;
+    border-radius:999px;
+    border:1px solid rgba(148,163,184,.6);
+    background:rgba(15,23,42,.95);
+    box-shadow:0 0 22px rgba(15,23,42,.95);
+  }
+  .news-search-icon{
+    color:rgba(148,163,184,.9);
+    font-size:.95rem;
+  }
+  .news-search-input{
+    flex:1;
+    border:none;
+    outline:none;
+    background:transparent;
+    color:#e5e7eb;
+    font-size:.85rem;
+  }
+  .news-search-input::placeholder{
+    color:rgba(148,163,184,.8);
+  }
+  .news-search-btn{
+    border:none;
+    border-radius:999px;
+    padding:.4rem .95rem;
+    background:linear-gradient(135deg,#0284c7,#0ea5e9);
+    color:#e5e7eb;
+    font-weight:600;
+    font-size:.8rem;
+    display:inline-flex;
+    align-items:center;
+    gap:.35rem;
+    box-shadow:0 0 18px rgba(56,189,248,.7);
+    cursor:pointer;
+    white-space:nowrap;
+    transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  }
+  .news-search-btn i{font-size:.85rem;}
+  .news-search-btn:hover{
+    transform:translateY(-1px);
+    box-shadow:0 0 24px rgba(56,189,248,.85);
+    filter:brightness(1.05);
+  }
+
+  /* ===== Filtros / chips ===== */
+  .news-filters {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+  }
+  .news-chip {
+    --chip-bg: rgba(15,23,42,.9);
+    --chip-border: rgba(148,163,184,.55);
+    display:inline-flex;
+    align-items:center;
+    gap:.4rem;
+    padding:.25rem .75rem;
+    border-radius:999px;
+    font-size:.78rem;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    border:1px solid var(--chip-border);
+    background:var(--chip-bg);
+    color:rgba(209,213,219,.9);
+    cursor:pointer;
+    transition:background .15s ease, box-shadow .15s ease, transform .15s ease;
+  }
+  .news-chip i{font-size:.85rem;}
+  .news-chip:hover{
+    text-decoration:none;
+    box-shadow:0 0 18px rgba(56,189,248,.45);
+    transform:translateY(-1px);
+  }
+  .news-chip.is-active{
+    background:linear-gradient(135deg, var(--accent), #22d3ee);
+    border-color:transparent;
+    color:#0f172a;
+    box-shadow:0 0 22px rgba(234,179,8,.55);
+  }
+
+  /* ===== Feature ===== */
+  .news-feature {
+    margin-top: 1.75rem;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    background:
+      radial-gradient(circle at top left, rgba(251,191,36,.32), transparent 55%),
+      radial-gradient(circle at bottom right, rgba(59,130,246,.3), transparent 55%),
+      rgba(15,23,42,.98);
+    box-shadow:
+      0 24px 60px rgba(0,0,0,.85),
+      0 0 0 1px rgba(148,163,184,.35);
+  }
+  .news-feature-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);
+    gap:1.25rem;
+  }
+  @media (max-width: 900px){
+    .news-feature-grid{
+      grid-template-columns:minmax(0,1fr);
+    }
+  }
+  .news-feature-body{
+    padding:1.5rem 1.75rem 1.5rem 1.75rem;
+    position:relative;
+    z-index:1;
+  }
+  .news-feature-label{
+    font-size:.8rem;
+    text-transform:uppercase;
+    letter-spacing:.15em;
+    color:#a5f3fc;
+  }
+  .news-feature-title{
+    margin-top:.4rem;
+    font-size:1.5rem;
+    font-weight:700;
+  }
+  .news-feature-summary{
+    margin-top:.6rem;
+    font-size:.9rem;
+    color:rgba(226,232,240,.9);
+  }
+  .news-feature-meta{
+    margin-top:.75rem;
+    font-size:.8rem;
+    color:rgba(148,163,184,.95);
+    display:flex;
+    flex-wrap:wrap;
+    gap:.5rem;
+    align-items:center;
+  }
+  .news-feature-tag{
+    display:inline-flex;
+    align-items:center;
+    gap:.35rem;
+    padding:.15rem .6rem;
+    border-radius:999px;
+    font-size:.7rem;
+    background:rgba(15,23,42,.9);
+    border:1px solid rgba(148,163,184,.65);
+  }
+  .news-feature-media{
+    position:relative;
+    padding:1.25rem 1.25rem 1.25rem 0;
+  }
+  @media (max-width: 900px){
+    .news-feature-media{
+      padding:0 1.25rem 1.25rem 1.25rem;
+    }
+  }
+  .news-feature-thumb{
+    width:100%;
+    height:100%;
+    min-height:220px;
+    border-radius:16px;
+    overflow:hidden;
+    border:1px solid rgba(148,163,184,.45);
+    box-shadow:0 18px 40px rgba(15,23,42,.9);
+  }
+  .news-feature-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    transform:scale(1.02);
+    transition:transform .4s ease;
+  }
+  .news-feature:hover .news-feature-thumb img{
+    transform:scale(1.06);
+  }
+  .floating-orb{
+    position:absolute;
+    right:-30px;
+    bottom:-30px;
+    width:160px;
+    height:160px;
+    border-radius:100%;
+    background:radial-gradient(closest-side, rgba(255,255,255,.22), rgba(255,255,255,0));
+    filter:blur(4px);
+    animation:floaty 4s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes floaty {0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+
+  /* ===== Layout principal: lista + sidebar ===== */
+  .news-layout{
+    margin-top:2rem;
+    display:grid;
+    grid-template-columns:minmax(0,2fr) minmax(0,1fr);
+    gap:1.75rem;
+  }
+  @media (max-width: 1024px){
+    .news-layout{
+      grid-template-columns:minmax(0,1fr);
+    }
+  }
+
+  /* ===== Cards de noticias ===== */
+  .news-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+    gap:1rem;
+  }
+  .news-card{
+    position:relative;
+    border-radius:16px;
+    padding:.9rem;
+    background:rgba(15,23,42,.95);
+    box-shadow:
+      0 18px 35px rgba(0,0,0,.75),
+      0 0 0 1px rgba(15,23,42,.9);
+    overflow:hidden;
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    border:1px solid rgba(31,41,55,.9);
+  }
+  .news-card::after{
+    content:"";
+    position:absolute;
+    inset:-1px;
+    border-radius:inherit;
+    background:radial-gradient(circle at top, rgba(59,130,246,.4), transparent 60%);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .18s ease;
+  }
+  .news-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 22px 40px rgba(0,0,0,.85);
+    border-color:rgba(96,165,250,.8);
+  }
+  .news-card:hover::after{opacity:.4;}
+  .news-card a{display:block;}
+  .news-thumb{
+    aspect-ratio:16/9;
+    border-radius:12px;
+    overflow:hidden;
+    border:1px solid rgba(148,163,184,.35);
+    margin-bottom:.6rem;
+  }
+  .news-thumb img{
+    width:100%;height:100%;object-fit:cover;
+    transition:transform .25s ease;
+  }
+  .news-card:hover .news-thumb img{
+    transform:scale(1.04);
+  }
+  .news-title{
+    font-size:.95rem;
+    font-weight:600;
+  }
+  .news-summary{
+    margin-top:.3rem;
+    font-size:.8rem;
+    color:rgba(209,213,219,.85);
+  }
+  .news-meta{
+    margin-top:.45rem;
+    font-size:.75rem;
+    color:rgba(148,163,184,.95);
+    display:flex;
+    flex-wrap:wrap;
+    gap:.45rem;
+    align-items:center;
+  }
+  .news-meta-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:.3rem;
+    padding:.1rem .5rem;
+    border-radius:999px;
+    background:rgba(15,23,42,.9);
+    border:1px solid rgba(55,65,81,.9);
+    font-size:.7rem;
+  }
+  .news-meta-tag-patch{
+    border-color:rgba(251,191,36,.9);
+    color:#facc15;
+  }
+
+  /* ===== Sidebar (notas de parche) ===== */
+  .news-sidebar{
+    border-radius:18px;
+    padding:1.25rem 1.5rem;
+    background:
+      radial-gradient(circle at top, rgba(56,189,248,.33), transparent 55%),
+      rgba(15,23,42,.98);
+    box-shadow:
+      0 22px 45px rgba(0,0,0,.85),
+      0 0 0 1px rgba(56,189,248,.35);
+  }
+  .news-sidebar h3{
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+    font-size:1rem;
+    font-weight:600;
+  }
+  .news-sidebar ul{
+    margin-top:.75rem;
+    display:flex;
+    flex-direction:column;
+    gap:.45rem;
+    font-size:.82rem;
+  }
+  .news-sidebar li a{
+    display:flex;
+    gap:.4rem;
+    align-items:center;
+  }
+  .news-sidebar-version{
+    display:inline-flex;
+    align-items:center;
+    gap:.25rem;
+    padding:.1rem .45rem;
+    border-radius:999px;
+    font-size:.7rem;
+    background:rgba(15,23,42,.95);
+    border:1px solid rgba(148,163,184,.6);
+  }
+  .news-sidebar-footer{
+    margin-top:1rem;
+    display:flex;
+    justify-content:flex-start;
+  }
+
+  .pagination-bar{
+    margin-top:1.75rem;
+    display:flex;
+    flex-wrap:wrap;
+    gap:.75rem;
+    align-items:center;
+    font-size:.85rem;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <section class="section">
-  <div class="flex items-center justify-between gap-4">
-    <h1 class="h1-glow text-3xl">Noticias</h1>
-    <form method="get" class="flex gap-2 items-center">
-      <input type="text" name="q" value="{{ query }}" placeholder="Buscar..." class="input" style="min-width:220px">
-      <button class="btn-ghost"><i class="fa-solid fa-magnifying-glass mr-2"></i>Buscar</button>
-    </form>
-  </div>
 
-  <!-- Chips de categorías -->
-  <div class="mt-3 flex flex-wrap gap-2">
-    <a href="{% url 'news:index' %}" class="tag {% if not current_category %}is-active{% endif %}">Todas</a>
-    {% for c in categories %}
-      <a href="?categoria={{ c.slug }}" class="tag {% if current_category == c.slug %}is-active{% endif %}" style="--chip: {{ c.color|default:'var(--accent)' }}">
-        {% if c.icon %}<i class="{{ c.icon }} mr-1"></i>{% endif %}{{ c.name }}
-      </a>
-    {% endfor %}
-  </div>
+  <!-- ===== Hero Noticias ===== -->
+  <header class="news-hero">
+    <div class="news-hero-inner">
+      <div class="news-hero-main">
+        <p class="kicker">Noticias</p>
+        <h1 class="h1-glow news-hero-title">Feed del Nexo</h1>
+        <p class="news-hero-sub">
+          Actualizaciones oficiales del juego, notas de parche y anuncios importantes del Nexo.
+        </p>
+        <div class="news-hero-meta">
+          <span><i class="fa-solid fa-newspaper mr-1"></i>{{ page_obj.paginator.count }} artículos</span>
+          {% if current_category %}
+            <span><i class="fa-solid fa-folder-tree mr-1"></i>Filtrando por categoría</span>
+          {% endif %}
+          {% if query %}
+            <span><i class="fa-solid fa-magnifying-glass mr-1"></i>Buscando: “{{ query }}”</span>
+          {% endif %}
+        </div>
 
-  <!-- Destacado -->
+        <div class="news-filters">
+          <a href="{% url 'news:index' %}"
+             class="news-chip {% if not current_category %}is-active{% endif %}">
+            <i class="fa-solid fa-bars"></i> Todo
+          </a>
+          {% for c in categories %}
+            <a href="?categoria={{ c.slug }}{% if query %}&q={{ query }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}"
+               class="news-chip {% if current_category == c.slug %}is-active{% endif %}"
+               style="--accent: {{ c.color|default:'var(--accent)' }}">
+              {% if c.icon %}
+                <i class="{{ c.icon }}"></i>
+              {% else %}
+                <i class="fa-solid fa-bookmark"></i>
+              {% endif %}
+              {{ c.name }}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="news-search-wrap">
+        <span class="news-search-label">Buscar en noticias</span>
+        <form method="get" class="news-search">
+          {% if current_category %}
+            <input type="hidden" name="categoria" value="{{ current_category }}">
+          {% endif %}
+          {% if current_tag %}
+            <input type="hidden" name="tag" value="{{ current_tag }}">
+          {% endif %}
+          <i class="fa-solid fa-magnifying-glass news-search-icon"></i>
+          <input
+            type="text"
+            name="q"
+            value="{{ query }}"
+            class="news-search-input"
+            placeholder="Buscar noticias del Nexo…">
+          <button type="submit" class="news-search-btn">
+            <i class="fa-solid fa-search"></i>
+            <span>Buscar</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Artículo destacado ===== -->
   {% if featured %}
     {% with a=featured.0 %}
-    <article class="card mt-5 relative overflow-hidden shine-border">
-      <div class="grid md:grid-cols-2 gap-4">
-        <div class="p-4">
-          <p class="kicker">{% if a.is_patch_notes %}Notas de parche{% else %}Destacado{% endif %}</p>
-          <h2 class="text-2xl md:text-3xl font-semibold mb-2">{{ a.title }}</h2>
-          <p class="text-white/70 mb-3">{{ a.summary|default_if_none:"" }}</p>
-          <p class="text-white/50 text-sm mb-4">
-            {% if a.category %}<span class="chip mr-2">{{ a.category.name }}</span>{% endif %}
-            <i class="fa-regular fa-clock mr-1"></i>{{ a.publish_at|naturaltime }} · {{ a.reading_time }} min
+    <article class="news-feature">
+      <div class="news-feature-grid">
+        <div class="news-feature-body">
+          <p class="news-feature-label">
+            {% if a.is_patch_notes %}Notas de parche destacadas{% else %}Destacado del Nexo{% endif %}
           </p>
-          <a class="lol-button" href="{{ a.get_absolute_url }}">
-            <span class="lol-button-text"><i class="fa-solid fa-arrow-right mr-2"></i>Leer</span>
-            <span class="lol-button-shine"></span>
-          </a>
-        </div>
-        <div class="relative">
-          {% if a.banner_image %}
-            <img src="{{ a.banner_image.url }}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:.5rem">
-            <div class="floating-orb"></div>
-          {% elif a.hero_image %}
-            <img src="{{ a.hero_image.url }}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:.5rem">
-          {% else %}
-            <div class="h-full w-full rounded-lg border border-white/10 flex items-center justify-center text-white/40">Sin imagen</div>
+          <h2 class="news-feature-title">{{ a.title }}</h2>
+          {% if a.summary %}
+            <p class="news-feature-summary">{{ a.summary }}</p>
           {% endif %}
+          <div class="news-feature-meta">
+            {% if a.category %}
+              <span class="news-feature-tag">
+                <i class="fa-solid fa-bookmark"></i> {{ a.category.name }}
+              </span>
+            {% endif %}
+            <span><i class="fa-regular fa-clock mr-1"></i>{{ a.publish_at|naturaltime }}</span>
+            <span>· {{ a.reading_time }} min de lectura</span>
+          </div>
+          <div class="mt-4">
+            <a class="lol-button" href="{{ a.get_absolute_url }}">
+              <span class="lol-button-text">
+                <i class="fa-solid fa-arrow-right mr-2"></i>Leer artículo
+              </span>
+              <span class="lol-button-shine"></span>
+            </a>
+          </div>
+        </div>
+        <div class="news-feature-media">
+          <div class="news-feature-thumb">
+            {% if a.banner_image %}
+              <img src="{{ a.banner_image.url }}" alt="">
+            {% elif a.hero_image %}
+              <img src="{{ a.hero_image.url }}" alt="">
+            {% else %}
+              <div class="w-full h-full flex items-center justify-center text-white/40">
+                Sin imagen
+              </div>
+            {% endif %}
+          </div>
+          <div class="floating-orb"></div>
         </div>
       </div>
     </article>
     {% endwith %}
   {% endif %}
 
-  <div class="grid md:grid-cols-3 gap-5 mt-5">
-    <!-- Columna izquierda: últimas notas de parche -->
-    <aside class="card order-last md:order-first">
-      <h3 class="card-title"><i class="fa-solid fa-screwdriver-wrench"></i> Notas de parche</h3>
-      <ul class="space-y-2">
-        {% for p in latest_patch_notes %}
-          <li>
-            <a class="link-soft" href="{{ p.get_absolute_url }}">
-              {% if p.version %}<span class="chip mr-1">{{ p.version }}</span>{% endif %}
-              {{ p.title }}
-            </a>
-          </li>
-        {% empty %}
-          <li class="text-white/60">—</li>
-        {% endfor %}
-      </ul>
-      <a class="btn-ghost mt-3 inline-block" href="{% url 'news:patch_notes' %}">
-        <i class="fa-regular fa-file-lines mr-2"></i>Ver todo
-      </a>
-    </aside>
+  <!-- ===== Layout principal: lista + sidebar ===== -->
+  <div class="news-layout">
 
     <!-- Listado principal -->
-    <section class="md:col-span-2 grid sm:grid-cols-2 gap-5">
+    <section class="news-grid">
       {% for a in page_obj %}
-      <article class="card hover-card">
-        <a href="{{ a.get_absolute_url }}">
-          <div class="aspect-[16/9] overflow-hidden rounded-md border border-white/10 mb-2">
-            {% if a.hero_image %}
-              <img src="{{ a.hero_image.url }}" alt="" style="width:100%;height:100%;object-fit:cover">
-            {% elif a.banner_image %}
-              <img src="{{ a.banner_image.url }}" alt="" style="width:100%;height:100%;object-fit:cover">
-            {% else %}
-              <div class="w-full h-full flex items-center justify-center text-white/30">Sin imagen</div>
+        <article class="news-card">
+          <a href="{{ a.get_absolute_url }}">
+            <div class="news-thumb">
+              {% if a.hero_image %}
+                <img src="{{ a.hero_image.url }}" alt="">
+              {% elif a.banner_image %}
+                <img src="{{ a.banner_image.url }}" alt="">
+              {% else %}
+                <div class="w-full h-full flex items-center justify-center text-white/30">
+                  Sin imagen
+                </div>
+              {% endif %}
+            </div>
+            <h4 class="news-title">{{ a.title }}</h4>
+            {% if a.summary %}
+              <p class="news-summary line-clamp-2">{{ a.summary }}</p>
             {% endif %}
-          </div>
-          <h4 class="font-semibold">{{ a.title }}</h4>
-          <p class="text-white/60 text-sm mt-1 line-clamp-2">{{ a.summary|default_if_none:"" }}</p>
-          <p class="text-white/50 text-xs mt-2">
-            {% if a.category %}<span class="chip mr-2">{{ a.category.name }}</span>{% endif %}
-            {{ a.publish_at|date:"M d, Y" }} · {{ a.reading_time }} min
-          </p>
-        </a>
-      </article>
+            <div class="news-meta">
+              {% if a.category %}
+                <span class="news-meta-chip">
+                  <i class="fa-solid fa-bookmark"></i> {{ a.category.name }}
+                </span>
+              {% endif %}
+              {% if a.is_patch_notes %}
+                <span class="news-meta-chip news-meta-tag-patch">
+                  <i class="fa-solid fa-screwdriver-wrench"></i> Notas de parche
+                </span>
+              {% endif %}
+              <span>
+                <i class="fa-regular fa-clock mr-1"></i>{{ a.publish_at|date:"M d, Y" }} · {{ a.reading_time }} min
+              </span>
+            </div>
+          </a>
+        </article>
       {% empty %}
         <p class="text-white/60">Aún no hay noticias.</p>
       {% endfor %}
     </section>
+
+    <!-- Sidebar: últimas notas de parche -->
+    <aside class="news-sidebar">
+      <h3><i class="fa-solid fa-screwdriver-wrench"></i> Últimas notas de parche</h3>
+      <ul>
+        {% for p in latest_patch_notes %}
+          <li>
+            <a class="link-soft" href="{{ p.get_absolute_url }}">
+              {% if p.version %}
+                <span class="news-sidebar-version">
+                  <i class="fa-solid fa-code-branch"></i> {{ p.version }}
+                </span>
+              {% endif %}
+              <span>{{ p.title }}</span>
+            </a>
+          </li>
+        {% empty %}
+          <li class="text-white/60">No hay notas de parche aún.</li>
+        {% endfor %}
+      </ul>
+      <div class="news-sidebar-footer">
+        <a class="btn-ghost inline-flex items-center" href="{% url 'news:patch_notes' %}">
+          <i class="fa-regular fa-file-lines mr-2"></i>Ver todas las notas
+        </a>
+      </div>
+    </aside>
   </div>
 
+  <!-- ===== Paginación ===== -->
   {% if page_obj.has_other_pages %}
-  <nav class="mt-6 flex items-center gap-2">
-    {% if page_obj.has_previous %}
-      <a class="btn-ghost" href="?page={{ page_obj.previous_page_number }}{% if current_category %}&categoria={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}{% if query %}&q={{ query }}{% endif %}">‹ Anterior</a>
-    {% endif %}
-    <span class="text-white/60">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}
-      <a class="btn-ghost" href="?page={{ page_obj.next_page_number }}{% if current_category %}&categoria={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}{% if query %}&q={{ query }}{% endif %}">Siguiente ›</a>
-    {% endif %}
-  </nav>
+    <nav class="pagination-bar">
+      {% if page_obj.has_previous %}
+        <a class="btn-ghost"
+           href="?page={{ page_obj.previous_page_number }}{% if current_category %}&categoria={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}{% if query %}&q={{ query }}{% endif %}">
+          ‹ Anterior
+        </a>
+      {% endif %}
+      <span class="text-white/60">
+        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+      </span>
+      {% if page_obj.has_next %}
+        <a class="btn-ghost"
+           href="?page={{ page_obj.next_page_number }}{% if current_category %}&categoria={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}{% if query %}&q={{ query }}{% endif %}">
+          Siguiente ›
+        </a>
+      {% endif %}
+    </nav>
   {% endif %}
-</section>
 
-<style>
-/* Efectos visuales ligeros */
-@keyframes floaty { 0%{transform:translateY(0)} 50%{transform:translateY(-6px)} 100%{transform:translateY(0)}}
-.floating-orb{position:absolute;right:-30px;bottom:-30px;width:160px;height:160px;border-radius:100%;
-background:radial-gradient(closest-side, rgba(255,255,255,.18), rgba(255,255,255,0));filter:blur(4px);animation:floaty 4s ease-in-out infinite;}
-.shine-border{position:relative}
-.shine-border::after{content:"";position:absolute;inset:0;border-radius:12px;
-background:conic-gradient(from 180deg at 50% 50%, rgba(255,255,255,.18), transparent 30%, transparent 70%, rgba(255,255,255,.18));
-mask:linear-gradient(#0000, #000, #0000);-webkit-mask:linear-gradient(#0000, #000, #0000);opacity:.6;pointer-events:none}
-.hover-card{transition:transform .2s ease, box-shadow .2s ease}
-.hover-card:hover{transform:translateY(-3px)}
-.tag.is-active{box-shadow:inset 0 0 0 1px var(--accent); color:#fff}
-</style>
+</section>
 {% endblock %}

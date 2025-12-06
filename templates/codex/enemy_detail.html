@@ -1,57 +1,252 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}{{ item.name }} · Enemigo{% endblock %}
-{% block content %}
-<section class="section">
-  <div class="grid lg:grid-cols-3 gap-5">
-    <article class="card lg:col-span-2">
-      <h1 class="h1-glow text-3xl">{{ item.name }}</h1>
-      {% if item.domain %}<p class="text-white/60">Dominio: <a class="link-soft" href="{{ item.domain.get_absolute_url }}">{{ item.domain.name }}</a></p>{% endif %}
 
-      <div class="mt-3">
+{% block content %}
+<style>
+  /* ===== Enemy detail (local) ===== */
+  #enemy-detail .top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:1rem;
+    margin-bottom:1.25rem;
+  }
+
+  .enemy-hero{
+    border-radius:20px;
+    padding:1.4rem 1.5rem;
+    background:
+      radial-gradient(circle at top left,rgba(248,113,113,.40),transparent 55%),
+      radial-gradient(circle at bottom right,rgba(30,64,175,.45),transparent 60%),
+      #020617;
+    border:1px solid rgba(148,163,184,.45);
+    box-shadow:0 22px 60px rgba(15,23,42,.95);
+    display:grid;
+    grid-template-columns:minmax(0,260px) minmax(0,1fr);
+    gap:1.4rem;
+    margin-bottom:1.5rem;
+  }
+  .enemy-hero-left{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:.75rem;
+  }
+  .enemy-hero-sprite{
+    border-radius:16px;
+    border:1px solid rgba(148,163,184,.7);
+    background:
+      radial-gradient(circle at 30% 20%,rgba(255,255,255,.22),transparent 60%),
+      radial-gradient(circle at 75% 85%,rgba(239,68,68,.5),transparent 55%),
+      #020617;
+    aspect-ratio:4/3;
+    width:100%;
+    max-width:260px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .enemy-hero-sprite img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    image-rendering:pixelated;
+  }
+
+  .enemy-hero-right h1{
+    margin:0 0 .35rem;
+  }
+  .enemy-pill-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.35rem;
+    font-size:.78rem;
+    margin-bottom:.4rem;
+  }
+  .enemy-pill{
+    padding:.18rem .6rem;
+    border-radius:999px;
+    border:1px solid rgba(148,163,184,.65);
+    background:rgba(15,23,42,.96);
+    display:inline-flex;
+    align-items:center;
+    gap:.3rem;
+  }
+  .enemy-tag-danger{
+    border-color:rgba(248,113,113,.8);
+    color:#fecaca;
+  }
+  .enemy-short{
+    margin-top:.4rem;
+    color:rgba(226,232,240,.92);
+    font-size:.9rem;
+  }
+
+  .enemy-layout{
+    display:grid;
+    grid-template-columns:2fr minmax(0,1.1fr);
+    gap:1.4rem;
+  }
+  .enemy-main, .enemy-aside{
+    border-radius:18px;
+    border:1px solid rgba(148,163,184,.35);
+    background:rgba(15,23,42,.96);
+    padding:1.1rem 1.2rem 1.2rem;
+    box-shadow:0 18px 45px rgba(15,23,42,.9);
+  }
+
+  .enemy-main-media{
+    margin-top:1rem;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid rgba(148,163,184,.55);
+  }
+  .enemy-main-media img,
+  .enemy-main-media video{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
+  .enemy-aside .card{
+    background:rgba(15,23,42,.95);
+    border-radius:14px;
+    border:1px solid rgba(148,163,184,.35);
+    padding:.7rem .8rem .8rem;
+  }
+
+  @media (max-width:1024px){
+    .enemy-hero{
+      grid-template-columns:1fr;
+      text-align:left;
+    }
+  }
+  @media (max-width:900px){
+    .enemy-layout{
+      grid-template-columns:1fr;
+    }
+  }
+</style>
+
+<section id="enemy-detail" class="section">
+  <div class="top-bar">
+    <div>
+      <a href="{% url 'codex:enemies_index' %}" class="btn-ghost mr-2">
+        <i class="fa-solid fa-arrow-left mr-1"></i> Volver a enemigos
+      </a>
+      <a href="{% url 'codex:index' %}" class="btn-ghost">
+        <i class="fa-solid fa-book mr-1"></i> Volver al Códex
+      </a>
+    </div>
+  </div>
+
+  <section class="enemy-hero">
+    <div class="enemy-hero-left">
+      <div class="enemy-hero-sprite">
         {% if item.sprite_gif %}
-          <img src="{{ item.sprite_gif.url }}" alt="" style="max-width:240px">
+          <img src="{{ item.sprite_gif.url }}" alt="{{ item.name }}">
         {% elif item.sprite_still %}
-          <img src="{{ item.sprite_still.url }}" alt="" style="max-width:240px">
+          <img src="{{ item.sprite_still.url }}" alt="{{ item.name }}">
+        {% elif item.image_full %}
+          <img src="{{ item.image_full.url }}" alt="{{ item.name }}">
+        {% else %}
+          <img src="{% static 'img/placeholders/enemy.png' %}" alt="{{ item.name }}">
+        {% endif %}
+      </div>
+      {% if item.domain %}
+        <span class="enemy-pill enemy-tag-danger mt-1">
+          <i class="fa-solid fa-mountain"></i> {{ item.domain.name }}
+        </span>
+      {% endif %}
+    </div>
+
+    <div class="enemy-hero-right">
+      <p class="text-xs tracking-[.25em] text-white/50 mb-1">ENEMIGO DEL NEXO</p>
+      <h1 class="h1-glow text-3xl">{{ item.name }}</h1>
+
+      <div class="enemy-pill-row">
+        <span class="enemy-pill enemy-tag-danger">
+          <i class="fa-solid fa-skull-crossbones"></i> Criatura hostil
+        </span>
+        {% if item.domain %}
+          <span class="enemy-pill">
+            <i class="fa-solid fa-location-dot"></i>
+            Dominio:
+            <a class="link-soft" href="{{ item.domain.get_absolute_url }}">
+              {{ item.domain.name }}
+            </a>
+          </span>
         {% endif %}
       </div>
 
-      {% if item.image_full %}
-      <div class="mt-3" style="aspect-ratio:16/9;overflow:hidden;border:1px solid var(--line);border-radius:.5rem">
-        <img src="{{ item.image_full.url }}" alt="" style="width:100%;height:100%;object-fit:cover">
-      </div>
+      {% if item.description %}
+        <p class="enemy-short">
+          {{ item.description|truncatechars:260 }}
+        </p>
+      {% endif %}
+    </div>
+  </section>
+
+  <div class="enemy-layout">
+    <article class="enemy-main">
+      <h3 class="card-title"><i class="fa-solid fa-book-open mr-2"></i> Historia y detalles</h3>
+
+      {% if item.image_full or item.video_url %}
+        <div class="enemy-main-media mt-3">
+          {% if item.video_url %}
+            <video controls>
+              <source src="{{ item.video_url }}" type="video/mp4">
+            </video>
+          {% elif item.image_full %}
+            <img src="{{ item.image_full.url }}" alt="{{ item.name }}">
+          {% endif %}
+        </div>
       {% endif %}
 
-      {% if item.video_url %}
-      <video class="mt-3" controls style="width:100%;border-radius:.5rem;border:1px solid var(--line)">
-        <source src="{{ item.video_url }}" type="video/mp4">
-      </video>
+      {% if item.description %}
+        <div class="prose mt-4">
+          {{ item.description|linebreaks }}
+        </div>
       {% endif %}
-
-      <div class="prose mt-4">{{ item.description|linebreaks }}</div>
     </article>
 
-    <aside class="card">
-      <h3 class="card-title"><i class="fa-solid fa-burst"></i> Comportamiento</h3>
-      <div class="prose">{{ item.behavior|linebreaks }}</div>
-
-      <div class="hr-soft"></div>
-      <h3 class="card-title"><i class="fa-solid fa-film"></i> Animaciones</h3>
-      <div class="space-y-3">
-        {% for a in item.animations.all %}
-        <div class="card">
-          <strong>{{ a.name }}</strong>
-          <div class="mt-2">
-            {% if a.gif %}
-              <img src="{{ a.gif.url }}" alt="" style="width:100%;object-fit:contain">
-            {% elif a.mp4 %}
-              <video controls style="width:100%;border-radius:.5rem;border:1px solid var(--line)"><source src="{{ a.mp4.url }}" type="video/mp4"></video>
-            {% elif a.webm %}
-              <video controls style="width:100%;border-radius:.5rem;border:1px solid var(--line)"><source src="{{ a.webm.url }}" type="video/webm"></video>
-            {% endif %}
-          </div>
+    <aside class="enemy-aside">
+      <h3 class="card-title"><i class="fa-solid fa-burst mr-2"></i> Comportamiento</h3>
+      {% if item.behavior %}
+        <div class="prose mt-2">
+          {{ item.behavior|linebreaks }}
         </div>
+      {% else %}
+        <p class="text-white/60 mt-2">Aún no se ha registrado su patrón de ataque.</p>
+      {% endif %}
+
+      <div class="hr-soft my-4"></div>
+
+      <h3 class="card-title"><i class="fa-solid fa-film mr-2"></i> Animaciones</h3>
+      <div class="space-y-3 mt-2">
+        {% for a in item.animations.all %}
+          <div class="card">
+            <strong>{{ a.name }}</strong>
+            <div class="mt-2">
+              {% if a.gif %}
+                <img src="{{ a.gif.url }}" alt="{{ a.name }}" style="width:100%;object-fit:contain">
+              {% elif a.mp4 %}
+                <video controls style="width:100%;border-radius:.5rem;border:1px solid var(--line)">
+                  <source src="{{ a.mp4.url }}" type="video/mp4">
+                  {% if a.webm %}<source src="{{ a.webm.url }}" type="video/webm">{% endif %}
+                </video>
+              {% elif a.webm %}
+                <video controls style="width:100%;border-radius:.5rem;border:1px solid var(--line)">
+                  <source src="{{ a.webm.url }}" type="video/webm">
+                </video>
+              {% endif %}
+            </div>
+          </div>
         {% empty %}
-        <p class="text-white/60">Sin animaciones.</p>
+          <p class="text-white/60">Sin animaciones registradas.</p>
         {% endfor %}
       </div>
     </aside>
